@@ -16,6 +16,19 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedChecklistsRouteImport } from './routes/_authenticated/checklists'
 import { Route as AuthenticatedPersonagensRouteImport } from './routes/_authenticated/personagens'
 import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
+import { Route as AuthenticatedChecklistsIndexRouteImport } from './routes/_authenticated/checklists.index'
+import { Route as AuthenticatedChecklistsAcompanhamentoRouteImport } from './routes/_authenticated/checklists.acompanhamento'
+import { Route as AuthenticatedChecklistsLiberacoesRouteImport } from './routes/_authenticated/checklists.liberacoes'
+import { Route as AuthenticatedChecklistsSetoresRouteImport } from './routes/_authenticated/checklists.setores'
+import { Route as AuthenticatedPersonagensIndexRouteImport } from './routes/_authenticated/personagens.index'
+import { Route as AuthenticatedPersonagensBibliotecaRouteImport } from './routes/_authenticated/personagens.biblioteca'
+import { Route as AuthenticatedPersonagensImprimirRouteImport } from './routes/_authenticated/personagens.imprimir'
+import { Route as AuthenticatedPersonagensSimulacaoRouteImport } from './routes/_authenticated/personagens.simulacao'
+import { Route as AuthenticatedChecklistsAvaliacoesIndexRouteImport } from './routes/_authenticated/checklists.avaliacoes.index'
+import { Route as AuthenticatedChecklistsAvaliacoesIdRouteImport } from './routes/_authenticated/checklists.avaliacoes.$id'
+import { Route as AuthenticatedChecklistsModelosIndexRouteImport } from './routes/_authenticated/checklists.modelos.index'
+import { Route as AuthenticatedChecklistsModelosIdRouteImport } from './routes/_authenticated/checklists.modelos.$id'
+import { Route as AuthenticatedPersonagensPersonasIdRouteImport } from './routes/_authenticated/personagens.personas.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,22 +65,124 @@ const AuthenticatedPortalRoute = AuthenticatedPortalRouteImport.update({
   path: '/portal',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedChecklistsIndexRoute =
+  AuthenticatedChecklistsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedChecklistsRoute,
+  } as any)
+const AuthenticatedChecklistsAcompanhamentoRoute =
+  AuthenticatedChecklistsAcompanhamentoRouteImport.update({
+    id: '/acompanhamento',
+    path: '/acompanhamento',
+    getParentRoute: () => AuthenticatedChecklistsRoute,
+  } as any)
+const AuthenticatedChecklistsLiberacoesRoute =
+  AuthenticatedChecklistsLiberacoesRouteImport.update({
+    id: '/liberacoes',
+    path: '/liberacoes',
+    getParentRoute: () => AuthenticatedChecklistsRoute,
+  } as any)
+const AuthenticatedChecklistsSetoresRoute =
+  AuthenticatedChecklistsSetoresRouteImport.update({
+    id: '/setores',
+    path: '/setores',
+    getParentRoute: () => AuthenticatedChecklistsRoute,
+  } as any)
+const AuthenticatedPersonagensIndexRoute =
+  AuthenticatedPersonagensIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedPersonagensRoute,
+  } as any)
+const AuthenticatedPersonagensBibliotecaRoute =
+  AuthenticatedPersonagensBibliotecaRouteImport.update({
+    id: '/biblioteca',
+    path: '/biblioteca',
+    getParentRoute: () => AuthenticatedPersonagensRoute,
+  } as any)
+const AuthenticatedPersonagensImprimirRoute =
+  AuthenticatedPersonagensImprimirRouteImport.update({
+    id: '/imprimir',
+    path: '/imprimir',
+    getParentRoute: () => AuthenticatedPersonagensRoute,
+  } as any)
+const AuthenticatedPersonagensSimulacaoRoute =
+  AuthenticatedPersonagensSimulacaoRouteImport.update({
+    id: '/simulacao',
+    path: '/simulacao',
+    getParentRoute: () => AuthenticatedPersonagensRoute,
+  } as any)
+const AuthenticatedChecklistsAvaliacoesIndexRoute =
+  AuthenticatedChecklistsAvaliacoesIndexRouteImport.update({
+    id: '/avaliacoes/',
+    path: '/avaliacoes/',
+    getParentRoute: () => AuthenticatedChecklistsRoute,
+  } as any)
+const AuthenticatedChecklistsAvaliacoesIdRoute =
+  AuthenticatedChecklistsAvaliacoesIdRouteImport.update({
+    id: '/avaliacoes/$id',
+    path: '/avaliacoes/$id',
+    getParentRoute: () => AuthenticatedChecklistsRoute,
+  } as any)
+const AuthenticatedChecklistsModelosIndexRoute =
+  AuthenticatedChecklistsModelosIndexRouteImport.update({
+    id: '/modelos/',
+    path: '/modelos/',
+    getParentRoute: () => AuthenticatedChecklistsRoute,
+  } as any)
+const AuthenticatedChecklistsModelosIdRoute =
+  AuthenticatedChecklistsModelosIdRouteImport.update({
+    id: '/modelos/$id',
+    path: '/modelos/$id',
+    getParentRoute: () => AuthenticatedChecklistsRoute,
+  } as any)
+const AuthenticatedPersonagensPersonasIdRoute =
+  AuthenticatedPersonagensPersonasIdRouteImport.update({
+    id: '/personas/$id',
+    path: '/personas/$id',
+    getParentRoute: () => AuthenticatedPersonagensRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRoute
-  '/checklists': typeof AuthenticatedChecklistsRoute
-  '/personagens': typeof AuthenticatedPersonagensRoute
+  '/checklists': typeof AuthenticatedChecklistsRouteWithChildren
+  '/personagens': typeof AuthenticatedPersonagensRouteWithChildren
   '/portal': typeof AuthenticatedPortalRoute
+  '/checklists/acompanhamento': typeof AuthenticatedChecklistsAcompanhamentoRoute
+  '/checklists/liberacoes': typeof AuthenticatedChecklistsLiberacoesRoute
+  '/checklists/setores': typeof AuthenticatedChecklistsSetoresRoute
+  '/personagens/biblioteca': typeof AuthenticatedPersonagensBibliotecaRoute
+  '/personagens/imprimir': typeof AuthenticatedPersonagensImprimirRoute
+  '/personagens/simulacao': typeof AuthenticatedPersonagensSimulacaoRoute
+  '/checklists/': typeof AuthenticatedChecklistsIndexRoute
+  '/personagens/': typeof AuthenticatedPersonagensIndexRoute
+  '/checklists/avaliacoes/$id': typeof AuthenticatedChecklistsAvaliacoesIdRoute
+  '/checklists/modelos/$id': typeof AuthenticatedChecklistsModelosIdRoute
+  '/personagens/personas/$id': typeof AuthenticatedPersonagensPersonasIdRoute
+  '/checklists/avaliacoes/': typeof AuthenticatedChecklistsAvaliacoesIndexRoute
+  '/checklists/modelos/': typeof AuthenticatedChecklistsModelosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRoute
-  '/checklists': typeof AuthenticatedChecklistsRoute
-  '/personagens': typeof AuthenticatedPersonagensRoute
   '/portal': typeof AuthenticatedPortalRoute
+  '/checklists/acompanhamento': typeof AuthenticatedChecklistsAcompanhamentoRoute
+  '/checklists/liberacoes': typeof AuthenticatedChecklistsLiberacoesRoute
+  '/checklists/setores': typeof AuthenticatedChecklistsSetoresRoute
+  '/personagens/biblioteca': typeof AuthenticatedPersonagensBibliotecaRoute
+  '/personagens/imprimir': typeof AuthenticatedPersonagensImprimirRoute
+  '/personagens/simulacao': typeof AuthenticatedPersonagensSimulacaoRoute
+  '/checklists': typeof AuthenticatedChecklistsIndexRoute
+  '/personagens': typeof AuthenticatedPersonagensIndexRoute
+  '/checklists/avaliacoes/$id': typeof AuthenticatedChecklistsAvaliacoesIdRoute
+  '/checklists/modelos/$id': typeof AuthenticatedChecklistsModelosIdRoute
+  '/personagens/personas/$id': typeof AuthenticatedPersonagensPersonasIdRoute
+  '/checklists/avaliacoes': typeof AuthenticatedChecklistsAvaliacoesIndexRoute
+  '/checklists/modelos': typeof AuthenticatedChecklistsModelosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -75,16 +190,64 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
-  '/_authenticated/checklists': typeof AuthenticatedChecklistsRoute
-  '/_authenticated/personagens': typeof AuthenticatedPersonagensRoute
+  '/_authenticated/checklists': typeof AuthenticatedChecklistsRouteWithChildren
+  '/_authenticated/personagens': typeof AuthenticatedPersonagensRouteWithChildren
   '/_authenticated/portal': typeof AuthenticatedPortalRoute
+  '/_authenticated/checklists/acompanhamento': typeof AuthenticatedChecklistsAcompanhamentoRoute
+  '/_authenticated/checklists/liberacoes': typeof AuthenticatedChecklistsLiberacoesRoute
+  '/_authenticated/checklists/setores': typeof AuthenticatedChecklistsSetoresRoute
+  '/_authenticated/personagens/biblioteca': typeof AuthenticatedPersonagensBibliotecaRoute
+  '/_authenticated/personagens/imprimir': typeof AuthenticatedPersonagensImprimirRoute
+  '/_authenticated/personagens/simulacao': typeof AuthenticatedPersonagensSimulacaoRoute
+  '/_authenticated/checklists/': typeof AuthenticatedChecklistsIndexRoute
+  '/_authenticated/personagens/': typeof AuthenticatedPersonagensIndexRoute
+  '/_authenticated/checklists/avaliacoes/$id': typeof AuthenticatedChecklistsAvaliacoesIdRoute
+  '/_authenticated/checklists/modelos/$id': typeof AuthenticatedChecklistsModelosIdRoute
+  '/_authenticated/personagens/personas/$id': typeof AuthenticatedPersonagensPersonasIdRoute
+  '/_authenticated/checklists/avaliacoes/': typeof AuthenticatedChecklistsAvaliacoesIndexRoute
+  '/_authenticated/checklists/modelos/': typeof AuthenticatedChecklistsModelosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/admin' | '/checklists' | '/personagens' | '/portal'
+    | '/'
+    | '/auth'
+    | '/admin'
+    | '/checklists'
+    | '/personagens'
+    | '/portal'
+    | '/checklists/acompanhamento'
+    | '/checklists/liberacoes'
+    | '/checklists/setores'
+    | '/personagens/biblioteca'
+    | '/personagens/imprimir'
+    | '/personagens/simulacao'
+    | '/checklists/'
+    | '/personagens/'
+    | '/checklists/avaliacoes/$id'
+    | '/checklists/modelos/$id'
+    | '/personagens/personas/$id'
+    | '/checklists/avaliacoes/'
+    | '/checklists/modelos/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/admin' | '/checklists' | '/personagens' | '/portal'
+  to:
+    | '/'
+    | '/auth'
+    | '/admin'
+    | '/portal'
+    | '/checklists/acompanhamento'
+    | '/checklists/liberacoes'
+    | '/checklists/setores'
+    | '/personagens/biblioteca'
+    | '/personagens/imprimir'
+    | '/personagens/simulacao'
+    | '/checklists'
+    | '/personagens'
+    | '/checklists/avaliacoes/$id'
+    | '/checklists/modelos/$id'
+    | '/personagens/personas/$id'
+    | '/checklists/avaliacoes'
+    | '/checklists/modelos'
   id:
     | '__root__'
     | '/'
@@ -94,6 +257,19 @@ export interface FileRouteTypes {
     | '/_authenticated/checklists'
     | '/_authenticated/personagens'
     | '/_authenticated/portal'
+    | '/_authenticated/checklists/acompanhamento'
+    | '/_authenticated/checklists/liberacoes'
+    | '/_authenticated/checklists/setores'
+    | '/_authenticated/personagens/biblioteca'
+    | '/_authenticated/personagens/imprimir'
+    | '/_authenticated/personagens/simulacao'
+    | '/_authenticated/checklists/'
+    | '/_authenticated/personagens/'
+    | '/_authenticated/checklists/avaliacoes/$id'
+    | '/_authenticated/checklists/modelos/$id'
+    | '/_authenticated/personagens/personas/$id'
+    | '/_authenticated/checklists/avaliacoes/'
+    | '/_authenticated/checklists/modelos/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -153,20 +329,171 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPortalRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/checklists/': {
+      id: '/_authenticated/checklists/'
+      path: '/'
+      fullPath: '/checklists/'
+      preLoaderRoute: typeof AuthenticatedChecklistsIndexRouteImport
+      parentRoute: typeof AuthenticatedChecklistsRoute
+    }
+    '/_authenticated/checklists/acompanhamento': {
+      id: '/_authenticated/checklists/acompanhamento'
+      path: '/acompanhamento'
+      fullPath: '/checklists/acompanhamento'
+      preLoaderRoute: typeof AuthenticatedChecklistsAcompanhamentoRouteImport
+      parentRoute: typeof AuthenticatedChecklistsRoute
+    }
+    '/_authenticated/checklists/liberacoes': {
+      id: '/_authenticated/checklists/liberacoes'
+      path: '/liberacoes'
+      fullPath: '/checklists/liberacoes'
+      preLoaderRoute: typeof AuthenticatedChecklistsLiberacoesRouteImport
+      parentRoute: typeof AuthenticatedChecklistsRoute
+    }
+    '/_authenticated/checklists/setores': {
+      id: '/_authenticated/checklists/setores'
+      path: '/setores'
+      fullPath: '/checklists/setores'
+      preLoaderRoute: typeof AuthenticatedChecklistsSetoresRouteImport
+      parentRoute: typeof AuthenticatedChecklistsRoute
+    }
+    '/_authenticated/personagens/': {
+      id: '/_authenticated/personagens/'
+      path: '/'
+      fullPath: '/personagens/'
+      preLoaderRoute: typeof AuthenticatedPersonagensIndexRouteImport
+      parentRoute: typeof AuthenticatedPersonagensRoute
+    }
+    '/_authenticated/personagens/biblioteca': {
+      id: '/_authenticated/personagens/biblioteca'
+      path: '/biblioteca'
+      fullPath: '/personagens/biblioteca'
+      preLoaderRoute: typeof AuthenticatedPersonagensBibliotecaRouteImport
+      parentRoute: typeof AuthenticatedPersonagensRoute
+    }
+    '/_authenticated/personagens/imprimir': {
+      id: '/_authenticated/personagens/imprimir'
+      path: '/imprimir'
+      fullPath: '/personagens/imprimir'
+      preLoaderRoute: typeof AuthenticatedPersonagensImprimirRouteImport
+      parentRoute: typeof AuthenticatedPersonagensRoute
+    }
+    '/_authenticated/personagens/simulacao': {
+      id: '/_authenticated/personagens/simulacao'
+      path: '/simulacao'
+      fullPath: '/personagens/simulacao'
+      preLoaderRoute: typeof AuthenticatedPersonagensSimulacaoRouteImport
+      parentRoute: typeof AuthenticatedPersonagensRoute
+    }
+    '/_authenticated/checklists/avaliacoes/': {
+      id: '/_authenticated/checklists/avaliacoes/'
+      path: '/avaliacoes'
+      fullPath: '/checklists/avaliacoes/'
+      preLoaderRoute: typeof AuthenticatedChecklistsAvaliacoesIndexRouteImport
+      parentRoute: typeof AuthenticatedChecklistsRoute
+    }
+    '/_authenticated/checklists/avaliacoes/$id': {
+      id: '/_authenticated/checklists/avaliacoes/$id'
+      path: '/avaliacoes/$id'
+      fullPath: '/checklists/avaliacoes/$id'
+      preLoaderRoute: typeof AuthenticatedChecklistsAvaliacoesIdRouteImport
+      parentRoute: typeof AuthenticatedChecklistsRoute
+    }
+    '/_authenticated/checklists/modelos/': {
+      id: '/_authenticated/checklists/modelos/'
+      path: '/modelos'
+      fullPath: '/checklists/modelos/'
+      preLoaderRoute: typeof AuthenticatedChecklistsModelosIndexRouteImport
+      parentRoute: typeof AuthenticatedChecklistsRoute
+    }
+    '/_authenticated/checklists/modelos/$id': {
+      id: '/_authenticated/checklists/modelos/$id'
+      path: '/modelos/$id'
+      fullPath: '/checklists/modelos/$id'
+      preLoaderRoute: typeof AuthenticatedChecklistsModelosIdRouteImport
+      parentRoute: typeof AuthenticatedChecklistsRoute
+    }
+    '/_authenticated/personagens/personas/$id': {
+      id: '/_authenticated/personagens/personas/$id'
+      path: '/personas/$id'
+      fullPath: '/personagens/personas/$id'
+      preLoaderRoute: typeof AuthenticatedPersonagensPersonasIdRouteImport
+      parentRoute: typeof AuthenticatedPersonagensRoute
+    }
   }
 }
 
+interface AuthenticatedChecklistsRouteChildren {
+  AuthenticatedChecklistsAcompanhamentoRoute: typeof AuthenticatedChecklistsAcompanhamentoRoute
+  AuthenticatedChecklistsLiberacoesRoute: typeof AuthenticatedChecklistsLiberacoesRoute
+  AuthenticatedChecklistsSetoresRoute: typeof AuthenticatedChecklistsSetoresRoute
+  AuthenticatedChecklistsIndexRoute: typeof AuthenticatedChecklistsIndexRoute
+  AuthenticatedChecklistsAvaliacoesIdRoute: typeof AuthenticatedChecklistsAvaliacoesIdRoute
+  AuthenticatedChecklistsModelosIdRoute: typeof AuthenticatedChecklistsModelosIdRoute
+  AuthenticatedChecklistsAvaliacoesIndexRoute: typeof AuthenticatedChecklistsAvaliacoesIndexRoute
+  AuthenticatedChecklistsModelosIndexRoute: typeof AuthenticatedChecklistsModelosIndexRoute
+}
+
+const AuthenticatedChecklistsRouteChildren: AuthenticatedChecklistsRouteChildren =
+  {
+    AuthenticatedChecklistsAcompanhamentoRoute:
+      AuthenticatedChecklistsAcompanhamentoRoute,
+    AuthenticatedChecklistsLiberacoesRoute:
+      AuthenticatedChecklistsLiberacoesRoute,
+    AuthenticatedChecklistsSetoresRoute: AuthenticatedChecklistsSetoresRoute,
+    AuthenticatedChecklistsIndexRoute: AuthenticatedChecklistsIndexRoute,
+    AuthenticatedChecklistsAvaliacoesIdRoute:
+      AuthenticatedChecklistsAvaliacoesIdRoute,
+    AuthenticatedChecklistsModelosIdRoute:
+      AuthenticatedChecklistsModelosIdRoute,
+    AuthenticatedChecklistsAvaliacoesIndexRoute:
+      AuthenticatedChecklistsAvaliacoesIndexRoute,
+    AuthenticatedChecklistsModelosIndexRoute:
+      AuthenticatedChecklistsModelosIndexRoute,
+  }
+
+const AuthenticatedChecklistsRouteWithChildren =
+  AuthenticatedChecklistsRoute._addFileChildren(
+    AuthenticatedChecklistsRouteChildren,
+  )
+
+interface AuthenticatedPersonagensRouteChildren {
+  AuthenticatedPersonagensBibliotecaRoute: typeof AuthenticatedPersonagensBibliotecaRoute
+  AuthenticatedPersonagensImprimirRoute: typeof AuthenticatedPersonagensImprimirRoute
+  AuthenticatedPersonagensSimulacaoRoute: typeof AuthenticatedPersonagensSimulacaoRoute
+  AuthenticatedPersonagensIndexRoute: typeof AuthenticatedPersonagensIndexRoute
+  AuthenticatedPersonagensPersonasIdRoute: typeof AuthenticatedPersonagensPersonasIdRoute
+}
+
+const AuthenticatedPersonagensRouteChildren: AuthenticatedPersonagensRouteChildren =
+  {
+    AuthenticatedPersonagensBibliotecaRoute:
+      AuthenticatedPersonagensBibliotecaRoute,
+    AuthenticatedPersonagensImprimirRoute:
+      AuthenticatedPersonagensImprimirRoute,
+    AuthenticatedPersonagensSimulacaoRoute:
+      AuthenticatedPersonagensSimulacaoRoute,
+    AuthenticatedPersonagensIndexRoute: AuthenticatedPersonagensIndexRoute,
+    AuthenticatedPersonagensPersonasIdRoute:
+      AuthenticatedPersonagensPersonasIdRoute,
+  }
+
+const AuthenticatedPersonagensRouteWithChildren =
+  AuthenticatedPersonagensRoute._addFileChildren(
+    AuthenticatedPersonagensRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
-  AuthenticatedChecklistsRoute: typeof AuthenticatedChecklistsRoute
-  AuthenticatedPersonagensRoute: typeof AuthenticatedPersonagensRoute
+  AuthenticatedChecklistsRoute: typeof AuthenticatedChecklistsRouteWithChildren
+  AuthenticatedPersonagensRoute: typeof AuthenticatedPersonagensRouteWithChildren
   AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
-  AuthenticatedChecklistsRoute: AuthenticatedChecklistsRoute,
-  AuthenticatedPersonagensRoute: AuthenticatedPersonagensRoute,
+  AuthenticatedChecklistsRoute: AuthenticatedChecklistsRouteWithChildren,
+  AuthenticatedPersonagensRoute: AuthenticatedPersonagensRouteWithChildren,
   AuthenticatedPortalRoute: AuthenticatedPortalRoute,
 }
 
@@ -181,13 +508,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

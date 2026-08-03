@@ -14,6 +14,254 @@ export type Database = {
   }
   public: {
     Tables: {
+      atribuicoes: {
+        Row: {
+          avaliador_id: string
+          checklist_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          avaliador_id: string
+          checklist_id: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          avaliador_id?: string
+          checklist_id?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "atribuicoes_checklist_id_fkey"
+            columns: ["checklist_id"]
+            isOneToOne: false
+            referencedRelation: "checklists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      avaliacoes: {
+        Row: {
+          avaliador_id: string
+          checklist_id: string
+          colaborador_nome: string
+          created_at: string
+          data_avaliacao: string
+          data_inicio: string | null
+          id: string
+          marcados: Json
+          media: number
+          observacoes: Json
+          setor: string
+          status: string
+          tutor: string
+          updated_at: string
+        }
+        Insert: {
+          avaliador_id: string
+          checklist_id: string
+          colaborador_nome?: string
+          created_at?: string
+          data_avaliacao?: string
+          data_inicio?: string | null
+          id?: string
+          marcados?: Json
+          media?: number
+          observacoes?: Json
+          setor?: string
+          status?: string
+          tutor?: string
+          updated_at?: string
+        }
+        Update: {
+          avaliador_id?: string
+          checklist_id?: string
+          colaborador_nome?: string
+          created_at?: string
+          data_avaliacao?: string
+          data_inicio?: string | null
+          id?: string
+          marcados?: Json
+          media?: number
+          observacoes?: Json
+          setor?: string
+          status?: string
+          tutor?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avaliacoes_checklist_id_fkey"
+            columns: ["checklist_id"]
+            isOneToOne: false
+            referencedRelation: "checklists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      categorias: {
+        Row: {
+          cor: string
+          created_at: string
+          id: string
+          nome: string
+        }
+        Insert: {
+          cor?: string
+          created_at?: string
+          id?: string
+          nome: string
+        }
+        Update: {
+          cor?: string
+          created_at?: string
+          id?: string
+          nome?: string
+        }
+        Relationships: []
+      }
+      checklists: {
+        Row: {
+          ativo: boolean
+          categoria_id: string | null
+          created_at: string
+          created_by: string | null
+          descricao: string
+          id: string
+          nome: string
+          nota_minima: number
+          observacoes_obrigatorias: boolean
+          permite_observacoes: boolean
+          pontos_desenvolvimento_modo: string
+          pontos_fortes_modo: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          categoria_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          descricao?: string
+          id?: string
+          nome: string
+          nota_minima?: number
+          observacoes_obrigatorias?: boolean
+          permite_observacoes?: boolean
+          pontos_desenvolvimento_modo?: string
+          pontos_fortes_modo?: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          categoria_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          descricao?: string
+          id?: string
+          nome?: string
+          nota_minima?: number
+          observacoes_obrigatorias?: boolean
+          permite_observacoes?: boolean
+          pontos_desenvolvimento_modo?: string
+          pontos_fortes_modo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checklists_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "categorias"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      criterios: {
+        Row: {
+          checklist_id: string
+          created_at: string
+          id: string
+          nome: string
+          obrigatorio: boolean
+          ordem: number
+          peso: number
+          secao_id: string | null
+        }
+        Insert: {
+          checklist_id: string
+          created_at?: string
+          id?: string
+          nome?: string
+          obrigatorio?: boolean
+          ordem?: number
+          peso?: number
+          secao_id?: string | null
+        }
+        Update: {
+          checklist_id?: string
+          created_at?: string
+          id?: string
+          nome?: string
+          obrigatorio?: boolean
+          ordem?: number
+          peso?: number
+          secao_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "criterios_checklist_id_fkey"
+            columns: ["checklist_id"]
+            isOneToOne: false
+            referencedRelation: "checklists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "criterios_secao_id_fkey"
+            columns: ["secao_id"]
+            isOneToOne: false
+            referencedRelation: "secoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exercicios: {
+        Row: {
+          checklist_id: string
+          created_at: string
+          id: string
+          nome: string
+          obrigatorio: boolean
+          ordem: number
+        }
+        Insert: {
+          checklist_id: string
+          created_at?: string
+          id?: string
+          nome?: string
+          obrigatorio?: boolean
+          ordem?: number
+        }
+        Update: {
+          checklist_id?: string
+          created_at?: string
+          id?: string
+          nome?: string
+          obrigatorio?: boolean
+          ordem?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exercicios_checklist_id_fkey"
+            columns: ["checklist_id"]
+            isOneToOne: false
+            referencedRelation: "checklists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       modules: {
         Row: {
           active: boolean
@@ -61,6 +309,27 @@ export type Database = {
           },
         ]
       }
+      perfis_comportamentais: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          nome: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          nome: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          nome?: string
+        }
+        Relationships: []
+      }
       permissions: {
         Row: {
           created_at: string
@@ -79,6 +348,178 @@ export type Database = {
           description?: string
           key?: string
           name?: string
+        }
+        Relationships: []
+      }
+      persona_historico: {
+        Row: {
+          acao: string
+          created_at: string
+          detalhes: Json
+          id: string
+          persona_id: string | null
+          persona_nome: string | null
+          user_id: string | null
+          user_nome: string | null
+        }
+        Insert: {
+          acao: string
+          created_at?: string
+          detalhes?: Json
+          id?: string
+          persona_id?: string | null
+          persona_nome?: string | null
+          user_id?: string | null
+          user_nome?: string | null
+        }
+        Update: {
+          acao?: string
+          created_at?: string
+          detalhes?: Json
+          id?: string
+          persona_id?: string | null
+          persona_nome?: string | null
+          user_id?: string | null
+          user_nome?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "persona_historico_persona_id_fkey"
+            columns: ["persona_id"]
+            isOneToOne: false
+            referencedRelation: "personas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      persona_materiais: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          nome: string
+          path: string
+          persona_id: string
+          tamanho: number | null
+          tipo: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          nome: string
+          path: string
+          persona_id: string
+          tamanho?: number | null
+          tipo?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          nome?: string
+          path?: string
+          persona_id?: string
+          tamanho?: number | null
+          tipo?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "persona_materiais_persona_id_fkey"
+            columns: ["persona_id"]
+            isOneToOne: false
+            referencedRelation: "personas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      personas: {
+        Row: {
+          cidade: string | null
+          complexidade: string | null
+          contexto_oculto: string | null
+          created_at: string
+          created_by: string | null
+          dados_tecnicos: Json
+          encerramento: string | null
+          escalada: Json
+          exercicio: string | null
+          fala_inicial: string | null
+          falas_gatilho: Json
+          favorita: boolean
+          id: string
+          idade: string | null
+          informacoes_ocultas: Json
+          nome: string
+          nome_dependente: string | null
+          objetivo: string | null
+          palavras_chave: string[]
+          perfil_comportamental: string[]
+          sexo: string | null
+          status: string
+          tipo_cliente: string | null
+          titularidade: string | null
+          updated_at: string
+          updated_by: string | null
+          vertente: string | null
+        }
+        Insert: {
+          cidade?: string | null
+          complexidade?: string | null
+          contexto_oculto?: string | null
+          created_at?: string
+          created_by?: string | null
+          dados_tecnicos?: Json
+          encerramento?: string | null
+          escalada?: Json
+          exercicio?: string | null
+          fala_inicial?: string | null
+          falas_gatilho?: Json
+          favorita?: boolean
+          id?: string
+          idade?: string | null
+          informacoes_ocultas?: Json
+          nome?: string
+          nome_dependente?: string | null
+          objetivo?: string | null
+          palavras_chave?: string[]
+          perfil_comportamental?: string[]
+          sexo?: string | null
+          status?: string
+          tipo_cliente?: string | null
+          titularidade?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          vertente?: string | null
+        }
+        Update: {
+          cidade?: string | null
+          complexidade?: string | null
+          contexto_oculto?: string | null
+          created_at?: string
+          created_by?: string | null
+          dados_tecnicos?: Json
+          encerramento?: string | null
+          escalada?: Json
+          exercicio?: string | null
+          fala_inicial?: string | null
+          falas_gatilho?: Json
+          favorita?: boolean
+          id?: string
+          idade?: string | null
+          informacoes_ocultas?: Json
+          nome?: string
+          nome_dependente?: string | null
+          objetivo?: string | null
+          palavras_chave?: string[]
+          perfil_comportamental?: string[]
+          sexo?: string | null
+          status?: string
+          tipo_cliente?: string | null
+          titularidade?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          vertente?: string | null
         }
         Relationships: []
       }
@@ -163,6 +604,98 @@ export type Database = {
           is_system?: boolean
           key?: string
           name?: string
+        }
+        Relationships: []
+      }
+      secoes: {
+        Row: {
+          checklist_id: string
+          created_at: string
+          id: string
+          nome: string
+          ordem: number
+        }
+        Insert: {
+          checklist_id: string
+          created_at?: string
+          id?: string
+          nome?: string
+          ordem?: number
+        }
+        Update: {
+          checklist_id?: string
+          created_at?: string
+          id?: string
+          nome?: string
+          ordem?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "secoes_checklist_id_fkey"
+            columns: ["checklist_id"]
+            isOneToOne: false
+            referencedRelation: "checklists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      setores: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          id: string
+          nome: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          id?: string
+          nome: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          id?: string
+          nome?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      simulacoes: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          exercicio: string | null
+          id: string
+          nome: string
+          observacoes: string | null
+          persona_ids: string[]
+          responsavel: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          exercicio?: string | null
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          persona_ids?: string[]
+          responsavel?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          exercicio?: string | null
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          persona_ids?: string[]
+          responsavel?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -261,7 +794,9 @@ export type Database = {
         Returns: boolean
       }
       has_role: { Args: { _role: string; _user_id: string }; Returns: boolean }
-      is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_admin:
+        | { Args: never; Returns: boolean }
+        | { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
