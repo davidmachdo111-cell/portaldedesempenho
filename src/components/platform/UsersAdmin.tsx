@@ -31,7 +31,15 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-type UserRow = Awaited<ReturnType<typeof usersQueryOptions.queryFn>>[number];
+type UserRow = {
+  id: string;
+  username: string;
+  full_name: string;
+  active: boolean;
+  created_at: string;
+  roleKeys: string[];
+  permissionKeys: string[];
+};
 
 export function UsersAdmin() {
   const queryClient = useQueryClient();
