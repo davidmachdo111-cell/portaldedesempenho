@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.sincronizar_atividade_avaliacao() FROM PUBLIC, anon, authenticated;

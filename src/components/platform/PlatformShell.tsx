@@ -1,7 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { LogOut, LayoutGrid, ShieldCheck, ClipboardCheck, Users } from "lucide-react";
+import {
+  LogOut,
+  LayoutGrid,
+  ShieldCheck,
+  ClipboardCheck,
+  Users,
+  UserRound,
+} from "lucide-react";
 import type { ReactNode } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -18,6 +25,7 @@ const navItems = [
     icon: Users,
     permission: "personagens_simulados",
   },
+  { to: "/colaboradores", label: "Colaboradores", icon: UserRound, permission: "colaboradores" },
   { to: "/admin", label: "Administração", icon: ShieldCheck, permission: "administracao" },
 ] as const;
 
