@@ -10,33 +10,96 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedChecklistsRouteImport } from './routes/_authenticated/checklists'
+import { Route as AuthenticatedPersonagensRouteImport } from './routes/_authenticated/personagens'
+import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedChecklistsRoute = AuthenticatedChecklistsRouteImport.update({
+  id: '/checklists',
+  path: '/checklists',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPersonagensRoute =
+  AuthenticatedPersonagensRouteImport.update({
+    id: '/personagens',
+    path: '/personagens',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedPortalRoute = AuthenticatedPortalRouteImport.update({
+  id: '/portal',
+  path: '/portal',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/checklists': typeof AuthenticatedChecklistsRoute
+  '/personagens': typeof AuthenticatedPersonagensRoute
+  '/portal': typeof AuthenticatedPortalRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/checklists': typeof AuthenticatedChecklistsRoute
+  '/personagens': typeof AuthenticatedPersonagensRoute
+  '/portal': typeof AuthenticatedPortalRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/checklists': typeof AuthenticatedChecklistsRoute
+  '/_authenticated/personagens': typeof AuthenticatedPersonagensRoute
+  '/_authenticated/portal': typeof AuthenticatedPortalRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/auth' | '/admin' | '/checklists' | '/personagens' | '/portal'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/auth' | '/admin' | '/checklists' | '/personagens' | '/portal'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/admin'
+    | '/_authenticated/checklists'
+    | '/_authenticated/personagens'
+    | '/_authenticated/portal'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +111,72 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/checklists': {
+      id: '/_authenticated/checklists'
+      path: '/checklists'
+      fullPath: '/checklists'
+      preLoaderRoute: typeof AuthenticatedChecklistsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/personagens': {
+      id: '/_authenticated/personagens'
+      path: '/personagens'
+      fullPath: '/personagens'
+      preLoaderRoute: typeof AuthenticatedPersonagensRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/portal': {
+      id: '/_authenticated/portal'
+      path: '/portal'
+      fullPath: '/portal'
+      preLoaderRoute: typeof AuthenticatedPortalRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedChecklistsRoute: typeof AuthenticatedChecklistsRoute
+  AuthenticatedPersonagensRoute: typeof AuthenticatedPersonagensRoute
+  AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedChecklistsRoute: AuthenticatedChecklistsRoute,
+  AuthenticatedPersonagensRoute: AuthenticatedPersonagensRoute,
+  AuthenticatedPortalRoute: AuthenticatedPortalRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
