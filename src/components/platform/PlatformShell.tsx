@@ -1,7 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { LogOut, LayoutGrid, ShieldCheck, ClipboardCheck, Users } from "lucide-react";
+import {
+  LogOut,
+  LayoutGrid,
+  ShieldCheck,
+  ClipboardCheck,
+  Users,
+  UserRound,
+} from "lucide-react";
 import type { ReactNode } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
