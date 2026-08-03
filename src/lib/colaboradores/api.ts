@@ -93,7 +93,13 @@ async function registrar(
   const a = await autor();
   await supabase
     .from("colaborador_historico")
-    .insert({ colaborador_id, acao, detalhes, user_id: a.id, user_nome: a.nome });
+    .insert({
+      colaborador_id,
+      acao,
+      detalhes: JSON.parse(JSON.stringify(detalhes)),
+      user_id: a.id,
+      user_nome: a.nome,
+    });
 }
 
 /* ---------- colaboradores ---------- */
