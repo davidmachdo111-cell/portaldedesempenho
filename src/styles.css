@@ -184,3 +184,49 @@
 @utility bg-brand-gradient {
   background-image: linear-gradient(135deg, var(--brand-dark) 0%, var(--brand) 65%, var(--brand-lime) 140%);
 }
+
+/* Tokens e utilitários herdados dos módulos (Checklists e Personagens e Simulados). */
+@theme inline {
+  --color-heading: var(--heading);
+  --shadow-soft: 0 1px 2px oklch(0.386 0.067 190.4 / 0.06), 0 8px 24px oklch(0.386 0.067 190.4 / 0.07);
+  --shadow-raised: 0 2px 4px oklch(0.386 0.067 190.4 / 0.08), 0 18px 40px oklch(0.386 0.067 190.4 / 0.12);
+}
+
+:root {
+  --heading: oklch(0.375 0.062 179);
+}
+
+.dark {
+  --heading: oklch(0.96 0.01 150);
+}
+
+@utility brand-gradient {
+  background-image: linear-gradient(135deg, var(--brand-dark) 0%, var(--brand) 65%, var(--brand-lime) 140%);
+}
+
+/* ---------- Impressão A4 (módulo Personagens e Simulados) ---------- */
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm 14mm 16mm 14mm;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-page {
+    break-after: page;
+    page-break-after: always;
+  }
+
+  .print-page:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+}
