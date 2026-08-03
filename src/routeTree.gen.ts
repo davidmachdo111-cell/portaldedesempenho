@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedChecklistsRouteImport } from './routes/_authenticated/checklists'
+import { Route as AuthenticatedColaboradoresRouteImport } from './routes/_authenticated/colaboradores'
 import { Route as AuthenticatedPersonagensRouteImport } from './routes/_authenticated/personagens'
 import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
 import { Route as AuthenticatedChecklistsIndexRouteImport } from './routes/_authenticated/checklists.index'
@@ -54,6 +55,12 @@ const AuthenticatedChecklistsRoute = AuthenticatedChecklistsRouteImport.update({
   path: '/checklists',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedColaboradoresRoute =
+  AuthenticatedColaboradoresRouteImport.update({
+    id: '/colaboradores',
+    path: '/colaboradores',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPersonagensRoute =
   AuthenticatedPersonagensRouteImport.update({
     id: '/personagens',
@@ -149,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/checklists': typeof AuthenticatedChecklistsRouteWithChildren
+  '/colaboradores': typeof AuthenticatedColaboradoresRoute
   '/personagens': typeof AuthenticatedPersonagensRouteWithChildren
   '/portal': typeof AuthenticatedPortalRoute
   '/checklists/acompanhamento': typeof AuthenticatedChecklistsAcompanhamentoRoute
@@ -169,6 +177,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/colaboradores': typeof AuthenticatedColaboradoresRoute
   '/portal': typeof AuthenticatedPortalRoute
   '/checklists/acompanhamento': typeof AuthenticatedChecklistsAcompanhamentoRoute
   '/checklists/liberacoes': typeof AuthenticatedChecklistsLiberacoesRoute
@@ -191,6 +200,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/checklists': typeof AuthenticatedChecklistsRouteWithChildren
+  '/_authenticated/colaboradores': typeof AuthenticatedColaboradoresRoute
   '/_authenticated/personagens': typeof AuthenticatedPersonagensRouteWithChildren
   '/_authenticated/portal': typeof AuthenticatedPortalRoute
   '/_authenticated/checklists/acompanhamento': typeof AuthenticatedChecklistsAcompanhamentoRoute
@@ -214,6 +224,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/admin'
     | '/checklists'
+    | '/colaboradores'
     | '/personagens'
     | '/portal'
     | '/checklists/acompanhamento'
@@ -234,6 +245,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/admin'
+    | '/colaboradores'
     | '/portal'
     | '/checklists/acompanhamento'
     | '/checklists/liberacoes'
@@ -255,6 +267,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/admin'
     | '/_authenticated/checklists'
+    | '/_authenticated/colaboradores'
     | '/_authenticated/personagens'
     | '/_authenticated/portal'
     | '/_authenticated/checklists/acompanhamento'
@@ -313,6 +326,13 @@ declare module '@tanstack/react-router' {
       path: '/checklists'
       fullPath: '/checklists'
       preLoaderRoute: typeof AuthenticatedChecklistsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/colaboradores': {
+      id: '/_authenticated/colaboradores'
+      path: '/colaboradores'
+      fullPath: '/colaboradores'
+      preLoaderRoute: typeof AuthenticatedColaboradoresRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/personagens': {
@@ -486,6 +506,7 @@ const AuthenticatedPersonagensRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedChecklistsRoute: typeof AuthenticatedChecklistsRouteWithChildren
+  AuthenticatedColaboradoresRoute: typeof AuthenticatedColaboradoresRoute
   AuthenticatedPersonagensRoute: typeof AuthenticatedPersonagensRouteWithChildren
   AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
 }
@@ -493,6 +514,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedChecklistsRoute: AuthenticatedChecklistsRouteWithChildren,
+  AuthenticatedColaboradoresRoute: AuthenticatedColaboradoresRoute,
   AuthenticatedPersonagensRoute: AuthenticatedPersonagensRouteWithChildren,
   AuthenticatedPortalRoute: AuthenticatedPortalRoute,
 }
