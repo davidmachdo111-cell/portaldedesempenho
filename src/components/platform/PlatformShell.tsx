@@ -25,6 +25,7 @@ const navItems = [
     icon: Users,
     permission: "personagens_simulados",
   },
+  { to: "/colaboradores", label: "Colaboradores", icon: UserRound, permission: "colaboradores" },
   { to: "/admin", label: "Administração", icon: ShieldCheck, permission: "administracao" },
 ] as const;
 
