@@ -12,8 +12,11 @@ async function registrarHistorico(input: {
 }) {
   const { data } = await supabase.auth.getUser();
   const user = data.user;
-  const nome =
-    (user?.user_metadata?.["nome"] as string | undefined) || user?.email || "Usuário";
+  // Identidade vem do cadastro central de usuários da plataforma.
+  const { data: perfil } = user
+    ? await supabase.from("profiles").select("full_name, username").eq("id", user.id).maybeSingle()
+    : { data: null };
+  const nome = perfil?.full_name || perfil?.username || user?.email || "Usuário";
   await supabase.from("persona_historico").insert({
     persona_id: input.persona_id ?? null,
     persona_nome: input.persona_nome ?? null,
