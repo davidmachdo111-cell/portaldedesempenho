@@ -21,6 +21,7 @@ import { Route as AuthenticatedChecklistsIndexRouteImport } from './routes/_auth
 import { Route as AuthenticatedChecklistsAcompanhamentoRouteImport } from './routes/_authenticated/checklists.acompanhamento'
 import { Route as AuthenticatedChecklistsLiberacoesRouteImport } from './routes/_authenticated/checklists.liberacoes'
 import { Route as AuthenticatedChecklistsSetoresRouteImport } from './routes/_authenticated/checklists.setores'
+import { Route as AuthenticatedColaboradoresIndexRouteImport } from './routes/_authenticated/colaboradores.index'
 import { Route as AuthenticatedPersonagensIndexRouteImport } from './routes/_authenticated/personagens.index'
 import { Route as AuthenticatedPersonagensBibliotecaRouteImport } from './routes/_authenticated/personagens.biblioteca'
 import { Route as AuthenticatedPersonagensImprimirRouteImport } from './routes/_authenticated/personagens.imprimir'
@@ -96,6 +97,12 @@ const AuthenticatedChecklistsSetoresRoute =
     path: '/setores',
     getParentRoute: () => AuthenticatedChecklistsRoute,
   } as any)
+const AuthenticatedColaboradoresIndexRoute =
+  AuthenticatedColaboradoresIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedColaboradoresRoute,
+  } as any)
 const AuthenticatedPersonagensIndexRoute =
   AuthenticatedPersonagensIndexRouteImport.update({
     id: '/',
@@ -156,7 +163,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/checklists': typeof AuthenticatedChecklistsRouteWithChildren
-  '/colaboradores': typeof AuthenticatedColaboradoresRoute
+  '/colaboradores': typeof AuthenticatedColaboradoresRouteWithChildren
   '/personagens': typeof AuthenticatedPersonagensRouteWithChildren
   '/portal': typeof AuthenticatedPortalRoute
   '/checklists/acompanhamento': typeof AuthenticatedChecklistsAcompanhamentoRoute
@@ -166,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/personagens/imprimir': typeof AuthenticatedPersonagensImprimirRoute
   '/personagens/simulacao': typeof AuthenticatedPersonagensSimulacaoRoute
   '/checklists/': typeof AuthenticatedChecklistsIndexRoute
+  '/colaboradores/': typeof AuthenticatedColaboradoresIndexRoute
   '/personagens/': typeof AuthenticatedPersonagensIndexRoute
   '/checklists/avaliacoes/$id': typeof AuthenticatedChecklistsAvaliacoesIdRoute
   '/checklists/modelos/$id': typeof AuthenticatedChecklistsModelosIdRoute
@@ -177,7 +185,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRoute
-  '/colaboradores': typeof AuthenticatedColaboradoresRoute
   '/portal': typeof AuthenticatedPortalRoute
   '/checklists/acompanhamento': typeof AuthenticatedChecklistsAcompanhamentoRoute
   '/checklists/liberacoes': typeof AuthenticatedChecklistsLiberacoesRoute
@@ -186,6 +193,7 @@ export interface FileRoutesByTo {
   '/personagens/imprimir': typeof AuthenticatedPersonagensImprimirRoute
   '/personagens/simulacao': typeof AuthenticatedPersonagensSimulacaoRoute
   '/checklists': typeof AuthenticatedChecklistsIndexRoute
+  '/colaboradores': typeof AuthenticatedColaboradoresIndexRoute
   '/personagens': typeof AuthenticatedPersonagensIndexRoute
   '/checklists/avaliacoes/$id': typeof AuthenticatedChecklistsAvaliacoesIdRoute
   '/checklists/modelos/$id': typeof AuthenticatedChecklistsModelosIdRoute
@@ -200,7 +208,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/checklists': typeof AuthenticatedChecklistsRouteWithChildren
-  '/_authenticated/colaboradores': typeof AuthenticatedColaboradoresRoute
+  '/_authenticated/colaboradores': typeof AuthenticatedColaboradoresRouteWithChildren
   '/_authenticated/personagens': typeof AuthenticatedPersonagensRouteWithChildren
   '/_authenticated/portal': typeof AuthenticatedPortalRoute
   '/_authenticated/checklists/acompanhamento': typeof AuthenticatedChecklistsAcompanhamentoRoute
@@ -210,6 +218,7 @@ export interface FileRoutesById {
   '/_authenticated/personagens/imprimir': typeof AuthenticatedPersonagensImprimirRoute
   '/_authenticated/personagens/simulacao': typeof AuthenticatedPersonagensSimulacaoRoute
   '/_authenticated/checklists/': typeof AuthenticatedChecklistsIndexRoute
+  '/_authenticated/colaboradores/': typeof AuthenticatedColaboradoresIndexRoute
   '/_authenticated/personagens/': typeof AuthenticatedPersonagensIndexRoute
   '/_authenticated/checklists/avaliacoes/$id': typeof AuthenticatedChecklistsAvaliacoesIdRoute
   '/_authenticated/checklists/modelos/$id': typeof AuthenticatedChecklistsModelosIdRoute
@@ -234,6 +243,7 @@ export interface FileRouteTypes {
     | '/personagens/imprimir'
     | '/personagens/simulacao'
     | '/checklists/'
+    | '/colaboradores/'
     | '/personagens/'
     | '/checklists/avaliacoes/$id'
     | '/checklists/modelos/$id'
@@ -245,7 +255,6 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/admin'
-    | '/colaboradores'
     | '/portal'
     | '/checklists/acompanhamento'
     | '/checklists/liberacoes'
@@ -254,6 +263,7 @@ export interface FileRouteTypes {
     | '/personagens/imprimir'
     | '/personagens/simulacao'
     | '/checklists'
+    | '/colaboradores'
     | '/personagens'
     | '/checklists/avaliacoes/$id'
     | '/checklists/modelos/$id'
@@ -277,6 +287,7 @@ export interface FileRouteTypes {
     | '/_authenticated/personagens/imprimir'
     | '/_authenticated/personagens/simulacao'
     | '/_authenticated/checklists/'
+    | '/_authenticated/colaboradores/'
     | '/_authenticated/personagens/'
     | '/_authenticated/checklists/avaliacoes/$id'
     | '/_authenticated/checklists/modelos/$id'
@@ -376,6 +387,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/checklists/setores'
       preLoaderRoute: typeof AuthenticatedChecklistsSetoresRouteImport
       parentRoute: typeof AuthenticatedChecklistsRoute
+    }
+    '/_authenticated/colaboradores/': {
+      id: '/_authenticated/colaboradores/'
+      path: '/'
+      fullPath: '/colaboradores/'
+      preLoaderRoute: typeof AuthenticatedColaboradoresIndexRouteImport
+      parentRoute: typeof AuthenticatedColaboradoresRoute
     }
     '/_authenticated/personagens/': {
       id: '/_authenticated/personagens/'
@@ -477,6 +495,20 @@ const AuthenticatedChecklistsRouteWithChildren =
     AuthenticatedChecklistsRouteChildren,
   )
 
+interface AuthenticatedColaboradoresRouteChildren {
+  AuthenticatedColaboradoresIndexRoute: typeof AuthenticatedColaboradoresIndexRoute
+}
+
+const AuthenticatedColaboradoresRouteChildren: AuthenticatedColaboradoresRouteChildren =
+  {
+    AuthenticatedColaboradoresIndexRoute: AuthenticatedColaboradoresIndexRoute,
+  }
+
+const AuthenticatedColaboradoresRouteWithChildren =
+  AuthenticatedColaboradoresRoute._addFileChildren(
+    AuthenticatedColaboradoresRouteChildren,
+  )
+
 interface AuthenticatedPersonagensRouteChildren {
   AuthenticatedPersonagensBibliotecaRoute: typeof AuthenticatedPersonagensBibliotecaRoute
   AuthenticatedPersonagensImprimirRoute: typeof AuthenticatedPersonagensImprimirRoute
@@ -506,7 +538,7 @@ const AuthenticatedPersonagensRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedChecklistsRoute: typeof AuthenticatedChecklistsRouteWithChildren
-  AuthenticatedColaboradoresRoute: typeof AuthenticatedColaboradoresRoute
+  AuthenticatedColaboradoresRoute: typeof AuthenticatedColaboradoresRouteWithChildren
   AuthenticatedPersonagensRoute: typeof AuthenticatedPersonagensRouteWithChildren
   AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
 }
@@ -514,7 +546,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedChecklistsRoute: AuthenticatedChecklistsRouteWithChildren,
-  AuthenticatedColaboradoresRoute: AuthenticatedColaboradoresRoute,
+  AuthenticatedColaboradoresRoute: AuthenticatedColaboradoresRouteWithChildren,
   AuthenticatedPersonagensRoute: AuthenticatedPersonagensRouteWithChildren,
   AuthenticatedPortalRoute: AuthenticatedPortalRoute,
 }
