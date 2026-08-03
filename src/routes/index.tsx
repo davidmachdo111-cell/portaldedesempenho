@@ -14,7 +14,7 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Plataforma Corporativa — Portal de Módulos" },
       {
         property: "og:description",
-        content: "Login único, portal de módulos e administração central em uma só plataforma.",
+        content: "Portal único com acesso aos módulos Checklists e Personagens e Simulados, com usuários, perfis e permissões centralizados.",
       },
     ],
   }),
