@@ -79,15 +79,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Portal de Desempenho — Portal de Módulos" },
+      { title: "Portal de Desempenho — Módulos corporativos" },
       { name: "description", content: "Portal único com acesso aos módulos Checklists e Personagens e Simulados, com usuários, perfis e permissões centralizados." },
       
-      { property: "og:title", content: "Portal de Desempenho — Portal de Módulos" },
+      { property: "og:title", content: "Portal de Desempenho — Módulos corporativos" },
       { property: "og:description", content: "Portal único com acesso aos módulos Checklists e Personagens e Simulados, com usuários, perfis e permissões centralizados." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Portal de Desempenho — Portal de Módulos" },
+      { name: "twitter:title", content: "Portal de Desempenho — Módulos corporativos" },
       { name: "twitter:description", content: "Portal único com acesso aos módulos Checklists e Personagens e Simulados, com usuários, perfis e permissões centralizados." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d967bccb-cd06-4a87-834a-27d9a913a1e2/id-preview-0eae3f52--af43ef68-264e-495d-9f3a-92ce204bbc0e.lovable.app-1785779265080.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d967bccb-cd06-4a87-834a-27d9a913a1e2/id-preview-0eae3f52--af43ef68-264e-495d-9f3a-92ce204bbc0e.lovable.app-1785779265080.png" },

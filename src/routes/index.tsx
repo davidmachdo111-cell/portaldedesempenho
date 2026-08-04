@@ -5,13 +5,13 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Portal de Desempenho — Portal de Módulos" },
+      { title: "Portal de Desempenho — Módulos corporativos" },
       {
         name: "description",
         content:
           "Portal único com acesso aos módulos Checklists e Personagens e Simulados, com usuários, perfis e permissões centralizados.",
       },
-      { property: "og:title", content: "Portal de Desempenho — Portal de Módulos" },
+      { property: "og:title", content: "Portal de Desempenho — Módulos corporativos" },
       {
         property: "og:description",
         content: "Portal único com acesso aos módulos Checklists e Personagens e Simulados, com usuários, perfis e permissões centralizados.",
