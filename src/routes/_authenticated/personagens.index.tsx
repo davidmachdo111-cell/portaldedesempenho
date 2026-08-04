@@ -35,13 +35,13 @@ import {
 export const Route = createFileRoute("/_authenticated/personagens/")({
   head: () => ({
     meta: [
-      { title: "Dashboard | Banco de Personas" },
+      { title: "Dashboard | Portal de Desempenho" },
       {
         name: "description",
         content:
-          "Indicadores do Banco de Personas: totais por exercício, vertente e complexidade, últimas alterações e simulações montadas.",
+          "Indicadores do Portal de Desempenho: totais por exercício, vertente e complexidade, últimas alterações e simulações montadas.",
       },
-      { property: "og:title", content: "Dashboard | Banco de Personas" },
+      { property: "og:title", content: "Dashboard | Portal de Desempenho" },
       {
         property: "og:description",
         content: "Painel de indicadores das personas usadas em simulações realísticas.",
@@ -108,7 +108,7 @@ function Dashboard() {
   return (
     <AppShell
       titulo="Dashboard"
-      descricao="Visão geral do Banco de Personas"
+      descricao="Visão geral do Portal de Desempenho"
       acoes={
         <>
           <Button asChild variant="outline">

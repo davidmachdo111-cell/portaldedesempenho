@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedChecklistsRouteImport } from './routes/_authenticated/checklists'
 import { Route as AuthenticatedColaboradoresRouteImport } from './routes/_authenticated/colaboradores'
+import { Route as AuthenticatedMeusConteudosRouteImport } from './routes/_authenticated/meus-conteudos'
 import { Route as AuthenticatedPersonagensRouteImport } from './routes/_authenticated/personagens'
 import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
 import { Route as AuthenticatedChecklistsIndexRouteImport } from './routes/_authenticated/checklists.index'
@@ -23,6 +24,7 @@ import { Route as AuthenticatedChecklistsLiberacoesRouteImport } from './routes/
 import { Route as AuthenticatedChecklistsSetoresRouteImport } from './routes/_authenticated/checklists.setores'
 import { Route as AuthenticatedColaboradoresIndexRouteImport } from './routes/_authenticated/colaboradores.index'
 import { Route as AuthenticatedColaboradoresIdRouteImport } from './routes/_authenticated/colaboradores.$id'
+import { Route as AuthenticatedMeusConteudosIndexRouteImport } from './routes/_authenticated/meus-conteudos.index'
 import { Route as AuthenticatedPersonagensIndexRouteImport } from './routes/_authenticated/personagens.index'
 import { Route as AuthenticatedPersonagensBibliotecaRouteImport } from './routes/_authenticated/personagens.biblioteca'
 import { Route as AuthenticatedPersonagensImprimirRouteImport } from './routes/_authenticated/personagens.imprimir'
@@ -31,6 +33,7 @@ import { Route as AuthenticatedChecklistsAvaliacoesIndexRouteImport } from './ro
 import { Route as AuthenticatedChecklistsAvaliacoesIdRouteImport } from './routes/_authenticated/checklists.avaliacoes.$id'
 import { Route as AuthenticatedChecklistsModelosIndexRouteImport } from './routes/_authenticated/checklists.modelos.index'
 import { Route as AuthenticatedChecklistsModelosIdRouteImport } from './routes/_authenticated/checklists.modelos.$id'
+import { Route as AuthenticatedMeusConteudosSimuladoIdRouteImport } from './routes/_authenticated/meus-conteudos.simulado.$id'
 import { Route as AuthenticatedPersonagensPersonasIdRouteImport } from './routes/_authenticated/personagens.personas.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -61,6 +64,12 @@ const AuthenticatedColaboradoresRoute =
   AuthenticatedColaboradoresRouteImport.update({
     id: '/colaboradores',
     path: '/colaboradores',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedMeusConteudosRoute =
+  AuthenticatedMeusConteudosRouteImport.update({
+    id: '/meus-conteudos',
+    path: '/meus-conteudos',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedPersonagensRoute =
@@ -110,6 +119,12 @@ const AuthenticatedColaboradoresIdRoute =
     path: '/$id',
     getParentRoute: () => AuthenticatedColaboradoresRoute,
   } as any)
+const AuthenticatedMeusConteudosIndexRoute =
+  AuthenticatedMeusConteudosIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedMeusConteudosRoute,
+  } as any)
 const AuthenticatedPersonagensIndexRoute =
   AuthenticatedPersonagensIndexRouteImport.update({
     id: '/',
@@ -158,6 +173,12 @@ const AuthenticatedChecklistsModelosIdRoute =
     path: '/modelos/$id',
     getParentRoute: () => AuthenticatedChecklistsRoute,
   } as any)
+const AuthenticatedMeusConteudosSimuladoIdRoute =
+  AuthenticatedMeusConteudosSimuladoIdRouteImport.update({
+    id: '/simulado/$id',
+    path: '/simulado/$id',
+    getParentRoute: () => AuthenticatedMeusConteudosRoute,
+  } as any)
 const AuthenticatedPersonagensPersonasIdRoute =
   AuthenticatedPersonagensPersonasIdRouteImport.update({
     id: '/personas/$id',
@@ -171,6 +192,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/checklists': typeof AuthenticatedChecklistsRouteWithChildren
   '/colaboradores': typeof AuthenticatedColaboradoresRouteWithChildren
+  '/meus-conteudos': typeof AuthenticatedMeusConteudosRouteWithChildren
   '/personagens': typeof AuthenticatedPersonagensRouteWithChildren
   '/portal': typeof AuthenticatedPortalRoute
   '/checklists/acompanhamento': typeof AuthenticatedChecklistsAcompanhamentoRoute
@@ -182,9 +204,11 @@ export interface FileRoutesByFullPath {
   '/personagens/simulacao': typeof AuthenticatedPersonagensSimulacaoRoute
   '/checklists/': typeof AuthenticatedChecklistsIndexRoute
   '/colaboradores/': typeof AuthenticatedColaboradoresIndexRoute
+  '/meus-conteudos/': typeof AuthenticatedMeusConteudosIndexRoute
   '/personagens/': typeof AuthenticatedPersonagensIndexRoute
   '/checklists/avaliacoes/$id': typeof AuthenticatedChecklistsAvaliacoesIdRoute
   '/checklists/modelos/$id': typeof AuthenticatedChecklistsModelosIdRoute
+  '/meus-conteudos/simulado/$id': typeof AuthenticatedMeusConteudosSimuladoIdRoute
   '/personagens/personas/$id': typeof AuthenticatedPersonagensPersonasIdRoute
   '/checklists/avaliacoes/': typeof AuthenticatedChecklistsAvaliacoesIndexRoute
   '/checklists/modelos/': typeof AuthenticatedChecklistsModelosIndexRoute
@@ -203,9 +227,11 @@ export interface FileRoutesByTo {
   '/personagens/simulacao': typeof AuthenticatedPersonagensSimulacaoRoute
   '/checklists': typeof AuthenticatedChecklistsIndexRoute
   '/colaboradores': typeof AuthenticatedColaboradoresIndexRoute
+  '/meus-conteudos': typeof AuthenticatedMeusConteudosIndexRoute
   '/personagens': typeof AuthenticatedPersonagensIndexRoute
   '/checklists/avaliacoes/$id': typeof AuthenticatedChecklistsAvaliacoesIdRoute
   '/checklists/modelos/$id': typeof AuthenticatedChecklistsModelosIdRoute
+  '/meus-conteudos/simulado/$id': typeof AuthenticatedMeusConteudosSimuladoIdRoute
   '/personagens/personas/$id': typeof AuthenticatedPersonagensPersonasIdRoute
   '/checklists/avaliacoes': typeof AuthenticatedChecklistsAvaliacoesIndexRoute
   '/checklists/modelos': typeof AuthenticatedChecklistsModelosIndexRoute
@@ -218,6 +244,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/checklists': typeof AuthenticatedChecklistsRouteWithChildren
   '/_authenticated/colaboradores': typeof AuthenticatedColaboradoresRouteWithChildren
+  '/_authenticated/meus-conteudos': typeof AuthenticatedMeusConteudosRouteWithChildren
   '/_authenticated/personagens': typeof AuthenticatedPersonagensRouteWithChildren
   '/_authenticated/portal': typeof AuthenticatedPortalRoute
   '/_authenticated/checklists/acompanhamento': typeof AuthenticatedChecklistsAcompanhamentoRoute
@@ -229,9 +256,11 @@ export interface FileRoutesById {
   '/_authenticated/personagens/simulacao': typeof AuthenticatedPersonagensSimulacaoRoute
   '/_authenticated/checklists/': typeof AuthenticatedChecklistsIndexRoute
   '/_authenticated/colaboradores/': typeof AuthenticatedColaboradoresIndexRoute
+  '/_authenticated/meus-conteudos/': typeof AuthenticatedMeusConteudosIndexRoute
   '/_authenticated/personagens/': typeof AuthenticatedPersonagensIndexRoute
   '/_authenticated/checklists/avaliacoes/$id': typeof AuthenticatedChecklistsAvaliacoesIdRoute
   '/_authenticated/checklists/modelos/$id': typeof AuthenticatedChecklistsModelosIdRoute
+  '/_authenticated/meus-conteudos/simulado/$id': typeof AuthenticatedMeusConteudosSimuladoIdRoute
   '/_authenticated/personagens/personas/$id': typeof AuthenticatedPersonagensPersonasIdRoute
   '/_authenticated/checklists/avaliacoes/': typeof AuthenticatedChecklistsAvaliacoesIndexRoute
   '/_authenticated/checklists/modelos/': typeof AuthenticatedChecklistsModelosIndexRoute
@@ -244,6 +273,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/checklists'
     | '/colaboradores'
+    | '/meus-conteudos'
     | '/personagens'
     | '/portal'
     | '/checklists/acompanhamento'
@@ -255,9 +285,11 @@ export interface FileRouteTypes {
     | '/personagens/simulacao'
     | '/checklists/'
     | '/colaboradores/'
+    | '/meus-conteudos/'
     | '/personagens/'
     | '/checklists/avaliacoes/$id'
     | '/checklists/modelos/$id'
+    | '/meus-conteudos/simulado/$id'
     | '/personagens/personas/$id'
     | '/checklists/avaliacoes/'
     | '/checklists/modelos/'
@@ -276,9 +308,11 @@ export interface FileRouteTypes {
     | '/personagens/simulacao'
     | '/checklists'
     | '/colaboradores'
+    | '/meus-conteudos'
     | '/personagens'
     | '/checklists/avaliacoes/$id'
     | '/checklists/modelos/$id'
+    | '/meus-conteudos/simulado/$id'
     | '/personagens/personas/$id'
     | '/checklists/avaliacoes'
     | '/checklists/modelos'
@@ -290,6 +324,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/checklists'
     | '/_authenticated/colaboradores'
+    | '/_authenticated/meus-conteudos'
     | '/_authenticated/personagens'
     | '/_authenticated/portal'
     | '/_authenticated/checklists/acompanhamento'
@@ -301,9 +336,11 @@ export interface FileRouteTypes {
     | '/_authenticated/personagens/simulacao'
     | '/_authenticated/checklists/'
     | '/_authenticated/colaboradores/'
+    | '/_authenticated/meus-conteudos/'
     | '/_authenticated/personagens/'
     | '/_authenticated/checklists/avaliacoes/$id'
     | '/_authenticated/checklists/modelos/$id'
+    | '/_authenticated/meus-conteudos/simulado/$id'
     | '/_authenticated/personagens/personas/$id'
     | '/_authenticated/checklists/avaliacoes/'
     | '/_authenticated/checklists/modelos/'
@@ -357,6 +394,13 @@ declare module '@tanstack/react-router' {
       path: '/colaboradores'
       fullPath: '/colaboradores'
       preLoaderRoute: typeof AuthenticatedColaboradoresRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/meus-conteudos': {
+      id: '/_authenticated/meus-conteudos'
+      path: '/meus-conteudos'
+      fullPath: '/meus-conteudos'
+      preLoaderRoute: typeof AuthenticatedMeusConteudosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/personagens': {
@@ -415,6 +459,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedColaboradoresIdRouteImport
       parentRoute: typeof AuthenticatedColaboradoresRoute
     }
+    '/_authenticated/meus-conteudos/': {
+      id: '/_authenticated/meus-conteudos/'
+      path: '/'
+      fullPath: '/meus-conteudos/'
+      preLoaderRoute: typeof AuthenticatedMeusConteudosIndexRouteImport
+      parentRoute: typeof AuthenticatedMeusConteudosRoute
+    }
     '/_authenticated/personagens/': {
       id: '/_authenticated/personagens/'
       path: '/'
@@ -470,6 +521,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/checklists/modelos/$id'
       preLoaderRoute: typeof AuthenticatedChecklistsModelosIdRouteImport
       parentRoute: typeof AuthenticatedChecklistsRoute
+    }
+    '/_authenticated/meus-conteudos/simulado/$id': {
+      id: '/_authenticated/meus-conteudos/simulado/$id'
+      path: '/simulado/$id'
+      fullPath: '/meus-conteudos/simulado/$id'
+      preLoaderRoute: typeof AuthenticatedMeusConteudosSimuladoIdRouteImport
+      parentRoute: typeof AuthenticatedMeusConteudosRoute
     }
     '/_authenticated/personagens/personas/$id': {
       id: '/_authenticated/personagens/personas/$id'
@@ -531,6 +589,23 @@ const AuthenticatedColaboradoresRouteWithChildren =
     AuthenticatedColaboradoresRouteChildren,
   )
 
+interface AuthenticatedMeusConteudosRouteChildren {
+  AuthenticatedMeusConteudosIndexRoute: typeof AuthenticatedMeusConteudosIndexRoute
+  AuthenticatedMeusConteudosSimuladoIdRoute: typeof AuthenticatedMeusConteudosSimuladoIdRoute
+}
+
+const AuthenticatedMeusConteudosRouteChildren: AuthenticatedMeusConteudosRouteChildren =
+  {
+    AuthenticatedMeusConteudosIndexRoute: AuthenticatedMeusConteudosIndexRoute,
+    AuthenticatedMeusConteudosSimuladoIdRoute:
+      AuthenticatedMeusConteudosSimuladoIdRoute,
+  }
+
+const AuthenticatedMeusConteudosRouteWithChildren =
+  AuthenticatedMeusConteudosRoute._addFileChildren(
+    AuthenticatedMeusConteudosRouteChildren,
+  )
+
 interface AuthenticatedPersonagensRouteChildren {
   AuthenticatedPersonagensBibliotecaRoute: typeof AuthenticatedPersonagensBibliotecaRoute
   AuthenticatedPersonagensImprimirRoute: typeof AuthenticatedPersonagensImprimirRoute
@@ -561,6 +636,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedChecklistsRoute: typeof AuthenticatedChecklistsRouteWithChildren
   AuthenticatedColaboradoresRoute: typeof AuthenticatedColaboradoresRouteWithChildren
+  AuthenticatedMeusConteudosRoute: typeof AuthenticatedMeusConteudosRouteWithChildren
   AuthenticatedPersonagensRoute: typeof AuthenticatedPersonagensRouteWithChildren
   AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
 }
@@ -569,6 +645,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedChecklistsRoute: AuthenticatedChecklistsRouteWithChildren,
   AuthenticatedColaboradoresRoute: AuthenticatedColaboradoresRouteWithChildren,
+  AuthenticatedMeusConteudosRoute: AuthenticatedMeusConteudosRouteWithChildren,
   AuthenticatedPersonagensRoute: AuthenticatedPersonagensRouteWithChildren,
   AuthenticatedPortalRoute: AuthenticatedPortalRoute,
 }
@@ -584,13 +661,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

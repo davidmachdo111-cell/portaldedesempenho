@@ -3,6 +3,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Copy, Printer, Save, Shuffle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/personas/PersonasShell";
+import { AnexosManager } from "@/components/personas/AnexosManager";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -35,7 +37,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/personagens/simulacao")({
   head: () => ({
     meta: [
-      { title: "Montar Simulação | Banco de Personas" },
+      { title: "Montar Simulação | Portal de Desempenho" },
       {
         name: "description",
         content:
@@ -197,6 +199,17 @@ function MontarSimulacao() {
               </Campo>
             </div>
           </SecaoFormulario>
+
+          <SecaoFormulario
+            titulo="Anexos do simulado"
+            descricao="Arquivos de apoio vinculados exclusivamente a este simulado, com descrição, momento e orientações de uso."
+          >
+            <AnexosManager
+              vinculo={simulacaoId ? { tipo: "simulado", id: simulacaoId } : null}
+              aviso="Salve a simulação para habilitar os anexos."
+            />
+          </SecaoFormulario>
+
 
           <SecaoFormulario
             titulo="Filtros e seleção"

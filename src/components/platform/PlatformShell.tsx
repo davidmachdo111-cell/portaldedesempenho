@@ -8,6 +8,7 @@ import {
   ClipboardCheck,
   Users,
   UserRound,
+  FolderOpen,
 } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -18,6 +19,7 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { to: "/portal", label: "Portal", icon: LayoutGrid, permission: null },
+  { to: "/meus-conteudos", label: "Meus Conteúdos", icon: FolderOpen, permission: "meus_conteudos" },
   { to: "/checklists", label: "Checklists", icon: ClipboardCheck, permission: "checklists" },
   {
     to: "/personagens",
@@ -28,6 +30,7 @@ const navItems = [
   { to: "/colaboradores", label: "Colaboradores", icon: UserRound, permission: "colaboradores" },
   { to: "/admin", label: "Administração", icon: ShieldCheck, permission: "administracao" },
 ] as const;
+
 
 export function PlatformShell({
   title,
@@ -59,14 +62,18 @@ export function PlatformShell({
     <div className="flex min-h-screen w-full bg-background">
       <aside className="hidden w-64 shrink-0 flex-col bg-sidebar text-sidebar-foreground md:flex">
         <div className="flex items-center gap-3 px-5 py-6">
-          <div className="flex size-9 items-center justify-center rounded-lg bg-brand-gradient font-bold text-brand-foreground">
+          <div
+            aria-hidden="true"
+            className="flex size-9 items-center justify-center rounded-lg bg-brand-gradient font-bold text-brand-foreground"
+          >
             P
           </div>
           <div className="leading-tight">
-            <p className="text-sm font-semibold">Plataforma</p>
-            <p className="text-xs text-sidebar-foreground/70">Corporativa</p>
+            <p className="text-sm font-semibold">Portal</p>
+            <p className="text-xs text-sidebar-foreground/70">de Desempenho</p>
           </div>
         </div>
+
         <nav className="flex-1 space-y-1 px-3">
           {visible.map((item) => {
             const active = pathname === item.to || pathname.startsWith(`${item.to}/`);

@@ -4,13 +4,13 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/_authenticated/personagens")({
   head: () => ({
     meta: [
-      { title: "Personagens e Simulados — Plataforma Corporativa" },
+      { title: "Personagens e Simulados — Portal de Desempenho" },
       {
         name: "description",
         content:
           "Módulo Personagens e Simulados: personagens, roteiros, cenários, simulações e PDFs para treinamentos.",
       },
-      { property: "og:title", content: "Personagens e Simulados — Plataforma Corporativa" },
+      { property: "og:title", content: "Personagens e Simulados — Portal de Desempenho" },
       {
         property: "og:description",
         content: "Personagens, roteiros, cenários e simulações para treinamentos.",

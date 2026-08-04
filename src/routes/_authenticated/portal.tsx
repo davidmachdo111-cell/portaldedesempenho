@@ -12,12 +12,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 export const Route = createFileRoute("/_authenticated/portal")({
   head: () => ({
     meta: [
-      { title: "Portal Principal — Plataforma Corporativa" },
+      { title: "Portal Principal — Portal de Desempenho" },
       {
         name: "description",
         content: "Acesse os módulos liberados para o seu usuário na plataforma corporativa.",
       },
-      { property: "og:title", content: "Portal Principal — Plataforma Corporativa" },
+      { property: "og:title", content: "Portal Principal — Portal de Desempenho" },
       {
         property: "og:description",
         content: "Portal central de módulos da plataforma corporativa.",

@@ -52,7 +52,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/personagens/biblioteca")({
   head: () => ({
     meta: [
-      { title: "Biblioteca de Personas | Banco de Personas" },
+      { title: "Biblioteca de Personas | Portal de Desempenho" },
       {
         name: "description",
         content:
