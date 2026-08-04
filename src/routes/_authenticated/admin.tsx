@@ -13,18 +13,25 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
-      { title: "Administração Central — Plataforma Corporativa" },
+      { title: "Administração Central — Portal de Desempenho" },
       {
         name: "description",
         content:
           "Gerencie usuários, perfis, permissões, sessões e módulos de toda a plataforma em um só painel.",
       },
-      { property: "og:title", content: "Administração Central — Plataforma Corporativa" },
+      { property: "og:title", content: "Administração Central — Portal de Desempenho" },
       {
         property: "og:description",
         content: "Usuários, perfis, permissões, sessões e módulos centralizados.",

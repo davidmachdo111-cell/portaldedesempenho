@@ -26,7 +26,12 @@ export function PersonaPrint({ persona, indice }: { persona: Persona; indice: nu
           </p>
           <h2 className="text-2xl font-bold text-brand-dark">{persona.nome}</h2>
           <p className="mt-1 text-[12px] text-muted-foreground">
-            {[persona.idade && `${persona.idade} anos`, persona.sexo, persona.cidade, persona.tipo_cliente]
+            {[
+              persona.idade && `${persona.idade} anos`,
+              persona.sexo,
+              persona.cidade,
+              persona.tipo_cliente,
+            ]
               .filter(Boolean)
               .join(" • ") || "—"}
           </p>
@@ -125,7 +130,7 @@ export function PersonaPrint({ persona, indice }: { persona: Persona; indice: nu
       {persona.encerramento && <Bloco titulo="Encerramento">{persona.encerramento}</Bloco>}
 
       <footer className="mt-6 border-t border-border pt-2 text-[10px] text-muted-foreground">
-        Banco de Personas • Material de apoio para simulação — uso interno
+        Portal de Desempenho • Material de apoio para simulação — uso interno
       </footer>
     </article>
   );

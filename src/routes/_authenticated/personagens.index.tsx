@@ -1,14 +1,6 @@
 import { useMemo } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  Archive,
-  ArrowUpRight,
-  ClipboardList,
-  History,
-  Layers,
-  Star,
-  Users,
-} from "lucide-react";
+import { Archive, ArrowUpRight, ClipboardList, History, Layers, Star, Users } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -35,13 +27,13 @@ import {
 export const Route = createFileRoute("/_authenticated/personagens/")({
   head: () => ({
     meta: [
-      { title: "Dashboard | Banco de Personas" },
+      { title: "Dashboard | Portal de Desempenho" },
       {
         name: "description",
         content:
-          "Indicadores do Banco de Personas: totais por exercício, vertente e complexidade, últimas alterações e simulações montadas.",
+          "Indicadores do Portal de Desempenho: totais por exercício, vertente e complexidade, últimas alterações e simulações montadas.",
       },
-      { property: "og:title", content: "Dashboard | Banco de Personas" },
+      { property: "og:title", content: "Dashboard | Portal de Desempenho" },
       {
         property: "og:description",
         content: "Painel de indicadores das personas usadas em simulações realísticas.",
@@ -51,7 +43,13 @@ export const Route = createFileRoute("/_authenticated/personagens/")({
   component: Dashboard,
 });
 
-const CORES = ["var(--brand)", "var(--brand-dark)", "var(--highlight)", "var(--warning)", "var(--brand-support)"];
+const CORES = [
+  "var(--brand)",
+  "var(--brand-dark)",
+  "var(--highlight)",
+  "var(--warning)",
+  "var(--brand-support)",
+];
 
 function Indicador({
   titulo,
@@ -99,7 +97,10 @@ function Dashboard() {
 
   const porExercicio = useMemo(() => contar(personas, "exercicio", EXERCICIOS), [personas]);
   const porVertente = useMemo(() => contar(personas, "vertente", VERTENTES), [personas]);
-  const porComplexidade = useMemo(() => contar(personas, "complexidade", COMPLEXIDADES), [personas]);
+  const porComplexidade = useMemo(
+    () => contar(personas, "complexidade", COMPLEXIDADES),
+    [personas],
+  );
 
   const ultimas = [...personas]
     .sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at))
@@ -108,7 +109,7 @@ function Dashboard() {
   return (
     <AppShell
       titulo="Dashboard"
-      descricao="Visão geral do Banco de Personas"
+      descricao="Visão geral do Portal de Desempenho"
       acoes={
         <>
           <Button asChild variant="outline">
@@ -150,7 +151,14 @@ function Dashboard() {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={porExercicio}>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                    <XAxis dataKey="nome" tick={{ fontSize: 11 }} interval={0} angle={-20} dy={10} height={50} />
+                    <XAxis
+                      dataKey="nome"
+                      tick={{ fontSize: 11 }}
+                      interval={0}
+                      angle={-20}
+                      dy={10}
+                      height={50}
+                    />
                     <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
                     <Tooltip cursor={{ fill: "var(--muted)" }} />
                     <Bar dataKey="total" fill="var(--brand)" radius={[6, 6, 0, 0]} />
@@ -164,7 +172,13 @@ function Dashboard() {
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={porVertente} dataKey="total" nameKey="nome" innerRadius={45} outerRadius={80}>
+                    <Pie
+                      data={porVertente}
+                      dataKey="total"
+                      nameKey="nome"
+                      innerRadius={45}
+                      outerRadius={80}
+                    >
                       {porVertente.map((_, i) => (
                         <Cell key={i} fill={CORES[i % CORES.length]} />
                       ))}

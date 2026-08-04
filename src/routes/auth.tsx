@@ -15,13 +15,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Entrar — Plataforma Corporativa" },
+      { title: "Entrar — Portal de Desempenho" },
       {
         name: "description",
         content:
           "Acesso único à plataforma corporativa: Checklists, Personagens e Simulados e Administração Central.",
       },
-      { property: "og:title", content: "Entrar — Plataforma Corporativa" },
+      { property: "og:title", content: "Entrar — Portal de Desempenho" },
       {
         property: "og:description",
         content: "Login único para todos os módulos da plataforma corporativa.",
@@ -110,7 +110,7 @@ function AuthPage() {
             P
           </div>
           <span className="text-sm font-semibold tracking-wide uppercase">
-            Plataforma Corporativa
+            Portal de Desempenho
           </span>
         </div>
         <div className="max-w-md space-y-4">

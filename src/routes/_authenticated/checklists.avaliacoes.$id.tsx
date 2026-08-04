@@ -162,7 +162,11 @@ function PaginaPreenchimento() {
       descricao={`${checklist?.nome ?? ""} · ${percentual.toFixed(0)}% concluído · média ${mediaGeral(avaliacao).toFixed(1)}%`}
       acoes={
         <>
-          <Button variant="outline" size="sm" onClick={() => exportarExcel(avaliacao, ctxRelatorio)}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => exportarExcel(avaliacao, ctxRelatorio)}
+          >
             <SheetIcon className="h-4 w-4" /> Excel
           </Button>
           <Button variant="outline" size="sm" onClick={() => exportarPDF(avaliacao, ctxRelatorio)}>
@@ -196,7 +200,11 @@ function PaginaPreenchimento() {
           <Button
             size="sm"
             variant="ghost"
-            onClick={() => router.navigate({ to: isAdmin && !proprio ? "/checklists/acompanhamento" : "/checklists/avaliacoes" })}
+            onClick={() =>
+              router.navigate({
+                to: isAdmin && !proprio ? "/checklists/acompanhamento" : "/checklists/avaliacoes",
+              })
+            }
           >
             Voltar
           </Button>

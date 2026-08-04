@@ -193,8 +193,16 @@ function PainelColaborador() {
       ) : (
         <div className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <Metrica titulo="Progresso" valor={`${m.percentual}%`} detalhe={`${m.concluidas} de ${m.total} atividades`} />
-            <Metrica titulo="Pendentes" valor={String(m.pendentes)} detalhe="Aguardando conclusão" />
+            <Metrica
+              titulo="Progresso"
+              valor={`${m.percentual}%`}
+              detalhe={`${m.concluidas} de ${m.total} atividades`}
+            />
+            <Metrica
+              titulo="Pendentes"
+              valor={String(m.pendentes)}
+              detalhe="Aguardando conclusão"
+            />
             <Metrica
               titulo="Checklists"
               valor={`${porTipo("checklist").filter((a) => a.status === "concluida").length}/${porTipo("checklist").length}`}
@@ -359,7 +367,10 @@ function PainelColaborador() {
                       <Leitura label="Setor" value={dados.setor || "—"} />
                       <Leitura label="Célula" value={dados.celula || "—"} />
                       <Leitura label="Admissão" value={formatarData(dados.data_admissao)} />
-                      <Leitura label="Status" value={dados.status === "ativo" ? "Ativo" : "Inativo"} />
+                      <Leitura
+                        label="Status"
+                        value={dados.status === "ativo" ? "Ativo" : "Inativo"}
+                      />
                     </>
                   )}
                 </CardContent>
@@ -483,15 +494,7 @@ function PainelColaborador() {
   );
 }
 
-function Metrica({
-  titulo,
-  valor,
-  detalhe,
-}: {
-  titulo: string;
-  valor: string;
-  detalhe: string;
-}) {
+function Metrica({ titulo, valor, detalhe }: { titulo: string; valor: string; detalhe: string }) {
   return (
     <Card>
       <CardContent className="p-5">

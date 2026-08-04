@@ -52,7 +52,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/personagens/biblioteca")({
   head: () => ({
     meta: [
-      { title: "Biblioteca de Personas | Banco de Personas" },
+      { title: "Biblioteca de Personas | Portal de Desempenho" },
       {
         name: "description",
         content:
@@ -154,7 +154,10 @@ function Biblioteca() {
       toast.error("Selecione ao menos uma persona.");
       return;
     }
-    navigate({ to: "/personagens/imprimir", search: { ids: selecionadas.join(","), nome: "Impressão em lote" } });
+    navigate({
+      to: "/personagens/imprimir",
+      search: { ids: selecionadas.join(","), nome: "Impressão em lote" },
+    });
   }
 
   return (
@@ -186,8 +189,18 @@ function Biblioteca() {
             />
           </div>
           <div className="flex flex-wrap gap-3">
-            <Selecao valor={exercicio} onChange={setExercicio} opcoes={EXERCICIOS} placeholder="Exercício" />
-            <Selecao valor={vertente} onChange={setVertente} opcoes={VERTENTES} placeholder="Vertente" />
+            <Selecao
+              valor={exercicio}
+              onChange={setExercicio}
+              opcoes={EXERCICIOS}
+              placeholder="Exercício"
+            />
+            <Selecao
+              valor={vertente}
+              onChange={setVertente}
+              opcoes={VERTENTES}
+              placeholder="Vertente"
+            />
             <Selecao
               valor={complexidade}
               onChange={setComplexidade}
@@ -269,7 +282,8 @@ function Biblioteca() {
                 <div className="min-w-0 flex-1">
                   <h3 className="truncate font-semibold">{p.nome}</h3>
                   <p className="truncate text-xs text-muted-foreground">
-                    {[p.cidade, p.tipo_cliente].filter(Boolean).join(" • ") || "Sem cidade definida"}
+                    {[p.cidade, p.tipo_cliente].filter(Boolean).join(" • ") ||
+                      "Sem cidade definida"}
                   </p>
                 </div>
                 <button
@@ -362,7 +376,10 @@ function Biblioteca() {
             </thead>
             <tbody>
               {filtradas.map((p) => (
-                <tr key={p.id} className="border-b border-border/70 last:border-0 hover:bg-muted/40">
+                <tr
+                  key={p.id}
+                  className="border-b border-border/70 last:border-0 hover:bg-muted/40"
+                >
                   <td className="p-3">
                     <Checkbox
                       checked={selecionadas.includes(p.id)}

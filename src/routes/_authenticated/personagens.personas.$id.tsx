@@ -15,18 +15,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { AnexosManager } from "@/components/personas/AnexosManager";
 import {
-  abrirMaterial,
   useAcoesPersona,
   useCriarPerfil,
   useHistorico,
-  useMateriais,
   usePerfisPersonalizados,
   usePersona,
-  useRemoverMaterial,
   useSalvarPersona,
-  useUploadMaterial,
 } from "@/lib/personas/api";
+
 import {
   CAMPOS_TECNICOS_SUGERIDOS,
   COMPLEXIDADES,
@@ -42,7 +40,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/personagens/personas/$id")({
   head: () => ({
     meta: [
-      { title: "Criar / Editar Persona | Banco de Personas" },
+      { title: "Criar / Editar Persona | Portal de Desempenho" },
       {
         name: "description",
         content:
@@ -70,9 +68,6 @@ function EditorPersona() {
   const { duplicar } = useAcoesPersona();
   const { data: perfisCustom = [] } = usePerfisPersonalizados();
   const criarPerfil = useCriarPerfil();
-  const { data: materiais = [] } = useMateriais(id);
-  const upload = useUploadMaterial(id);
-  const removerMaterial = useRemoverMaterial(id);
   const { data: historico = [] } = useHistorico(novo ? undefined : id, 20);
 
   const [form, setForm] = useState<Form>(personaVazia());
@@ -81,8 +76,14 @@ function EditorPersona() {
 
   useEffect(() => {
     if (persona) {
-      const { id: _i, created_at: _c, updated_at: _u, created_by: _cb, updated_by: _ub, ...resto } =
-        persona;
+      const {
+        id: _i,
+        created_at: _c,
+        updated_at: _u,
+        created_by: _cb,
+        updated_by: _ub,
+        ...resto
+      } = persona;
       setForm({ ...personaVazia(), ...(resto as Partial<Form>) } as Form);
     }
   }, [persona]);
@@ -169,7 +170,10 @@ function EditorPersona() {
                   <Input value={form.sexo ?? ""} onChange={(e) => set("sexo", e.target.value)} />
                 </Campo>
                 <Campo label="Cidade">
-                  <Input value={form.cidade ?? ""} onChange={(e) => set("cidade", e.target.value)} />
+                  <Input
+                    value={form.cidade ?? ""}
+                    onChange={(e) => set("cidade", e.target.value)}
+                  />
                 </Campo>
                 <Campo label="Tipo de cliente">
                   <Input
@@ -279,7 +283,12 @@ function EditorPersona() {
             >
               <ListaPares
                 itens={(form.dados_tecnicos ?? []).map((d) => ({ a: d.label, b: d.valor }))}
-                onChange={(v) => set("dados_tecnicos", v.map((x) => ({ label: x.a, valor: x.b })))}
+                onChange={(v) =>
+                  set(
+                    "dados_tecnicos",
+                    v.map((x) => ({ label: x.a, valor: x.b })),
+                  )
+                }
                 labelA="Campo"
                 labelB="Valor"
                 rotuloAdicionar="Adicionar campo técnico"
@@ -364,7 +373,10 @@ function EditorPersona() {
                       b: i.resposta,
                     }))}
                     onChange={(v) =>
-                      set("informacoes_ocultas", v.map((x) => ({ pergunta: x.a, resposta: x.b })))
+                      set(
+                        "informacoes_ocultas",
+                        v.map((x) => ({ pergunta: x.a, resposta: x.b })),
+                      )
                     }
                     labelA="Pergunta esperada"
                     labelB="Resposta da persona"
@@ -419,7 +431,10 @@ function EditorPersona() {
                     <button
                       type="button"
                       onClick={() =>
-                        set("palavras_chave", form.palavras_chave.filter((x) => x !== p))
+                        set(
+                          "palavras_chave",
+                          form.palavras_chave.filter((x) => x !== p),
+                        )
                       }
                     >
                       <X className="size-3" />
@@ -484,58 +499,13 @@ function EditorPersona() {
             </SecaoFormulario>
 
             <SecaoFormulario
-              titulo="Materiais de apoio"
-              descricao="PDFs, guias, imagens e capturas vinculados a esta persona."
+              titulo="Anexos do personagem"
+              descricao="PDFs, guias, imagens e capturas vinculados exclusivamente a este personagem, com descrição, momento e orientações de uso."
             >
-              {novo ? (
-                <p className="text-sm text-muted-foreground">
-                  Salve a persona para habilitar os anexos.
-                </p>
-              ) : (
-                <>
-                  <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground transition-colors hover:border-brand hover:text-brand">
-                    <Paperclip className="size-4" />
-                    {upload.isPending ? "Enviando…" : "Anexar arquivo"}
-                    <input
-                      type="file"
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file)
-                          upload.mutate(file, {
-                            onSuccess: () => toast.success("Material anexado."),
-                            onError: (err) => toast.error(err.message),
-                          });
-                        e.target.value = "";
-                      }}
-                    />
-                  </label>
-                  <ul className="mt-3 space-y-2">
-                    {materiais.map((m) => (
-                      <li
-                        key={m.id}
-                        className="flex items-center gap-2 rounded-lg border border-border p-2.5 text-sm"
-                      >
-                        <button
-                          className="min-w-0 flex-1 truncate text-left hover:text-brand"
-                          onClick={() => abrirMaterial(m.path)}
-                        >
-                          {m.nome}
-                        </button>
-                        <button
-                          className="text-muted-foreground hover:text-destructive"
-                          onClick={() => removerMaterial.mutate(m)}
-                        >
-                          <Trash2 className="size-4" />
-                        </button>
-                      </li>
-                    ))}
-                    {materiais.length === 0 && (
-                      <li className="text-sm text-muted-foreground">Nenhum material anexado.</li>
-                    )}
-                  </ul>
-                </>
-              )}
+              <AnexosManager
+                vinculo={novo ? null : { tipo: "persona", id: id }}
+                aviso="Salve o personagem para habilitar os anexos."
+              />
             </SecaoFormulario>
 
             {!novo && (

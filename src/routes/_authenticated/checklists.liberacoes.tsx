@@ -98,9 +98,7 @@ function PaginaLiberacoes() {
                 <Checkbox
                   disabled={!atual || alternar.isPending}
                   checked={liberado(a.id)}
-                  onCheckedChange={(v) =>
-                    alternar.mutate({ avaliadorId: a.id, ativo: v === true })
-                  }
+                  onCheckedChange={(v) => alternar.mutate({ avaliadorId: a.id, ativo: v === true })}
                   className="h-5 w-5 rounded-[6px] border-border data-[state=checked]:border-primary data-[state=checked]:bg-primary"
                 />
                 <div className="min-w-0">

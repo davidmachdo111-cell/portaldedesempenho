@@ -548,30 +548,42 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string | null
+          descricao: string
           id: string
+          momento: string
           nome: string
+          orientacoes: string
           path: string
-          persona_id: string
+          persona_id: string | null
+          simulacao_id: string | null
           tamanho: number | null
           tipo: string | null
         }
         Insert: {
           created_at?: string
           created_by?: string | null
+          descricao?: string
           id?: string
+          momento?: string
           nome: string
+          orientacoes?: string
           path: string
-          persona_id: string
+          persona_id?: string | null
+          simulacao_id?: string | null
           tamanho?: number | null
           tipo?: string | null
         }
         Update: {
           created_at?: string
           created_by?: string | null
+          descricao?: string
           id?: string
+          momento?: string
           nome?: string
+          orientacoes?: string
           path?: string
-          persona_id?: string
+          persona_id?: string | null
+          simulacao_id?: string | null
           tamanho?: number | null
           tipo?: string | null
         }
@@ -581,6 +593,13 @@ export type Database = {
             columns: ["persona_id"]
             isOneToOne: false
             referencedRelation: "personas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "persona_materiais_simulacao_id_fkey"
+            columns: ["simulacao_id"]
+            isOneToOne: false
+            referencedRelation: "simulacoes"
             referencedColumns: ["id"]
           },
         ]
@@ -949,6 +968,14 @@ export type Database = {
       is_admin:
         | { Args: never; Returns: boolean }
         | { Args: { _user_id: string }; Returns: boolean }
+      persona_liberada: { Args: { _persona_id: string }; Returns: boolean }
+      pode_baixar_material: { Args: { _path: string }; Returns: boolean }
+      pode_gerenciar_colaboradores: {
+        Args: { _user_id: string }
+        Returns: boolean
+      }
+      pode_gerenciar_personas: { Args: { _user_id: string }; Returns: boolean }
+      simulado_liberado: { Args: { _simulacao_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

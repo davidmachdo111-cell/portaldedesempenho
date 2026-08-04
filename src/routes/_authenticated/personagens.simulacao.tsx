@@ -3,6 +3,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Copy, Printer, Save, Shuffle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/personas/PersonasShell";
+import { AnexosManager } from "@/components/personas/AnexosManager";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -35,7 +37,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/personagens/simulacao")({
   head: () => ({
     meta: [
-      { title: "Montar Simulação | Banco de Personas" },
+      { title: "Montar Simulação | Portal de Desempenho" },
       {
         name: "description",
         content:
@@ -183,7 +185,11 @@ function MontarSimulacao() {
           <SecaoFormulario titulo="Dados da simulação">
             <div className="grid gap-4 sm:grid-cols-2">
               <Campo label="Nome da simulação">
-                <Input value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Ex.: Turma 12 — Exercício 3" />
+                <Input
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
+                  placeholder="Ex.: Turma 12 — Exercício 3"
+                />
               </Campo>
               <Campo label="Responsável">
                 <Input
@@ -193,9 +199,23 @@ function MontarSimulacao() {
                 />
               </Campo>
               <Campo label="Observações" className="sm:col-span-2">
-                <Textarea rows={2} value={observacoes} onChange={(e) => setObservacoes(e.target.value)} />
+                <Textarea
+                  rows={2}
+                  value={observacoes}
+                  onChange={(e) => setObservacoes(e.target.value)}
+                />
               </Campo>
             </div>
+          </SecaoFormulario>
+
+          <SecaoFormulario
+            titulo="Anexos do simulado"
+            descricao="Arquivos de apoio vinculados exclusivamente a este simulado, com descrição, momento e orientações de uso."
+          >
+            <AnexosManager
+              vinculo={simulacaoId ? { tipo: "simulado", id: simulacaoId } : null}
+              aviso="Salve a simulação para habilitar os anexos."
+            />
           </SecaoFormulario>
 
           <SecaoFormulario

@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_authenticated/personagens/imprimir")({
   }),
   head: () => ({
     meta: [
-      { title: "Impressão de simulação | Banco de Personas" },
+      { title: "Impressão de simulação | Portal de Desempenho" },
       {
         name: "description",
         content: "Documento em A4 com capa e uma persona por página, pronto para impressão ou PDF.",
@@ -75,7 +75,7 @@ function Imprimir() {
           <section className="print-page mx-auto mb-8 flex min-h-[240mm] w-full max-w-[210mm] flex-col justify-between bg-white p-12 shadow-soft print:mb-0 print:min-h-[247mm] print:p-0 print:shadow-none">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-brand">
-                Banco de Personas
+                Portal de Desempenho
               </p>
               <div className="mt-2 h-1 w-24 rounded-full bg-highlight" />
             </div>

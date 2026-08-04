@@ -65,7 +65,10 @@ function PaginaColaboradores() {
 
   const criar = useMutation({
     mutationFn: () =>
-      criarColaborador({ ...form, username: normalizeUsername(form.username || form.nome_completo) }),
+      criarColaborador({
+        ...form,
+        username: normalizeUsername(form.username || form.nome_completo),
+      }),
     onSuccess: () => {
       toast.success("Colaborador cadastrado.");
       setAberto(false);

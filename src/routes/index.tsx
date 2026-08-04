@@ -5,13 +5,13 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Plataforma Corporativa — Portal de Módulos" },
+      { title: "Portal de Desempenho — Módulos corporativos" },
       {
         name: "description",
         content:
           "Portal único com acesso aos módulos Checklists e Personagens e Simulados, com usuários, perfis e permissões centralizados.",
       },
-      { property: "og:title", content: "Plataforma Corporativa — Portal de Módulos" },
+      { property: "og:title", content: "Portal de Desempenho — Módulos corporativos" },
       {
         property: "og:description",
         content: "Portal único com acesso aos módulos Checklists e Personagens e Simulados, com usuários, perfis e permissões centralizados.",
@@ -34,7 +34,7 @@ function Index() {
         <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-xl bg-brand-foreground/15 text-xl font-bold">
           P
         </div>
-        <h1 className="text-xl font-semibold">Plataforma Corporativa</h1>
+        <h1 className="text-xl font-semibold">Portal de Desempenho</h1>
         <p className="mt-1 text-sm text-brand-foreground/80">Redirecionando...</p>
       </div>
     </div>
