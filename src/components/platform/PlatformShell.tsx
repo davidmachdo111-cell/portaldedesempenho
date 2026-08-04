@@ -19,7 +19,12 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { to: "/portal", label: "Portal", icon: LayoutGrid, permission: null },
-  { to: "/meus-conteudos", label: "Meus Conteúdos", icon: FolderOpen, permission: "meus_conteudos" },
+  {
+    to: "/meus-conteudos",
+    label: "Meus Conteúdos",
+    icon: FolderOpen,
+    permission: "meus_conteudos",
+  },
   { to: "/checklists", label: "Checklists", icon: ClipboardCheck, permission: "checklists" },
   {
     to: "/personagens",
@@ -30,7 +35,6 @@ const navItems = [
   { to: "/colaboradores", label: "Colaboradores", icon: UserRound, permission: "colaboradores" },
   { to: "/admin", label: "Administração", icon: ShieldCheck, permission: "administracao" },
 ] as const;
-
 
 export function PlatformShell({
   title,

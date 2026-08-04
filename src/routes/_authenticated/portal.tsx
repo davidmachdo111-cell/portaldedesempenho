@@ -51,8 +51,8 @@ function PortalPage() {
           <CardHeader>
             <CardTitle>Nenhum módulo liberado</CardTitle>
             <CardDescription>
-              Seu usuário ainda não possui permissão para acessar módulos. Procure o administrador da
-              plataforma.
+              Seu usuário ainda não possui permissão para acessar módulos. Procure o administrador
+              da plataforma.
             </CardDescription>
           </CardHeader>
         </Card>

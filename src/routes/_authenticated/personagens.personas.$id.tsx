@@ -76,8 +76,14 @@ function EditorPersona() {
 
   useEffect(() => {
     if (persona) {
-      const { id: _i, created_at: _c, updated_at: _u, created_by: _cb, updated_by: _ub, ...resto } =
-        persona;
+      const {
+        id: _i,
+        created_at: _c,
+        updated_at: _u,
+        created_by: _cb,
+        updated_by: _ub,
+        ...resto
+      } = persona;
       setForm({ ...personaVazia(), ...(resto as Partial<Form>) } as Form);
     }
   }, [persona]);
@@ -164,7 +170,10 @@ function EditorPersona() {
                   <Input value={form.sexo ?? ""} onChange={(e) => set("sexo", e.target.value)} />
                 </Campo>
                 <Campo label="Cidade">
-                  <Input value={form.cidade ?? ""} onChange={(e) => set("cidade", e.target.value)} />
+                  <Input
+                    value={form.cidade ?? ""}
+                    onChange={(e) => set("cidade", e.target.value)}
+                  />
                 </Campo>
                 <Campo label="Tipo de cliente">
                   <Input
@@ -274,7 +283,12 @@ function EditorPersona() {
             >
               <ListaPares
                 itens={(form.dados_tecnicos ?? []).map((d) => ({ a: d.label, b: d.valor }))}
-                onChange={(v) => set("dados_tecnicos", v.map((x) => ({ label: x.a, valor: x.b })))}
+                onChange={(v) =>
+                  set(
+                    "dados_tecnicos",
+                    v.map((x) => ({ label: x.a, valor: x.b })),
+                  )
+                }
                 labelA="Campo"
                 labelB="Valor"
                 rotuloAdicionar="Adicionar campo técnico"
@@ -359,7 +373,10 @@ function EditorPersona() {
                       b: i.resposta,
                     }))}
                     onChange={(v) =>
-                      set("informacoes_ocultas", v.map((x) => ({ pergunta: x.a, resposta: x.b })))
+                      set(
+                        "informacoes_ocultas",
+                        v.map((x) => ({ pergunta: x.a, resposta: x.b })),
+                      )
                     }
                     labelA="Pergunta esperada"
                     labelB="Resposta da persona"
@@ -414,7 +431,10 @@ function EditorPersona() {
                     <button
                       type="button"
                       onClick={() =>
-                        set("palavras_chave", form.palavras_chave.filter((x) => x !== p))
+                        set(
+                          "palavras_chave",
+                          form.palavras_chave.filter((x) => x !== p),
+                        )
                       }
                     >
                       <X className="size-3" />
@@ -487,7 +507,6 @@ function EditorPersona() {
                 aviso="Salve o personagem para habilitar os anexos."
               />
             </SecaoFormulario>
-
 
             {!novo && (
               <SecaoFormulario titulo="Histórico de alterações">

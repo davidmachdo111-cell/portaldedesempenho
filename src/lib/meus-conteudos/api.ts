@@ -152,9 +152,12 @@ export function useSimuladoParaDownload(simuladoId: string) {
         ? ((await supabase.from("personas").select("*").in("id", ids)).data ?? [])
         : [];
 
-      const anexos =
-        ((await supabase.from("persona_materiais").select(COLUNAS_ANEXO).eq("simulacao_id", simuladoId))
-          .data ?? []) as Anexo[];
+      const anexos = ((
+        await supabase
+          .from("persona_materiais")
+          .select(COLUNAS_ANEXO)
+          .eq("simulacao_id", simuladoId)
+      ).data ?? []) as Anexo[];
 
       return {
         simulado,

@@ -489,7 +489,6 @@ function EditorChecklist() {
             </Select>
           </div>
 
-
           <div className="flex items-center justify-between gap-3 border-t border-border pt-4">
             <div>
               <p className="text-sm font-medium text-heading">Checklist ativo</p>
@@ -504,8 +503,7 @@ function EditorChecklist() {
           <div className="rounded-xl bg-secondary p-4 text-xs text-brand-support">
             <p className="font-semibold text-brand-dark">Resumo</p>
             <p className="mt-1">
-              {secoes.length} seções · {criterios.length} critérios · {exercicios.length}{" "}
-              exercícios
+              {secoes.length} seções · {criterios.length} critérios · {exercicios.length} exercícios
             </p>
             <p>Peso total: {criterios.reduce((s, c) => s + c.peso, 0)}</p>
           </div>

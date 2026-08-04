@@ -52,7 +52,9 @@ function ListaAnexos({ anexos }: { anexos: Anexo[] }) {
               <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                 <Badge variant="secondary">{rotuloMomento(a.momento)}</Badge>
                 {a.tamanho ? (
-                  <span className="text-xs text-muted-foreground">{formatarTamanho(a.tamanho)}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {formatarTamanho(a.tamanho)}
+                  </span>
                 ) : null}
               </div>
               {a.orientacoes && (
@@ -139,10 +141,7 @@ function MeusConteudosPage() {
                         <p className="text-sm text-muted-foreground">{s.observacoes}</p>
                       )}
                       <Button asChild size="sm" variant="outline">
-                        <Link
-                          to="/meus-conteudos/simulado/$id"
-                          params={{ id: s.id }}
-                        >
+                        <Link to="/meus-conteudos/simulado/$id" params={{ id: s.id }}>
                           <FileText className="size-4" /> Baixar simulado (PDF)
                         </Link>
                       </Button>

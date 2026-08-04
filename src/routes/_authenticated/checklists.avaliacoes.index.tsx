@@ -19,8 +19,7 @@ export const Route = createFileRoute("/_authenticated/checklists/avaliacoes/")({
       { title: "Minhas avaliações | Checklists de Conhecimento" },
       {
         name: "description",
-        content:
-          "Checklists liberados para o avaliador e avaliações em andamento ou concluídas.",
+        content: "Checklists liberados para o avaliador e avaliações em andamento ou concluídas.",
       },
       { property: "og:title", content: "Minhas avaliações" },
       {

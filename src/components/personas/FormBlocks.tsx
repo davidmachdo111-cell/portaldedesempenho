@@ -150,7 +150,11 @@ export function ListaPares({
           ))}
         </datalist>
       )}
-      <Button type="button" variant="outline" onClick={() => onChange([...itens, { a: "", b: "" }])}>
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => onChange([...itens, { a: "", b: "" }])}
+      >
         <Plus className="size-4" /> {rotuloAdicionar}
       </Button>
     </div>

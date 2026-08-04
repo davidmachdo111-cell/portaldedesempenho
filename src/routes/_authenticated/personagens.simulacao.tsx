@@ -185,7 +185,11 @@ function MontarSimulacao() {
           <SecaoFormulario titulo="Dados da simulação">
             <div className="grid gap-4 sm:grid-cols-2">
               <Campo label="Nome da simulação">
-                <Input value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Ex.: Turma 12 — Exercício 3" />
+                <Input
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
+                  placeholder="Ex.: Turma 12 — Exercício 3"
+                />
               </Campo>
               <Campo label="Responsável">
                 <Input
@@ -195,7 +199,11 @@ function MontarSimulacao() {
                 />
               </Campo>
               <Campo label="Observações" className="sm:col-span-2">
-                <Textarea rows={2} value={observacoes} onChange={(e) => setObservacoes(e.target.value)} />
+                <Textarea
+                  rows={2}
+                  value={observacoes}
+                  onChange={(e) => setObservacoes(e.target.value)}
+                />
               </Campo>
             </div>
           </SecaoFormulario>
@@ -209,7 +217,6 @@ function MontarSimulacao() {
               aviso="Salve a simulação para habilitar os anexos."
             />
           </SecaoFormulario>
-
 
           <SecaoFormulario
             titulo="Filtros e seleção"
