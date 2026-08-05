@@ -37,7 +37,7 @@ export const Route = createFileRoute("/_authenticated/checklists/setores")({
 });
 
 function PaginaSetores() {
-  const { isAdmin } = useAuth();
+  const { podeGerenciarChecklists: isAdmin } = useAuth();
   const qc = useQueryClient();
   const [novo, setNovo] = useState("");
 

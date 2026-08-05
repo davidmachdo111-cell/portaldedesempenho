@@ -17,7 +17,7 @@ export const Route = createFileRoute("/_authenticated/checklists/liberacoes")({
 function PaginaLiberacoes() {
   const qc = useQueryClient();
   const router = useRouter();
-  const { isAdmin, loading } = useAuth();
+  const { podeGerenciarChecklists: isAdmin, loading } = useAuth();
   const [checklistSel, setChecklistSel] = useState<string>("");
 
   useEffect(() => {

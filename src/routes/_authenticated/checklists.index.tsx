@@ -16,7 +16,7 @@ export const Route = createFileRoute("/_authenticated/checklists/")({
 });
 
 function Painel() {
-  const { isAdmin, loading } = useAuth();
+  const { podeGerenciarChecklists: isAdmin, loading } = useAuth();
   const router = useRouter();
   useEffect(() => {
     if (!loading && !isAdmin) router.navigate({ to: "/checklists/avaliacoes", replace: true });
