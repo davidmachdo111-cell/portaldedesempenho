@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Plus, Search, Trash2, UserRound } from "lucide-react";
 import { toast } from "sonner";
 
@@ -29,9 +29,8 @@ import {
   criarColaborador,
   excluirColaborador,
   formatarData,
-  listarColaboradores,
-  listarTodasAtividades,
-  progresso,
+  listarColaboradoresPagina,
+  resumoAtividades,
   type ColaboradorInput,
 } from "@/lib/colaboradores/api";
 import { normalizeUsername } from "@/lib/platform";
@@ -139,7 +138,7 @@ function PaginaColaboradores() {
               className="pl-9"
             />
           </div>
-          {isAdmin && (
+          {podeGerenciarColaboradores && (
             <Button onClick={() => setAberto(true)}>
               <Plus className="size-4" /> Novo colaborador
             </Button>
@@ -195,7 +194,7 @@ function PaginaColaboradores() {
                     <Badge variant={c.status === "ativo" ? "default" : "secondary"}>
                       {c.status === "ativo" ? "Ativo" : "Inativo"}
                     </Badge>
-                    {isAdmin && (
+                    {podeGerenciarColaboradores && (
                       <Button
                         variant="ghost"
                         size="icon"
