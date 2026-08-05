@@ -50,17 +50,43 @@ const vazio: ColaboradorInput = {
   status: "ativo",
 };
 
+const POR_PAGINA = 20;
+
 function PaginaColaboradores() {
   const qc = useQueryClient();
-  const { isAdmin } = useAuth();
+  const { podeGerenciarColaboradores } = useAuth();
   const [busca, setBusca] = useState("");
+  const [buscaAplicada, setBuscaAplicada] = useState("");
+  const [pagina, setPagina] = useState(0);
   const [aberto, setAberto] = useState(false);
   const [form, setForm] = useState<ColaboradorInput>(vazio);
 
-  const colaboradores = useQuery({ queryKey: ["colaboradores"], queryFn: listarColaboradores });
-  const atividades = useQuery({
-    queryKey: ["colaboradores", "atividades"],
-    queryFn: listarTodasAtividades,
+  // Busca com debounce: evita uma consulta por tecla digitada.
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setBuscaAplicada(busca);
+      setPagina(0);
+    }, 350);
+    return () => clearTimeout(t);
+  }, [busca]);
+
+  const colaboradores = useQuery({
+    queryKey: ["colaboradores", "pagina", buscaAplicada, pagina],
+    queryFn: () =>
+      listarColaboradoresPagina({ busca: buscaAplicada, pagina, porPagina: POR_PAGINA }),
+    placeholderData: (anterior) => anterior,
+  });
+
+  const lista = colaboradores.data?.itens ?? [];
+  const total = colaboradores.data?.total ?? 0;
+  const totalPaginas = Math.max(1, Math.ceil(total / POR_PAGINA));
+
+  const ids = useMemo(() => lista.map((c) => c.id), [lista]);
+  // Contagens apenas dos colaboradores visíveis nesta página.
+  const resumos = useQuery({
+    queryKey: ["colaboradores", "resumo", ids],
+    queryFn: () => resumoAtividades(ids),
+    enabled: ids.length > 0,
   });
 
   const criar = useMutation({
@@ -87,20 +113,15 @@ function PaginaColaboradores() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const lista = useMemo(() => {
-    const termo = busca.trim().toLowerCase();
-    const todos = colaboradores.data ?? [];
-    if (!termo) return todos;
-    return todos.filter((c) =>
-      [c.nome_completo, c.username, c.cargo, c.setor, c.celula]
-        .join(" ")
-        .toLowerCase()
-        .includes(termo),
-    );
-  }, [colaboradores.data, busca]);
+  const metricas = (id: string) => {
+    const r = resumos.data?.[id] ?? { total: 0, concluidas: 0 };
+    return {
+      total: r.total,
+      concluidas: r.concluidas,
+      percentual: r.total ? Math.round((r.concluidas / r.total) * 100) : 0,
+    };
+  };
 
-  const metricas = (id: string) =>
-    progresso((atividades.data ?? []).filter((a) => a.colaborador_id === id));
 
   return (
     <PlatformShell
