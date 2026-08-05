@@ -217,6 +217,31 @@ function PaginaColaboradores() {
             )}
           </ul>
         </div>
+
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-xs text-muted-foreground">
+            {total} colaborador{total === 1 ? "" : "es"} · página {pagina + 1} de {totalPaginas}
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={pagina === 0 || colaboradores.isFetching}
+              onClick={() => setPagina((p) => Math.max(0, p - 1))}
+            >
+              Anterior
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={pagina + 1 >= totalPaginas || colaboradores.isFetching}
+              onClick={() => setPagina((p) => p + 1)}
+            >
+              Próxima
+            </Button>
+          </div>
+        </div>
+
       </div>
 
       <Dialog open={aberto} onOpenChange={setAberto}>
