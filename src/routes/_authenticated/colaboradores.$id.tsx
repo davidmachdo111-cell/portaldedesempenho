@@ -50,6 +50,7 @@ import {
   listarAtividades,
   listarAvaliacoesDoColaborador,
   listarCatalogo,
+  listarConteudosVinculados,
   listarHistorico,
   progresso,
   removerAtividade,
@@ -68,9 +69,7 @@ function PainelColaborador() {
   const { id } = Route.useParams();
   const qc = useQueryClient();
   const navigate = useNavigate();
-  const { isAdmin, roleKeys } = useAuth();
-  const somenteLiberadas = !isAdmin && roleKeys.includes("auxiliar");
-  const podeAvaliar = isAdmin || roleKeys.includes("avaliador");
+  const { podeGerenciarColaboradores, podeAvaliar } = useAuth();
 
   const [liberar, setLiberar] = useState(false);
   const [selecionados, setSelecionados] = useState<string[]>([]);
@@ -91,6 +90,10 @@ function PainelColaborador() {
   const avaliacoes = useQuery({
     queryKey: ["colaboradores", id, "avaliacoes"],
     queryFn: () => listarAvaliacoesDoColaborador(id),
+  });
+  const conteudos = useQuery({
+    queryKey: ["colaboradores", id, "conteudos"],
+    queryFn: () => listarConteudosVinculados(id),
   });
   const catalogo = useQuery({
     queryKey: ["colaboradores", "catalogo"],
@@ -218,22 +221,21 @@ function PainelColaborador() {
           <Tabs defaultValue="atividades">
             <TabsList>
               <TabsTrigger value="atividades">Treinamentos e Atividades</TabsTrigger>
+              <TabsTrigger value="conteudos">Personagens e Simulados</TabsTrigger>
               <TabsTrigger value="dados">Dados cadastrais</TabsTrigger>
               <TabsTrigger value="avaliacoes">Avaliações</TabsTrigger>
               <TabsTrigger value="historico">Histórico</TabsTrigger>
             </TabsList>
 
             <TabsContent value="atividades" className="mt-4 space-y-4">
-              {isAdmin && (
+              {podeGerenciarColaboradores && (
                 <Button onClick={() => setLiberar(true)}>
                   <Plus className="size-4" /> Liberar atividades
                 </Button>
               )}
               <div className="overflow-hidden rounded-xl border bg-card">
                 <ul className="divide-y">
-                  {lista
-                    .filter((a) => !somenteLiberadas || a.status === "pendente" || true)
-                    .map((a, index) => (
+                  {lista.map((a, index) => (
                       <li key={a.id} className="flex flex-wrap items-center gap-3 px-5 py-4">
                         {a.status === "concluida" ? (
                           <CheckCircle2 className="size-5 shrink-0 text-primary" />
@@ -262,7 +264,7 @@ function PainelColaborador() {
                             <PlayCircle className="size-4" /> Avaliar
                           </Button>
                         )}
-                        {isAdmin && (
+                        {podeGerenciarColaboradores && (
                           <div className="flex items-center gap-1">
                             <Button variant="ghost" size="icon" onClick={() => mover(index, -1)}>
                               <ArrowUp className="size-4" />
@@ -305,7 +307,7 @@ function PainelColaborador() {
                   <CardTitle className="text-base">Dados cadastrais</CardTitle>
                 </CardHeader>
                 <CardContent className="grid gap-4 sm:grid-cols-2">
-                  {isAdmin ? (
+                  {podeGerenciarColaboradores ? (
                     <>
                       <Campo
                         label="Nome completo"
