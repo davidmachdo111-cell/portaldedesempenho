@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Plus, Search, Trash2, UserRound } from "lucide-react";
 import { toast } from "sonner";
 
@@ -29,9 +29,8 @@ import {
   criarColaborador,
   excluirColaborador,
   formatarData,
-  listarColaboradores,
-  listarTodasAtividades,
-  progresso,
+  listarColaboradoresPagina,
+  resumoAtividades,
   type ColaboradorInput,
 } from "@/lib/colaboradores/api";
 import { normalizeUsername } from "@/lib/platform";
@@ -50,17 +49,43 @@ const vazio: ColaboradorInput = {
   status: "ativo",
 };
 
+const POR_PAGINA = 20;
+
 function PaginaColaboradores() {
   const qc = useQueryClient();
-  const { isAdmin } = useAuth();
+  const { podeGerenciarColaboradores } = useAuth();
   const [busca, setBusca] = useState("");
+  const [buscaAplicada, setBuscaAplicada] = useState("");
+  const [pagina, setPagina] = useState(0);
   const [aberto, setAberto] = useState(false);
   const [form, setForm] = useState<ColaboradorInput>(vazio);
 
-  const colaboradores = useQuery({ queryKey: ["colaboradores"], queryFn: listarColaboradores });
-  const atividades = useQuery({
-    queryKey: ["colaboradores", "atividades"],
-    queryFn: listarTodasAtividades,
+  // Busca com debounce: evita uma consulta por tecla digitada.
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setBuscaAplicada(busca);
+      setPagina(0);
+    }, 350);
+    return () => clearTimeout(t);
+  }, [busca]);
+
+  const colaboradores = useQuery({
+    queryKey: ["colaboradores", "pagina", buscaAplicada, pagina],
+    queryFn: () =>
+      listarColaboradoresPagina({ busca: buscaAplicada, pagina, porPagina: POR_PAGINA }),
+    placeholderData: (anterior) => anterior,
+  });
+
+  const lista = colaboradores.data?.itens ?? [];
+  const total = colaboradores.data?.total ?? 0;
+  const totalPaginas = Math.max(1, Math.ceil(total / POR_PAGINA));
+
+  const ids = useMemo(() => lista.map((c) => c.id), [lista]);
+  // Contagens apenas dos colaboradores visíveis nesta página.
+  const resumos = useQuery({
+    queryKey: ["colaboradores", "resumo", ids],
+    queryFn: () => resumoAtividades(ids),
+    enabled: ids.length > 0,
   });
 
   const criar = useMutation({
@@ -87,20 +112,15 @@ function PaginaColaboradores() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const lista = useMemo(() => {
-    const termo = busca.trim().toLowerCase();
-    const todos = colaboradores.data ?? [];
-    if (!termo) return todos;
-    return todos.filter((c) =>
-      [c.nome_completo, c.username, c.cargo, c.setor, c.celula]
-        .join(" ")
-        .toLowerCase()
-        .includes(termo),
-    );
-  }, [colaboradores.data, busca]);
+  const metricas = (id: string) => {
+    const r = resumos.data?.[id] ?? { total: 0, concluidas: 0 };
+    return {
+      total: r.total,
+      concluidas: r.concluidas,
+      percentual: r.total ? Math.round((r.concluidas / r.total) * 100) : 0,
+    };
+  };
 
-  const metricas = (id: string) =>
-    progresso((atividades.data ?? []).filter((a) => a.colaborador_id === id));
 
   return (
     <PlatformShell
@@ -118,7 +138,7 @@ function PaginaColaboradores() {
               className="pl-9"
             />
           </div>
-          {isAdmin && (
+          {podeGerenciarColaboradores && (
             <Button onClick={() => setAberto(true)}>
               <Plus className="size-4" /> Novo colaborador
             </Button>
@@ -174,7 +194,7 @@ function PaginaColaboradores() {
                     <Badge variant={c.status === "ativo" ? "default" : "secondary"}>
                       {c.status === "ativo" ? "Ativo" : "Inativo"}
                     </Badge>
-                    {isAdmin && (
+                    {podeGerenciarColaboradores && (
                       <Button
                         variant="ghost"
                         size="icon"
@@ -197,6 +217,31 @@ function PaginaColaboradores() {
             )}
           </ul>
         </div>
+
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-xs text-muted-foreground">
+            {total} colaborador{total === 1 ? "" : "es"} · página {pagina + 1} de {totalPaginas}
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={pagina === 0 || colaboradores.isFetching}
+              onClick={() => setPagina((p) => Math.max(0, p - 1))}
+            >
+              Anterior
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={pagina + 1 >= totalPaginas || colaboradores.isFetching}
+              onClick={() => setPagina((p) => p + 1)}
+            >
+              Próxima
+            </Button>
+          </div>
+        </div>
+
       </div>
 
       <Dialog open={aberto} onOpenChange={setAberto}>

@@ -39,7 +39,7 @@ export function AdminShell({
   acoes?: ReactNode;
   children: ReactNode;
 }) {
-  const { isAdmin } = useAuth();
+  const { podeGerenciarChecklists: isAdmin } = useAuth();
   const itens = isAdmin ? [...itensAdmin, ...itensAvaliador] : [...itensAvaliador];
 
   return (

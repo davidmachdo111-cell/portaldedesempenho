@@ -1,8 +1,9 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter, redirect } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Copy, Plus, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AdminShell } from "@/components/checklists/ChecklistsShell";
@@ -18,6 +19,15 @@ import {
 } from "@/lib/checklists/checklists";
 
 export const Route = createFileRoute("/_authenticated/checklists/modelos/")({
+  beforeLoad: async () => {
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) throw redirect({ to: "/auth" });
+    const { data: allowed } = await supabase.rpc("has_permission", {
+      _user_id: data.user.id,
+      _permission: "checklists_gerenciar",
+    });
+    if (allowed !== true) throw redirect({ to: "/checklists/avaliacoes" });
+  },
   component: ListaChecklists,
 });
 

@@ -969,13 +969,21 @@ export type Database = {
         | { Args: never; Returns: boolean }
         | { Args: { _user_id: string }; Returns: boolean }
       persona_liberada: { Args: { _persona_id: string }; Returns: boolean }
+      persona_vinculada: { Args: { _persona_id: string }; Returns: boolean }
+      pode_avaliar: { Args: { _user_id: string }; Returns: boolean }
       pode_baixar_material: { Args: { _path: string }; Returns: boolean }
+      pode_gerenciar_checklists: {
+        Args: { _user_id: string }
+        Returns: boolean
+      }
       pode_gerenciar_colaboradores: {
         Args: { _user_id: string }
         Returns: boolean
       }
       pode_gerenciar_personas: { Args: { _user_id: string }; Returns: boolean }
+      pode_ver_colaboradores: { Args: { _user_id: string }; Returns: boolean }
       simulado_liberado: { Args: { _simulacao_id: string }; Returns: boolean }
+      simulado_vinculado: { Args: { _simulacao_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

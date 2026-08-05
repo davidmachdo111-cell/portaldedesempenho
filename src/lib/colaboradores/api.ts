@@ -355,3 +355,161 @@ export const formatarData = (iso: string | null | undefined) =>
 
 export const formatarDataHora = (iso: string | null | undefined) =>
   iso ? new Date(iso).toLocaleString("pt-BR") : "—";
+
+/* ---------- desempenho: listagem paginada e contagens sob demanda ---------- */
+
+export const COLUNAS_LISTA =
+  "id, nome_completo, username, cargo, setor, celula, data_admissao, status, updated_at";
+
+export type ColaboradorLista = Pick<
+  Colaborador,
+  | "id"
+  | "nome_completo"
+  | "username"
+  | "cargo"
+  | "setor"
+  | "celula"
+  | "data_admissao"
+  | "status"
+  | "updated_at"
+>;
+
+/** Busca uma página de colaboradores com filtro aplicado no banco. */
+export async function listarColaboradoresPagina(opcoes: {
+  busca?: string;
+  pagina: number;
+  porPagina: number;
+}): Promise<{ itens: ColaboradorLista[]; total: number }> {
+  const { busca = "", pagina, porPagina } = opcoes;
+  const inicio = pagina * porPagina;
+  let query = supabase
+    .from("colaboradores")
+    .select(COLUNAS_LISTA, { count: "exact" })
+    .order("nome_completo")
+    .range(inicio, inicio + porPagina - 1);
+
+  const termo = busca.trim();
+  if (termo) {
+    const like = `%${termo}%`;
+    query = query.or(
+      [
+        `nome_completo.ilike.${like}`,
+        `username.ilike.${like}`,
+        `cargo.ilike.${like}`,
+        `setor.ilike.${like}`,
+        `celula.ilike.${like}`,
+      ].join(","),
+    );
+  }
+
+  const { data, error, count } = await query;
+  if (error) throw new Error(error.message);
+  return { itens: (data ?? []) as ColaboradorLista[], total: count ?? 0 };
+}
+
+/** Contagem de atividades apenas dos colaboradores exibidos na página atual. */
+export async function resumoAtividades(
+  colaboradorIds: string[],
+): Promise<Record<string, { total: number; concluidas: number }>> {
+  if (!colaboradorIds.length) return {};
+  const { data, error } = await supabase
+    .from("colaborador_atividades")
+    .select("colaborador_id, status")
+    .in("colaborador_id", colaboradorIds);
+  if (error) throw new Error(error.message);
+  const mapa: Record<string, { total: number; concluidas: number }> = {};
+  for (const row of data ?? []) {
+    const item = (mapa[row.colaborador_id] ??= { total: 0, concluidas: 0 });
+    item.total += 1;
+    if (row.status === "concluida") item.concluidas += 1;
+  }
+  return mapa;
+}
+
+/* ---------- conteúdos vinculados (simulados e personagens do colaborador) ---------- */
+
+export interface ConteudoVinculado {
+  atividadeId: string;
+  tipo: "simulado" | "persona";
+  refId: string;
+  titulo: string;
+  detalhe: string;
+  anexos: {
+    id: string;
+    nome: string;
+    path: string;
+    tamanho: number | null;
+    descricao: string;
+    momento: string;
+    orientacoes: string;
+  }[];
+}
+
+/**
+ * Simulados e personagens liberados para o colaborador selecionado, com os
+ * anexos enviados no cadastro. As políticas do banco garantem que apenas
+ * conteúdos vinculados fiquem visíveis.
+ */
+export async function listarConteudosVinculados(
+  colaboradorId: string,
+): Promise<ConteudoVinculado[]> {
+  const { data: atividades, error } = await supabase
+    .from("colaborador_atividades")
+    .select("id, tipo, ref_id, titulo, ordem")
+    .eq("colaborador_id", colaboradorId)
+    .in("tipo", ["simulado", "persona"])
+    .order("ordem");
+  if (error) throw new Error(error.message);
+
+  const simuladoIds = (atividades ?? [])
+    .filter((a) => a.tipo === "simulado" && a.ref_id)
+    .map((a) => a.ref_id as string);
+  const personaIds = (atividades ?? [])
+    .filter((a) => a.tipo === "persona" && a.ref_id)
+    .map((a) => a.ref_id as string);
+
+  if (!simuladoIds.length && !personaIds.length) return [];
+
+  const colunasAnexo =
+    "id, nome, path, tamanho, descricao, momento, orientacoes, persona_id, simulacao_id";
+
+  const [simulados, personas, anexosSimulado, anexosPersona] = await Promise.all([
+    simuladoIds.length
+      ? supabase.from("simulacoes").select("id, nome, exercicio").in("id", simuladoIds)
+      : Promise.resolve({ data: [] as { id: string; nome: string; exercicio: string | null }[] }),
+    personaIds.length
+      ? supabase.from("personas").select("id, nome, exercicio").in("id", personaIds)
+      : Promise.resolve({ data: [] as { id: string; nome: string; exercicio: string | null }[] }),
+    simuladoIds.length
+      ? supabase.from("persona_materiais").select(colunasAnexo).in("simulacao_id", simuladoIds)
+      : Promise.resolve({ data: [] }),
+    personaIds.length
+      ? supabase.from("persona_materiais").select(colunasAnexo).in("persona_id", personaIds)
+      : Promise.resolve({ data: [] }),
+  ]);
+
+  const anexos = [...(anexosSimulado.data ?? []), ...(anexosPersona.data ?? [])] as ({
+    persona_id: string | null;
+    simulacao_id: string | null;
+  } & ConteudoVinculado["anexos"][number])[];
+
+  return (atividades ?? [])
+    .filter((a) => a.ref_id)
+    .map((a) => {
+      const refId = a.ref_id as string;
+      const origem =
+        a.tipo === "simulado"
+          ? (simulados.data ?? []).find((s) => s.id === refId)
+          : (personas.data ?? []).find((p) => p.id === refId);
+      return {
+        atividadeId: a.id,
+        tipo: a.tipo as "simulado" | "persona",
+        refId,
+        titulo: origem?.nome ?? a.titulo,
+        detalhe: origem?.exercicio || (a.tipo === "simulado" ? "Simulado" : "Personagem"),
+        anexos: anexos
+          .filter((m) => (a.tipo === "simulado" ? m.simulacao_id === refId : m.persona_id === refId))
+          .map(({ persona_id: _p, simulacao_id: _s, ...anexo }) => anexo),
+      };
+    });
+}
