@@ -15,6 +15,7 @@ import {
 import { toast } from "sonner";
 
 import { PlatformShell } from "@/components/platform/PlatformShell";
+import { ConteudosVinculados } from "@/components/colaboradores/ConteudosVinculados";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,7 +51,6 @@ import {
   listarAtividades,
   listarAvaliacoesDoColaborador,
   listarCatalogo,
-  listarConteudosVinculados,
   listarHistorico,
   progresso,
   removerAtividade,
@@ -90,10 +90,6 @@ function PainelColaborador() {
   const avaliacoes = useQuery({
     queryKey: ["colaboradores", id, "avaliacoes"],
     queryFn: () => listarAvaliacoesDoColaborador(id),
-  });
-  const conteudos = useQuery({
-    queryKey: ["colaboradores", id, "conteudos"],
-    queryFn: () => listarConteudosVinculados(id),
   });
   const catalogo = useQuery({
     queryKey: ["colaboradores", "catalogo"],
@@ -299,6 +295,10 @@ function PainelColaborador() {
                   )}
                 </ul>
               </div>
+            </TabsContent>
+
+            <TabsContent value="conteudos" className="mt-4">
+              <ConteudosVinculados colaboradorId={id} />
             </TabsContent>
 
             <TabsContent value="dados" className="mt-4">
