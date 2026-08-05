@@ -5,11 +5,30 @@ import { ClipboardList, LayoutDashboard, Library, UserPlus } from "lucide-react"
 import { PlatformShell } from "@/components/platform/PlatformShell";
 
 const NAV = [
-  { to: "/personagens", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { to: "/personagens/biblioteca", label: "Biblioteca de Personas", icon: Library, exact: false },
-  { to: "/personagens/personas/nova", label: "Criar Persona", icon: UserPlus, exact: false },
-  { to: "/personagens/simulacao", label: "Montar Simulação", icon: ClipboardList, exact: false },
+  { to: "/personagens", label: "Dashboard", icon: LayoutDashboard, exact: true, params: {} },
+  {
+    to: "/personagens/biblioteca",
+    label: "Biblioteca de Personas",
+    icon: Library,
+    exact: false,
+    params: {},
+  },
+  {
+    to: "/personagens/personas/$id",
+    label: "Criar Persona",
+    icon: UserPlus,
+    exact: false,
+    params: { id: "nova" },
+  },
+  {
+    to: "/personagens/simulacao",
+    label: "Montar Simulação",
+    icon: ClipboardList,
+    exact: false,
+    params: {},
+  },
 ] as const;
+
 
 /**
  * Casca do módulo Personagens e Simulados, agora dentro da navegação única da plataforma.
@@ -33,7 +52,9 @@ export function AppShell({
             <Link
               key={item.to}
               to={item.to}
+              params={item.params as never}
               activeOptions={{ exact: item.exact }}
+
               activeProps={{ className: "bg-accent text-accent-foreground font-medium" }}
               className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent/60"
             >
