@@ -25,7 +25,7 @@ export const Route = createFileRoute("/_authenticated/meus-conteudos/persona/$id
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: PersonaDownload;
+  component: PersonaDownload,
 });
 
 function PersonaDownload() {
