@@ -16,6 +16,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AnexosManager } from "@/components/personas/AnexosManager";
+import { enviarAnexosPendentes, type AnexoPendente } from "@/lib/personas/anexos";
+
 import {
   useAcoesPersona,
   useCriarPerfil,
