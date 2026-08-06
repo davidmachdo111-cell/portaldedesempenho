@@ -170,8 +170,17 @@ function EditorPersona() {
               </Button>
             </>
           )}
-          <Button onClick={submeter} disabled={salvar.isPending}>
-            <Save className="size-4" /> {salvar.isPending ? "Salvando…" : "Salvar"}
+          <Button onClick={submeter} disabled={salvando}>
+            <Save className="size-4" />{" "}
+            {salvando
+              ? enviandoAnexos
+                ? "Enviando anexos…"
+                : "Salvando…"
+              : novo && pendentes.length
+                ? `Salvar com ${pendentes.length} anexo(s)`
+                : "Salvar"}
+          </Button>
+
           </Button>
         </>
       }
