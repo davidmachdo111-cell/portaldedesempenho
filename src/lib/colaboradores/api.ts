@@ -428,34 +428,50 @@ export async function resumoAtividades(
 
 /* ---------- conteúdos vinculados (simulados e personagens do colaborador) ---------- */
 
+export interface AnexoVinculado {
+  id: string;
+  nome: string;
+  path: string;
+  tamanho: number | null;
+  descricao: string;
+  momento: string;
+  orientacoes: string;
+}
+
+export interface PersonaDoConteudo {
+  id: string;
+  nome: string;
+  detalhe: string;
+  anexos: AnexoVinculado[];
+}
+
 export interface ConteudoVinculado {
   atividadeId: string;
   tipo: "simulado" | "persona";
   refId: string;
   titulo: string;
   detalhe: string;
-  anexos: {
-    id: string;
-    nome: string;
-    path: string;
-    tamanho: number | null;
-    descricao: string;
-    momento: string;
-    orientacoes: string;
-  }[];
+  status: StatusAtividade;
+  concluidaEm: string | null;
+  concluidoPorNome: string | null;
+  anexos: AnexoVinculado[];
+  /** Personagens que compõem o simulado (vazio quando o item já é um personagem). */
+  personas: PersonaDoConteudo[];
 }
+
+type AnexoBruto = AnexoVinculado & { persona_id: string | null; simulacao_id: string | null };
 
 /**
  * Simulados e personagens liberados para o colaborador selecionado, com os
- * anexos enviados no cadastro. As políticas do banco garantem que apenas
- * conteúdos vinculados fiquem visíveis.
+ * anexos enviados no cadastro e os personagens de cada simulado. As políticas
+ * do banco garantem que apenas conteúdos vinculados fiquem visíveis.
  */
 export async function listarConteudosVinculados(
   colaboradorId: string,
 ): Promise<ConteudoVinculado[]> {
   const { data: atividades, error } = await supabase
     .from("colaborador_atividades")
-    .select("id, tipo, ref_id, titulo, ordem")
+    .select("id, tipo, ref_id, titulo, ordem, status, concluida_em, concluido_por_nome")
     .eq("colaborador_id", colaboradorId)
     .in("tipo", ["simulado", "persona"])
     .order("ordem");
@@ -464,52 +480,121 @@ export async function listarConteudosVinculados(
   const simuladoIds = (atividades ?? [])
     .filter((a) => a.tipo === "simulado" && a.ref_id)
     .map((a) => a.ref_id as string);
-  const personaIds = (atividades ?? [])
+  const personaIdsDiretos = (atividades ?? [])
     .filter((a) => a.tipo === "persona" && a.ref_id)
     .map((a) => a.ref_id as string);
 
-  if (!simuladoIds.length && !personaIds.length) return [];
+  if (!simuladoIds.length && !personaIdsDiretos.length) return [];
 
   const colunasAnexo =
     "id, nome, path, tamanho, descricao, momento, orientacoes, persona_id, simulacao_id";
 
-  const [simulados, personas, anexosSimulado, anexosPersona] = await Promise.all([
-    simuladoIds.length
-      ? supabase.from("simulacoes").select("id, nome, exercicio").in("id", simuladoIds)
-      : Promise.resolve({ data: [] as { id: string; nome: string; exercicio: string | null }[] }),
+  const simulados = simuladoIds.length
+    ? ((
+        await supabase.from("simulacoes").select("id, nome, exercicio, persona_ids").in("id", simuladoIds)
+      ).data ?? []).map((s) => ({
+        ...s,
+        persona_ids: (s.persona_ids ?? []) as string[],
+      }))
+    : [];
+
+  // Personagens do simulado entram na lista para que o material da persona
+  // (PDF e demais anexos) também fique disponível.
+  const personaIds = Array.from(
+    new Set([...personaIdsDiretos, ...simulados.flatMap((s) => s.persona_ids)]),
+  );
+
+  const [personasRes, anexosRes] = await Promise.all([
     personaIds.length
       ? supabase.from("personas").select("id, nome, exercicio").in("id", personaIds)
       : Promise.resolve({ data: [] as { id: string; nome: string; exercicio: string | null }[] }),
-    simuladoIds.length
-      ? supabase.from("persona_materiais").select(colunasAnexo).in("simulacao_id", simuladoIds)
-      : Promise.resolve({ data: [] }),
-    personaIds.length
-      ? supabase.from("persona_materiais").select(colunasAnexo).in("persona_id", personaIds)
-      : Promise.resolve({ data: [] }),
+    supabase
+      .from("persona_materiais")
+      .select(colunasAnexo)
+      .or(
+        [
+          personaIds.length ? `persona_id.in.(${personaIds.join(",")})` : null,
+          simuladoIds.length ? `simulacao_id.in.(${simuladoIds.join(",")})` : null,
+        ]
+          .filter(Boolean)
+          .join(","),
+      ),
   ]);
 
-  const anexos = [...(anexosSimulado.data ?? []), ...(anexosPersona.data ?? [])] as ({
-    persona_id: string | null;
-    simulacao_id: string | null;
-  } & ConteudoVinculado["anexos"][number])[];
+  const personasInfo = personasRes.data ?? [];
+  const anexos = (anexosRes.data ?? []) as AnexoBruto[];
+  const limpar = ({ persona_id: _p, simulacao_id: _s, ...anexo }: AnexoBruto): AnexoVinculado =>
+    anexo;
+
+  const montarPersona = (personaId: string): PersonaDoConteudo => {
+    const info = personasInfo.find((p) => p.id === personaId);
+    return {
+      id: personaId,
+      nome: info?.nome ?? "Personagem",
+      detalhe: info?.exercicio || "Personagem",
+      anexos: anexos.filter((m) => m.persona_id === personaId).map(limpar),
+    };
+  };
 
   return (atividades ?? [])
     .filter((a) => a.ref_id)
     .map((a) => {
       const refId = a.ref_id as string;
-      const origem =
-        a.tipo === "simulado"
-          ? (simulados.data ?? []).find((s) => s.id === refId)
-          : (personas.data ?? []).find((p) => p.id === refId);
+      const simulado = a.tipo === "simulado" ? simulados.find((s) => s.id === refId) : undefined;
+      const persona = a.tipo === "persona" ? personasInfo.find((p) => p.id === refId) : undefined;
       return {
         atividadeId: a.id,
         tipo: a.tipo as "simulado" | "persona",
         refId,
-        titulo: origem?.nome ?? a.titulo,
-        detalhe: origem?.exercicio || (a.tipo === "simulado" ? "Simulado" : "Personagem"),
-        anexos: anexos
-          .filter((m) => (a.tipo === "simulado" ? m.simulacao_id === refId : m.persona_id === refId))
-          .map(({ persona_id: _p, simulacao_id: _s, ...anexo }) => anexo),
+        titulo: simulado?.nome ?? persona?.nome ?? a.titulo,
+        detalhe:
+          simulado?.exercicio ||
+          persona?.exercicio ||
+          (a.tipo === "simulado" ? "Simulado" : "Personagem"),
+        status: (a.status ?? "pendente") as StatusAtividade,
+        concluidaEm: a.concluida_em ?? null,
+        concluidoPorNome: a.concluido_por_nome ?? null,
+        anexos:
+          a.tipo === "simulado"
+            ? anexos.filter((m) => m.simulacao_id === refId).map(limpar)
+            : anexos.filter((m) => m.persona_id === refId).map(limpar),
+        personas: simulado ? simulado.persona_ids.map(montarPersona) : [],
       };
     });
 }
+
+/* ---------- controle de conclusão do treinamento ---------- */
+
+export const LABEL_STATUS_ATIVIDADE: Record<StatusAtividade, string> = {
+  pendente: "Pendente",
+  em_andamento: "Em andamento",
+  concluida: "Concluído",
+};
+
+/**
+ * Registra o andamento do treinamento de um personagem/simulado.
+ * Ao concluir, guarda data e usuário responsável — sem substituir o checklist
+ * de avaliação.
+ */
+export async function registrarAndamentoAtividade(
+  atividade: { id: string; colaborador_id: string; titulo: string },
+  status: StatusAtividade,
+) {
+  const a = await autor();
+  const concluida = status === "concluida";
+  const { error } = await supabase
+    .from("colaborador_atividades")
+    .update({
+      status,
+      concluida_em: concluida ? new Date().toISOString() : null,
+      concluido_por: concluida ? a.id : null,
+      concluido_por_nome: concluida ? a.nome : null,
+    })
+    .eq("id", atividade.id);
+  if (error) throw new Error(error.message);
+  await registrar(atividade.colaborador_id, `atividade_${status}`, {
+    titulo: atividade.titulo,
+    usuario: a.nome,
+  });
+}
+
