@@ -132,33 +132,12 @@ export function useEnviarAnexo(vinculo?: VinculoAnexo | null) {
       if (!vinculo?.id || vinculo.id === "nova") {
         throw new Error("Salve o cadastro antes de anexar arquivos.");
       }
-      const { data: auth } = await supabase.auth.getUser();
-      const nomeSeguro = file.name.replace(/[^\w.\-]/g, "_");
-      const path = `${vinculo.tipo === "persona" ? "personas" : "simulados"}/${vinculo.id}/${crypto.randomUUID()}-${nomeSeguro}`;
-      const { error: upErr } = await supabase.storage
-        .from(BUCKET)
-        .upload(path, file, { cacheControl: "3600", upsert: false });
-      if (upErr) throw upErr;
-      const { error } = await supabase.from("persona_materiais").insert({
-        persona_id: vinculo.tipo === "persona" ? vinculo.id : null,
-        simulacao_id: vinculo.tipo === "simulado" ? vinculo.id : null,
-        nome: file.name,
-        path,
-        tipo: file.type,
-        tamanho: file.size,
-        descricao: meta.descricao,
-        momento: meta.momento,
-        orientacoes: meta.orientacoes,
-        created_by: auth.user?.id ?? null,
-      });
-      if (error) {
-        await supabase.storage.from(BUCKET).remove([path]);
-        throw error;
-      }
+      await enviarAnexoAvulso(vinculo, file, meta);
     },
     onSuccess: () => void qc.invalidateQueries({ queryKey: chave(vinculo) }),
   });
 }
+
 
 export function useAtualizarAnexo(vinculo?: VinculoAnexo | null) {
   const qc = useQueryClient();
