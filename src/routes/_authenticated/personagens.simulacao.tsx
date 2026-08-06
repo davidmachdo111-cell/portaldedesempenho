@@ -4,6 +4,8 @@ import { Copy, Printer, Save, Shuffle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/personas/PersonasShell";
 import { AnexosManager } from "@/components/personas/AnexosManager";
+import { enviarAnexosPendentes, type AnexoPendente } from "@/lib/personas/anexos";
+
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -73,6 +75,9 @@ function MontarSimulacao() {
   const [busca, setBusca] = useState("");
   const [selecionadas, setSelecionadas] = useState<string[]>([]);
   const [simulacaoId, setSimulacaoId] = useState<string | undefined>();
+  const [pendentes, setPendentes] = useState<AnexoPendente[]>([]);
+  const [enviandoAnexos, setEnviandoAnexos] = useState(false);
+
 
   const filtradas = useMemo(
     () =>
@@ -135,8 +140,23 @@ function MontarSimulacao() {
     };
     const salva = await salvar.mutateAsync(simulacaoId ? { id: simulacaoId, values } : { values });
     setSimulacaoId(salva.id);
+
+    // Anexos escolhidos antes de salvar sobem junto, em uma única operação.
+    if (pendentes.length) {
+      setEnviandoAnexos(true);
+      const { enviados, falhas } = await enviarAnexosPendentes(
+        { tipo: "simulado", id: salva.id },
+        pendentes,
+      );
+      setEnviandoAnexos(false);
+      setPendentes([]);
+      if (enviados) toast.success(`${enviados} anexo(s) enviado(s).`);
+      if (falhas.length) toast.error(`Falha em ${falhas.length} anexo(s): ${falhas[0]}`);
+    }
+
     toast.success("Simulação salva.");
   }
+
 
   function carregar(simId: string) {
     const s = simulacoes.find((x) => x.id === simId);
@@ -171,9 +191,19 @@ function MontarSimulacao() {
       descricao="Selecione personas já cadastradas e gere o material de apoio"
       acoes={
         <>
-          <Button variant="outline" onClick={salvarSimulacao} disabled={salvar.isPending}>
-            <Save className="size-4" /> Salvar simulação
+          <Button
+            variant="outline"
+            onClick={salvarSimulacao}
+            disabled={salvar.isPending || enviandoAnexos}
+          >
+            <Save className="size-4" />{" "}
+            {enviandoAnexos
+              ? "Enviando anexos…"
+              : !simulacaoId && pendentes.length
+                ? `Salvar com ${pendentes.length} anexo(s)`
+                : "Salvar simulação"}
           </Button>
+
           <Button onClick={abrirPdf}>
             <Printer className="size-4" /> Gerar PDF
           </Button>
@@ -214,8 +244,10 @@ function MontarSimulacao() {
           >
             <AnexosManager
               vinculo={simulacaoId ? { tipo: "simulado", id: simulacaoId } : null}
-              aviso="Salve a simulação para habilitar os anexos."
+              pendentes={pendentes}
+              onPendentesChange={setPendentes}
             />
+
           </SecaoFormulario>
 
           <SecaoFormulario

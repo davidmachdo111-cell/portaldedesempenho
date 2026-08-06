@@ -47,12 +47,64 @@ export type MetaAnexo = {
   orientacoes: string;
 };
 
+/** Anexo escolhido antes de o cadastro existir (fica na memória até salvar). */
+export type AnexoPendente = { tempId: string; file: File; meta: MetaAnexo };
+
 const BUCKET = "persona-materiais";
 const COLUNAS =
   "id, persona_id, simulacao_id, nome, path, tipo, tamanho, descricao, momento, orientacoes, created_at";
 
 const chave = (v?: VinculoAnexo | null) => ["anexos", v?.tipo ?? "-", v?.id ?? "-"] as const;
 const coluna = (v: VinculoAnexo) => (v.tipo === "persona" ? "persona_id" : "simulacao_id");
+
+/** Envia um arquivo já vinculado a um conteúdo existente. */
+export async function enviarAnexoAvulso(vinculo: VinculoAnexo, file: File, meta: MetaAnexo) {
+  const { data: auth } = await supabase.auth.getUser();
+  const nomeSeguro = file.name.replace(/[^\w.\-]/g, "_");
+  const path = `${vinculo.tipo === "persona" ? "personas" : "simulados"}/${vinculo.id}/${crypto.randomUUID()}-${nomeSeguro}`;
+  const { error: upErr } = await supabase.storage
+    .from(BUCKET)
+    .upload(path, file, { cacheControl: "3600", upsert: false });
+  if (upErr) throw upErr;
+  const { error } = await supabase.from("persona_materiais").insert({
+    persona_id: vinculo.tipo === "persona" ? vinculo.id : null,
+    simulacao_id: vinculo.tipo === "simulado" ? vinculo.id : null,
+    nome: file.name,
+    path,
+    tipo: file.type,
+    tamanho: file.size,
+    descricao: meta.descricao,
+    momento: meta.momento,
+    orientacoes: meta.orientacoes,
+    created_by: auth.user?.id ?? null,
+  });
+  if (error) {
+    await supabase.storage.from(BUCKET).remove([path]);
+    throw error;
+  }
+}
+
+/**
+ * Sobe os anexos escolhidos durante a criação, logo após o cadastro ser salvo,
+ * permitindo cadastrar personagem/simulado e materiais em uma única etapa.
+ */
+export async function enviarAnexosPendentes(
+  vinculo: VinculoAnexo,
+  pendentes: AnexoPendente[],
+): Promise<{ enviados: number; falhas: string[] }> {
+  const falhas: string[] = [];
+  let enviados = 0;
+  for (const p of pendentes) {
+    try {
+      await enviarAnexoAvulso(vinculo, p.file, p.meta);
+      enviados += 1;
+    } catch (e) {
+      falhas.push(`${p.file.name}: ${e instanceof Error ? e.message : "erro no envio"}`);
+    }
+  }
+  return { enviados, falhas };
+}
+
 
 /** Lista apenas os anexos do conteúdo informado (nunca mistura conteúdos). */
 export function useAnexos(vinculo?: VinculoAnexo | null) {
@@ -80,33 +132,12 @@ export function useEnviarAnexo(vinculo?: VinculoAnexo | null) {
       if (!vinculo?.id || vinculo.id === "nova") {
         throw new Error("Salve o cadastro antes de anexar arquivos.");
       }
-      const { data: auth } = await supabase.auth.getUser();
-      const nomeSeguro = file.name.replace(/[^\w.\-]/g, "_");
-      const path = `${vinculo.tipo === "persona" ? "personas" : "simulados"}/${vinculo.id}/${crypto.randomUUID()}-${nomeSeguro}`;
-      const { error: upErr } = await supabase.storage
-        .from(BUCKET)
-        .upload(path, file, { cacheControl: "3600", upsert: false });
-      if (upErr) throw upErr;
-      const { error } = await supabase.from("persona_materiais").insert({
-        persona_id: vinculo.tipo === "persona" ? vinculo.id : null,
-        simulacao_id: vinculo.tipo === "simulado" ? vinculo.id : null,
-        nome: file.name,
-        path,
-        tipo: file.type,
-        tamanho: file.size,
-        descricao: meta.descricao,
-        momento: meta.momento,
-        orientacoes: meta.orientacoes,
-        created_by: auth.user?.id ?? null,
-      });
-      if (error) {
-        await supabase.storage.from(BUCKET).remove([path]);
-        throw error;
-      }
+      await enviarAnexoAvulso(vinculo, file, meta);
     },
     onSuccess: () => void qc.invalidateQueries({ queryKey: chave(vinculo) }),
   });
 }
+
 
 export function useAtualizarAnexo(vinculo?: VinculoAnexo | null) {
   const qc = useQueryClient();

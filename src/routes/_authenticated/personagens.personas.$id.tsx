@@ -16,6 +16,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AnexosManager } from "@/components/personas/AnexosManager";
+import { enviarAnexosPendentes, type AnexoPendente } from "@/lib/personas/anexos";
+
 import {
   useAcoesPersona,
   useCriarPerfil,
@@ -73,6 +75,8 @@ function EditorPersona() {
   const [form, setForm] = useState<Form>(personaVazia());
   const [novoPerfil, setNovoPerfil] = useState("");
   const [novaPalavra, setNovaPalavra] = useState("");
+  const [pendentes, setPendentes] = useState<AnexoPendente[]>([]);
+  const [enviandoAnexos, setEnviandoAnexos] = useState(false);
 
   useEffect(() => {
     if (persona) {
@@ -103,12 +107,31 @@ function EditorPersona() {
         ...(novo ? {} : { id }),
         values: form as Partial<Persona>,
       });
+
+      // Cadastro em uma única etapa: os anexos escolhidos antes de salvar
+      // são enviados imediatamente após a criação do personagem.
+      if (pendentes.length) {
+        setEnviandoAnexos(true);
+        const { enviados, falhas } = await enviarAnexosPendentes(
+          { tipo: "persona", id: salva.id },
+          pendentes,
+        );
+        setEnviandoAnexos(false);
+        setPendentes([]);
+        if (enviados) toast.success(`${enviados} anexo(s) enviado(s).`);
+        if (falhas.length) toast.error(`Falha em ${falhas.length} anexo(s): ${falhas[0]}`);
+      }
+
       toast.success(novo ? "Persona criada com sucesso." : "Alterações salvas.");
       if (novo) navigate({ to: "/personagens/personas/$id", params: { id: salva.id } });
     } catch (err) {
+      setEnviandoAnexos(false);
       toast.error(err instanceof Error ? err.message : "Não foi possível salvar.");
     }
   }
+
+  const salvando = salvar.isPending || enviandoAnexos;
+
 
   return (
     <AppShell
@@ -147,8 +170,15 @@ function EditorPersona() {
               </Button>
             </>
           )}
-          <Button onClick={submeter} disabled={salvar.isPending}>
-            <Save className="size-4" /> {salvar.isPending ? "Salvando…" : "Salvar"}
+          <Button onClick={submeter} disabled={salvando}>
+            <Save className="size-4" />{" "}
+            {salvando
+              ? enviandoAnexos
+                ? "Enviando anexos…"
+                : "Salvando…"
+              : novo && pendentes.length
+                ? `Salvar com ${pendentes.length} anexo(s)`
+                : "Salvar"}
           </Button>
         </>
       }
@@ -504,8 +534,10 @@ function EditorPersona() {
             >
               <AnexosManager
                 vinculo={novo ? null : { tipo: "persona", id: id }}
-                aviso="Salve o personagem para habilitar os anexos."
+                pendentes={pendentes}
+                onPendentesChange={setPendentes}
               />
+
             </SecaoFormulario>
 
             {!novo && (

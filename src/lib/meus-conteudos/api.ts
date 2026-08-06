@@ -133,7 +133,31 @@ export function useMeusConteudos() {
   });
 }
 
+/** Persona completa liberada para o usuário (versão A4 para download/impressão). */
+export function usePersonaParaDownload(personaId: string) {
+  return useQuery({
+    queryKey: ["meus-conteudos", "persona", personaId],
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data: persona, error } = await supabase
+        .from("personas")
+        .select("*")
+        .eq("id", personaId)
+        .maybeSingle();
+      if (error) throw error;
+      if (!persona) return null;
+
+      const anexos = ((
+        await supabase.from("persona_materiais").select(COLUNAS_ANEXO).eq("persona_id", personaId)
+      ).data ?? []) as Anexo[];
+
+      return { persona: persona as unknown as Persona, anexos };
+    },
+  });
+}
+
 /** Personas completas de um simulado liberado (usado na versão para download). */
+
 export function useSimuladoParaDownload(simuladoId: string) {
   return useQuery({
     queryKey: ["meus-conteudos", "simulado", simuladoId],
