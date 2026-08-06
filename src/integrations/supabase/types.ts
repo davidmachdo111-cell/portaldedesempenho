@@ -194,6 +194,8 @@ export type Database = {
           avaliacao_id: string | null
           colaborador_id: string
           concluida_em: string | null
+          concluido_por: string | null
+          concluido_por_nome: string | null
           created_at: string
           created_by: string | null
           id: string
@@ -209,6 +211,8 @@ export type Database = {
           avaliacao_id?: string | null
           colaborador_id: string
           concluida_em?: string | null
+          concluido_por?: string | null
+          concluido_por_nome?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
@@ -224,6 +228,8 @@ export type Database = {
           avaliacao_id?: string | null
           colaborador_id?: string
           concluida_em?: string | null
+          concluido_por?: string | null
+          concluido_por_nome?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
