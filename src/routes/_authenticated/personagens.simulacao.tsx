@@ -4,6 +4,8 @@ import { Copy, Printer, Save, Shuffle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/personas/PersonasShell";
 import { AnexosManager } from "@/components/personas/AnexosManager";
+import { enviarAnexosPendentes, type AnexoPendente } from "@/lib/personas/anexos";
+
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
