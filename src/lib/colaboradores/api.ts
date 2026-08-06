@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export type StatusColaborador = "ativo" | "inativo";
 export type TipoAtividade = "checklist" | "simulado" | "persona";
-export type StatusAtividade = "pendente" | "concluida";
+export type StatusAtividade = "pendente" | "em_andamento" | "concluida";
 
 export interface Colaborador {
   id: string;
