@@ -180,8 +180,6 @@ function EditorPersona() {
                 ? `Salvar com ${pendentes.length} anexo(s)`
                 : "Salvar"}
           </Button>
-
-          </Button>
         </>
       }
     >
