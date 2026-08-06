@@ -244,8 +244,10 @@ function MontarSimulacao() {
           >
             <AnexosManager
               vinculo={simulacaoId ? { tipo: "simulado", id: simulacaoId } : null}
-              aviso="Salve a simulação para habilitar os anexos."
+              pendentes={pendentes}
+              onPendentesChange={setPendentes}
             />
+
           </SecaoFormulario>
 
           <SecaoFormulario
