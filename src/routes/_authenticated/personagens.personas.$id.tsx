@@ -534,8 +534,10 @@ function EditorPersona() {
             >
               <AnexosManager
                 vinculo={novo ? null : { tipo: "persona", id: id }}
-                aviso="Salve o personagem para habilitar os anexos."
+                pendentes={pendentes}
+                onPendentesChange={setPendentes}
               />
+
             </SecaoFormulario>
 
             {!novo && (
