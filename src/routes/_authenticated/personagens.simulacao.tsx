@@ -140,8 +140,23 @@ function MontarSimulacao() {
     };
     const salva = await salvar.mutateAsync(simulacaoId ? { id: simulacaoId, values } : { values });
     setSimulacaoId(salva.id);
+
+    // Anexos escolhidos antes de salvar sobem junto, em uma única operação.
+    if (pendentes.length) {
+      setEnviandoAnexos(true);
+      const { enviados, falhas } = await enviarAnexosPendentes(
+        { tipo: "simulado", id: salva.id },
+        pendentes,
+      );
+      setEnviandoAnexos(false);
+      setPendentes([]);
+      if (enviados) toast.success(`${enviados} anexo(s) enviado(s).`);
+      if (falhas.length) toast.error(`Falha em ${falhas.length} anexo(s): ${falhas[0]}`);
+    }
+
     toast.success("Simulação salva.");
   }
+
 
   function carregar(simId: string) {
     const s = simulacoes.find((x) => x.id === simId);
