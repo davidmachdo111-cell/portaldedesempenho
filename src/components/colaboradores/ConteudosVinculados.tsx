@@ -12,6 +12,8 @@ import {
   rotuloMomento,
   visualizarAnexo,
 } from "@/lib/personas/anexos";
+import { AcoesPdfPersona } from "@/components/personas/PdfPersonaAcoes";
+import { pdfDosAnexos } from "@/lib/personas/pdf";
 import {
   LABEL_STATUS_ATIVIDADE,
   listarConteudosVinculados,
@@ -20,6 +22,7 @@ import {
   type ConteudoVinculado,
   type StatusAtividade,
 } from "@/lib/colaboradores/api";
+
 
 const CORES_STATUS: Record<StatusAtividade, "secondary" | "outline" | "default"> = {
   pendente: "outline",
