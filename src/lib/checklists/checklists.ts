@@ -51,11 +51,19 @@ export interface Exercicio {
   ordem: number;
 }
 
+/** Vínculo N:N entre um exercício do checklist e um critério. */
+export interface VinculoExercicioCriterio {
+  exercicio_id: string;
+  criterio_id: string;
+}
+
 export interface EstruturaChecklist {
   checklist: Checklist;
   secoes: Secao[];
   criterios: Criterio[];
   exercicios: Exercicio[];
+  /** Critérios vinculados a cada exercício (N:N, sem duplicar critérios). */
+  vinculos: VinculoExercicioCriterio[];
 }
 
 const check = <T,>(res: { data: T | null; error: { message: string } | null }): T => {
