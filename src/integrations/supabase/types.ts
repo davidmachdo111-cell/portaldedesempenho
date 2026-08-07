@@ -251,6 +251,48 @@ export type Database = {
           },
         ]
       }
+      colaborador_exercicios: {
+        Row: {
+          colaborador_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          simulacao_id: string
+          updated_at: string
+        }
+        Insert: {
+          colaborador_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          simulacao_id: string
+          updated_at?: string
+        }
+        Update: {
+          colaborador_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          simulacao_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "colaborador_exercicios_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "colaborador_exercicios_simulacao_id_fkey"
+            columns: ["simulacao_id"]
+            isOneToOne: false
+            referencedRelation: "simulacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       colaborador_historico: {
         Row: {
           acao: string
@@ -912,6 +954,45 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      simulacao_personas: {
+        Row: {
+          created_at: string
+          id: string
+          ordem: number
+          persona_id: string
+          simulacao_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ordem?: number
+          persona_id: string
+          simulacao_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ordem?: number
+          persona_id?: string
+          simulacao_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "simulacao_personas_persona_id_fkey"
+            columns: ["persona_id"]
+            isOneToOne: false
+            referencedRelation: "personas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "simulacao_personas_simulacao_id_fkey"
+            columns: ["simulacao_id"]
+            isOneToOne: false
+            referencedRelation: "simulacoes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       simulacoes: {
         Row: {

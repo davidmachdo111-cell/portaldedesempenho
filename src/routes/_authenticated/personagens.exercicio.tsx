@@ -36,16 +36,16 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/personagens/simulacao")({
+export const Route = createFileRoute("/_authenticated/personagens/exercicio")({
   head: () => ({
     meta: [
-      { title: "Montar Simulação | Portal de Desempenho" },
+      { title: "Montar Exercício | Portal de Desempenho" },
       {
         name: "description",
         content:
-          "Selecione personas manualmente ou por sorteio automático, salve a simulação e gere o PDF profissional em A4.",
+          "Selecione personas manualmente ou por sorteio automático, salve o exercício e gere o PDF profissional em A4.",
       },
-      { property: "og:title", content: "Montar Simulação" },
+      { property: "og:title", content: "Montar Exercício" },
       {
         property: "og:description",
         content: "Monte um treinamento completo em menos de dois minutos.",
@@ -59,7 +59,7 @@ const TODOS = "__todos__";
 
 function MontarSimulacao() {
   const navigate = useNavigate();
-  const { nome: usuario } = useAuth();
+  const { nome: usuario, podeGerenciarPersonagens } = useAuth();
   const { data: personas = [] } = usePersonas();
   const { data: simulacoes = [] } = useSimulacoes();
   const salvar = useSalvarSimulacao();
@@ -119,7 +119,7 @@ function MontarSimulacao() {
       to: "/personagens/imprimir",
       search: {
         ids: selecionadas.join(","),
-        nome: nome || "Simulação",
+        nome: nome || "Exercício",
         ...(exercicio !== TODOS ? { exercicio } : {}),
         responsavel: responsavel || usuario,
       },
@@ -132,7 +132,7 @@ function MontarSimulacao() {
       return;
     }
     const values = {
-      nome: nome || "Simulação sem título",
+      nome: nome || "Exercício sem título",
       exercicio: exercicio === TODOS ? null : exercicio,
       responsavel: responsavel || usuario,
       observacoes,
@@ -154,7 +154,7 @@ function MontarSimulacao() {
       if (falhas.length) toast.error(`Falha em ${falhas.length} anexo(s): ${falhas[0]}`);
     }
 
-    toast.success("Simulação salva.");
+    toast.success("Exercício salvo.");
   }
 
 
@@ -167,7 +167,7 @@ function MontarSimulacao() {
     setObservacoes(s.observacoes ?? "");
     setExercicio(s.exercicio ?? TODOS);
     setSelecionadas(s.persona_ids ?? []);
-    toast.success("Simulação carregada.");
+    toast.success("Exercício carregado.");
   }
 
   async function duplicarSimulacao(simId: string) {
@@ -182,12 +182,22 @@ function MontarSimulacao() {
         persona_ids: s.persona_ids,
       },
     });
-    toast.success("Simulação duplicada.");
+    toast.success("Exercício duplicado.");
+  }
+
+  if (!podeGerenciarPersonagens) {
+    return (
+      <AppShell titulo="Montar Exercício" descricao="Acesso restrito">
+        <div className="surface-card p-8 text-center text-sm text-muted-foreground">
+          Seu perfil permite apenas visualizar e baixar os exercícios vinculados a você.
+        </div>
+      </AppShell>
+    );
   }
 
   return (
     <AppShell
-      titulo="Montar Simulação"
+      titulo="Montar Exercício"
       descricao="Selecione personas já cadastradas e gere o material de apoio"
       acoes={
         <>
@@ -201,7 +211,7 @@ function MontarSimulacao() {
               ? "Enviando anexos…"
               : !simulacaoId && pendentes.length
                 ? `Salvar com ${pendentes.length} anexo(s)`
-                : "Salvar simulação"}
+                : "Salvar exercício"}
           </Button>
 
           <Button onClick={abrirPdf}>
@@ -212,9 +222,9 @@ function MontarSimulacao() {
     >
       <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
         <div className="space-y-6">
-          <SecaoFormulario titulo="Dados da simulação">
+          <SecaoFormulario titulo="Dados do exercício">
             <div className="grid gap-4 sm:grid-cols-2">
-              <Campo label="Nome da simulação">
+              <Campo label="Nome do exercício">
                 <Input
                   value={nome}
                   onChange={(e) => setNome(e.target.value)}
@@ -239,8 +249,8 @@ function MontarSimulacao() {
           </SecaoFormulario>
 
           <SecaoFormulario
-            titulo="Anexos do simulado"
-            descricao="Arquivos de apoio vinculados exclusivamente a este simulado, com descrição, momento e orientações de uso."
+            titulo="Anexos do exercício"
+            descricao="Arquivos de apoio vinculados exclusivamente a este exercício, com descrição, momento e orientações de uso."
           >
             <AnexosManager
               vinculo={simulacaoId ? { tipo: "simulado", id: simulacaoId } : null}
@@ -383,10 +393,10 @@ function MontarSimulacao() {
             </ul>
           </SecaoFormulario>
 
-          <SecaoFormulario titulo="Simulações salvas">
+          <SecaoFormulario titulo="Exercícios salvos">
             <ul className="space-y-3">
               {simulacoes.length === 0 && (
-                <li className="text-sm text-muted-foreground">Nenhuma simulação salva ainda.</li>
+                <li className="text-sm text-muted-foreground">Nenhum exercício salvo ainda.</li>
               )}
               {simulacoes.map((s) => (
                 <li key={s.id} className="rounded-xl border border-border p-3">

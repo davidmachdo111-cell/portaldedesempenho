@@ -14,6 +14,7 @@ import {
   YAxis,
 } from "recharts";
 import { AppShell } from "@/components/personas/PersonasShell";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { useHistorico, usePersonas, useSimulacoes } from "@/lib/personas/api";
 import {
@@ -31,12 +32,12 @@ export const Route = createFileRoute("/_authenticated/personagens/")({
       {
         name: "description",
         content:
-          "Indicadores do Portal de Desempenho: totais por exercício, vertente e complexidade, últimas alterações e simulações montadas.",
+          "Indicadores do Portal de Desempenho: totais por exercício, vertente e complexidade, últimas alterações e exercícios montadas.",
       },
       { property: "og:title", content: "Dashboard | Portal de Desempenho" },
       {
         property: "og:description",
-        content: "Painel de indicadores das personas usadas em simulações realísticas.",
+        content: "Painel de indicadores das personas usadas em exercícios realísticos.",
       },
     ],
   }),
@@ -88,6 +89,7 @@ function contar(personas: Persona[], chave: keyof Persona, valores: readonly str
 }
 
 function Dashboard() {
+  const { podeGerenciarPersonagens } = useAuth();
   const { data: personas = [], isLoading } = usePersonas();
   const { data: historico = [] } = useHistorico(undefined, 8);
   const { data: simulacoes = [] } = useSimulacoes();
@@ -115,11 +117,13 @@ function Dashboard() {
           <Button asChild variant="outline">
             <Link to="/personagens/biblioteca">Biblioteca</Link>
           </Button>
-          <Button asChild>
-            <Link to="/personagens/personas/$id" params={{ id: "nova" }}>
-              Nova persona
-            </Link>
-          </Button>
+          {podeGerenciarPersonagens && (
+            <Button asChild>
+              <Link to="/personagens/personas/$id" params={{ id: "nova" }}>
+                Nova persona
+              </Link>
+            </Button>
+          )}
         </>
       }
     >
@@ -137,7 +141,7 @@ function Dashboard() {
               destaque="warning"
             />
             <Indicador
-              titulo="Simulações montadas"
+              titulo="Exercícios montados"
               valor={simulacoes.length}
               icone={ClipboardList}
               destaque="highlight"

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { Link2, Plus, Search, Trash2, UserRound } from "lucide-react";
+import { ClipboardList, Link2, Plus, Search, Trash2, UserRound } from "lucide-react";
 import { toast } from "sonner";
 
 
@@ -43,6 +43,7 @@ import {
   useUsuariosVinculaveis,
   useVinculosDaPagina,
 } from "@/components/colaboradores/VinculosResponsaveis";
+import { DialogExerciciosColaborador } from "@/components/colaboradores/ExerciciosVinculados";
 
 
 export const Route = createFileRoute("/_authenticated/colaboradores/")({
@@ -69,6 +70,7 @@ function PaginaColaboradores() {
   const [pagina, setPagina] = useState(0);
   const [aberto, setAberto] = useState(false);
   const [vinculando, setVinculando] = useState<{ id: string; nome_completo: string } | null>(null);
+  const [exercicioDe, setExercicioDe] = useState<{ id: string; nome_completo: string } | null>(null);
   const [form, setForm] = useState<ColaboradorInput>(vazio);
 
 
@@ -262,6 +264,16 @@ function PaginaColaboradores() {
                         <Link2 className="size-4" />
                       </Button>
                     )}
+                    {isAdmin && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        title="Vincular exercícios"
+                        onClick={() => setExercicioDe({ id: c.id, nome_completo: c.nome_completo })}
+                      >
+                        <ClipboardList className="size-4" />
+                      </Button>
+                    )}
                     {podeGerenciarColaboradores && (
                       <Button
                         variant="ghost"
@@ -313,6 +325,14 @@ function PaginaColaboradores() {
 
         {isAdmin && <PainelVinculosGeral />}
       </div>
+
+      {exercicioDe && (
+        <DialogExerciciosColaborador
+          colaborador={exercicioDe}
+          aberto={!!exercicioDe}
+          onFechar={() => setExercicioDe(null)}
+        />
+      )}
 
       <DialogVinculos
         colaborador={vinculando}

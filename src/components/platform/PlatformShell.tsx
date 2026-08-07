@@ -28,7 +28,7 @@ const navItems = [
   { to: "/checklists", label: "Checklists", icon: ClipboardCheck, permission: "checklists" },
   {
     to: "/personagens",
-    label: "Personagens e Simulados",
+    label: "Personagens e Exercícios",
     icon: Users,
     permission: "personagens_simulados",
   },

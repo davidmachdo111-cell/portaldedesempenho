@@ -8,19 +8,19 @@ import { formatarData } from "@/lib/personas/constants";
 import { useSimuladoParaDownload } from "@/lib/meus-conteudos/api";
 import { rotuloMomento } from "@/lib/personas/anexos";
 
-export const Route = createFileRoute("/_authenticated/meus-conteudos/simulado/$id")({
+export const Route = createFileRoute("/_authenticated/meus-conteudos/exercicio/$id")({
   head: () => ({
     meta: [
-      { title: "Simulado liberado para download — Portal de Desempenho" },
+      { title: "Exercício liberado para download — Portal de Desempenho" },
       {
         name: "description",
         content:
-          "Documento A4 do simulado liberado para você, com capa, personagens e a lista de anexos com orientações de uso.",
+          "Documento A4 do exercício liberado para você, com capa, personagens e a lista de anexos com orientações de uso.",
       },
-      { property: "og:title", content: "Simulado liberado para download" },
+      { property: "og:title", content: "Exercício liberado para download" },
       {
         property: "og:description",
-        content: "Material A4 do simulado atribuído ao seu usuário.",
+        content: "Material A4 do exercício atribuído ao seu usuário.",
       },
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary" },
@@ -47,7 +47,7 @@ function SimuladoDownload() {
   if (!data) {
     return (
       <p className="p-10 text-center text-muted-foreground">
-        Simulado não encontrado ou não liberado para o seu usuário.
+        Exercício não encontrado ou não liberado para o seu usuário.
       </p>
     );
   }
@@ -102,7 +102,7 @@ function SimuladoDownload() {
           )}
         </div>
         <p className="text-xs text-muted-foreground">
-          Documento de uso interno — material de apoio do simulado.
+          Documento de uso interno — material de apoio do exercício.
         </p>
       </section>
 

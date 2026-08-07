@@ -19,7 +19,7 @@ export const Route = createFileRoute("/auth")({
       {
         name: "description",
         content:
-          "Acesso único à plataforma corporativa: Checklists, Personagens e Simulados e Administração Central.",
+          "Acesso único à plataforma corporativa: Checklists, Personagens e Exercícios e Administração Central.",
       },
       { property: "og:title", content: "Entrar — Portal de Desempenho" },
       {
@@ -118,7 +118,7 @@ function AuthPage() {
             Um único acesso para todos os módulos
           </h2>
           <p className="text-brand-foreground/80">
-            Checklists, Personagens e Simulados e Administração Central compartilham login,
+            Checklists, Personagens e Exercícios e Administração Central compartilham login,
             usuários, perfis e permissões.
           </p>
         </div>

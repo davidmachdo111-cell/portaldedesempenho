@@ -70,8 +70,8 @@ export const GRUPOS_PERMISSAO: GrupoPermissao[] = [
   },
   {
     moduleKey: "personagens",
-    titulo: "Módulo Personagens e Simulados",
-    descricao: "Personagens, simulados e materiais anexados.",
+    titulo: "Módulo Personagens e Exercícios",
+    descricao: "Personagens, exercícios e materiais anexados.",
   },
   {
     moduleKey: "treinamentos",

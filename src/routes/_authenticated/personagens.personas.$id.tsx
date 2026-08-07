@@ -37,6 +37,7 @@ import {
   personaVazia,
   type Persona,
 } from "@/lib/personas/constants";
+import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/personagens/personas/$id")({
@@ -46,12 +47,12 @@ export const Route = createFileRoute("/_authenticated/personagens/personas/$id")
       {
         name: "description",
         content:
-          "Cadastre identificação, classificação, dados técnicos, roteiro e materiais de apoio de uma persona de simulação.",
+          "Cadastre identificação, classificação, dados técnicos, roteiro e materiais de apoio de uma persona de exercício.",
       },
       { property: "og:title", content: "Criar / Editar Persona" },
       {
         property: "og:description",
-        content: "Formulário completo e totalmente editável de personas para simulações.",
+        content: "Formulário completo e totalmente editável de personas para exercícios.",
       },
     ],
   }),
@@ -61,6 +62,7 @@ export const Route = createFileRoute("/_authenticated/personagens/personas/$id")
 type Form = ReturnType<typeof personaVazia>;
 
 function EditorPersona() {
+  const { podeGerenciarPersonagens } = useAuth();
   const { id } = Route.useParams();
   const novo = id === "nova";
   const navigate = useNavigate();
@@ -132,8 +134,18 @@ function EditorPersona() {
 
   const salvando = salvar.isPending || enviandoAnexos;
 
+  if (!podeGerenciarPersonagens) {
+    return (
+      <AppShell titulo="Personagens" descricao="Acesso restrito">
+        <div className="surface-card p-8 text-center text-sm text-muted-foreground">
+          Seu perfil permite apenas visualizar e baixar os personagens vinculados a você.
+        </div>
+      </AppShell>
+    );
+  }
 
   return (
+
     <AppShell
       titulo={novo ? "Criar Persona" : `Editar: ${form.nome || "persona"}`}
       descricao={
@@ -286,7 +298,7 @@ function EditorPersona() {
 
             <SecaoFormulario
               titulo="Objetivo e contexto"
-              descricao="O contexto oculto é visível apenas para o auxiliar da simulação."
+              descricao="O contexto oculto é visível apenas para o auxiliar do exercício."
             >
               <div className="space-y-4">
                 <Campo label="Objetivo da persona">
@@ -379,7 +391,7 @@ function EditorPersona() {
               </div>
             </SecaoFormulario>
 
-            <SecaoFormulario titulo="Roteiro da simulação">
+            <SecaoFormulario titulo="Roteiro do exercício">
               <div className="space-y-8">
                 <div>
                   <h3 className="mb-3 text-sm font-semibold">Fala inicial</h3>

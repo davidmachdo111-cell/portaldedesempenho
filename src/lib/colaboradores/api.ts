@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 /**
  * Cadastro central de colaboradores.
  * É a única fonte de dados de pessoas para os módulos (Checklists, Personagens
- * e Simulados). Os módulos continuam com suas próprias tabelas de conteúdo —
+ * e Exercícios). Os módulos continuam com suas próprias tabelas de conteúdo —
  * aqui ficam apenas as pessoas, as liberações e o histórico.
  */
 
@@ -106,7 +106,7 @@ async function registrar(
 
 export const LABEL_TIPO: Record<TipoAtividade, string> = {
   checklist: "Checklist",
-  simulado: "Simulado",
+  simulado: "Exercício",
   persona: "Personagem",
 };
 
@@ -244,7 +244,7 @@ export async function listarCatalogo(): Promise<ItemCatalogo[]> {
       tipo: "simulado",
       ref_id: s.id,
       titulo: s.nome,
-      detalhe: s.exercicio || "Simulado",
+      detalhe: s.exercicio || "Exercício",
     });
   }
   for (const p of personas.data ?? []) {
@@ -426,7 +426,7 @@ export async function resumoAtividades(
   return mapa;
 }
 
-/* ---------- conteúdos vinculados (simulados e personagens do colaborador) ---------- */
+/* ---------- conteúdos vinculados (exercícios e personagens do colaborador) ---------- */
 
 export interface AnexoVinculado {
   id: string;
@@ -462,7 +462,7 @@ export interface ConteudoVinculado {
 type AnexoBruto = AnexoVinculado & { persona_id: string | null; simulacao_id: string | null };
 
 /**
- * Simulados e personagens liberados para o colaborador selecionado, com os
+ * Exercícios e personagens liberados para o colaborador selecionado, com os
  * anexos enviados no cadastro e os personagens de cada simulado. As políticas
  * do banco garantem que apenas conteúdos vinculados fiquem visíveis.
  */
@@ -550,7 +550,7 @@ export async function listarConteudosVinculados(
         detalhe:
           simulado?.exercicio ||
           persona?.exercicio ||
-          (a.tipo === "simulado" ? "Simulado" : "Personagem"),
+          (a.tipo === "simulado" ? "Exercício" : "Personagem"),
         status: (a.status ?? "pendente") as StatusAtividade,
         concluidaEm: a.concluida_em ?? null,
         concluidoPorNome: a.concluido_por_nome ?? null,
@@ -698,4 +698,95 @@ export async function souResponsavel(colaboradorId: string): Promise<boolean> {
   });
   if (error) throw new Error(error.message);
   return data === true;
+}
+
+/* ---------- vínculos Exercício x Colaborador (tabela pivot) ---------- */
+
+export interface ExercicioDisponivel {
+  id: string;
+  nome: string;
+  detalhe: string;
+}
+
+export interface VinculoExercicio {
+  id: string;
+  colaborador_id: string;
+  simulacao_id: string;
+  created_at: string;
+}
+
+/** Exercícios que o usuário atual pode ver (o banco já filtra pelo vínculo). */
+export async function listarExerciciosDisponiveis(): Promise<ExercicioDisponivel[]> {
+  const { data, error } = await supabase
+    .from("simulacoes")
+    .select("id, nome, exercicio, persona_ids")
+    .order("nome");
+  if (error) throw new Error(error.message);
+  return (data ?? []).map((s) => ({
+    id: s.id,
+    nome: s.nome,
+    detalhe: [s.exercicio, `${(s.persona_ids ?? []).length} personagem(ns)`]
+      .filter(Boolean)
+      .join(" · "),
+  }));
+}
+
+/** Vínculos de exercícios dos colaboradores informados. */
+export async function listarVinculosExercicios(
+  colaboradorIds: string[],
+): Promise<Record<string, VinculoExercicio[]>> {
+  if (!colaboradorIds.length) return {};
+  const { data, error } = await supabase
+    .from("colaborador_exercicios")
+    .select("id, colaborador_id, simulacao_id, created_at")
+    .in("colaborador_id", colaboradorIds);
+  if (error) throw new Error(error.message);
+  const mapa: Record<string, VinculoExercicio[]> = {};
+  for (const v of (data ?? []) as VinculoExercicio[]) {
+    (mapa[v.colaborador_id] ??= []).push(v);
+  }
+  return mapa;
+}
+
+/**
+ * Vincula um exercício ao colaborador. Além do pivot, cria a atividade
+ * correspondente para que o acompanhamento de status continue funcionando.
+ */
+export async function vincularExercicio(colaboradorId: string, exercicio: ExercicioDisponivel) {
+  const a = await autor();
+  const { error } = await supabase.from("colaborador_exercicios").insert({
+    colaborador_id: colaboradorId,
+    simulacao_id: exercicio.id,
+    created_by: a.id,
+  });
+  if (error && error.code !== "23505") throw new Error(error.message);
+
+  const atuais = await listarAtividades(colaboradorId);
+  const jaTem = atuais.some((x) => x.tipo === "simulado" && x.ref_id === exercicio.id);
+  if (!jaTem) {
+    await liberarAtividades(colaboradorId, [
+      { tipo: "simulado", ref_id: exercicio.id, titulo: exercicio.nome, detalhe: exercicio.detalhe },
+    ]);
+  }
+  await registrar(colaboradorId, "exercicio_vinculado", { exercicio: exercicio.nome });
+}
+
+/** Desvincula o exercício do colaborador — o exercício e os personagens permanecem. */
+export async function desvincularExercicio(colaboradorId: string, exercicioId: string, nome?: string) {
+  const { error } = await supabase
+    .from("colaborador_exercicios")
+    .delete()
+    .eq("colaborador_id", colaboradorId)
+    .eq("simulacao_id", exercicioId);
+  if (error) throw new Error(error.message);
+
+  const { error: erroAtividade } = await supabase
+    .from("colaborador_atividades")
+    .delete()
+    .eq("colaborador_id", colaboradorId)
+    .eq("tipo", "simulado")
+    .eq("ref_id", exercicioId);
+  if (erroAtividade) throw new Error(erroAtividade.message);
+
+  await registrar(colaboradorId, "exercicio_desvinculado", { exercicio: nome ?? exercicioId });
 }

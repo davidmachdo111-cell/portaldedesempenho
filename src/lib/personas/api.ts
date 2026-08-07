@@ -307,7 +307,49 @@ export async function abrirMaterial(path: string) {
   window.open(data.signedUrl, "_blank", "noopener");
 }
 
-/* ------------------------------ simulações ------------------------------ */
+/* ------------------------------ exercícios ------------------------------ */
+
+/**
+ * Sincroniza a relação N:N entre exercício e personagens (tabela pivot).
+ * Remover um exercício apaga apenas os vínculos — os personagens continuam
+ * disponíveis para outros exercícios.
+ */
+async function sincronizarPersonasDoExercicio(simulacaoId: string, personaIds: string[]) {
+  const { data: atuais, error: erroLeitura } = await supabase
+    .from("simulacao_personas")
+    .select("id, persona_id")
+    .eq("simulacao_id", simulacaoId);
+  if (erroLeitura) throw erroLeitura;
+
+  const existentes = (atuais ?? []) as { id: string; persona_id: string }[];
+  const remover = existentes.filter((v) => !personaIds.includes(v.persona_id)).map((v) => v.id);
+  const inserir = personaIds
+    .filter((id) => !existentes.some((v) => v.persona_id === id))
+    .map((id) => ({
+      simulacao_id: simulacaoId,
+      persona_id: id,
+      ordem: personaIds.indexOf(id),
+    }));
+
+  if (remover.length) {
+    const { error } = await supabase.from("simulacao_personas").delete().in("id", remover);
+    if (error) throw error;
+  }
+  if (inserir.length) {
+    const { error } = await supabase.from("simulacao_personas").insert(inserir);
+    if (error) throw error;
+  }
+  // Mantém a ordem escolhida também nos vínculos que já existiam.
+  await Promise.all(
+    personaIds.map((personaId, ordem) =>
+      supabase
+        .from("simulacao_personas")
+        .update({ ordem })
+        .eq("simulacao_id", simulacaoId)
+        .eq("persona_id", personaId),
+    ),
+  );
+}
 
 export function useSimulacoes() {
   return useQuery({
@@ -328,23 +370,33 @@ export function useSalvarSimulacao() {
   return useMutation({
     mutationFn: async ({ id, values }: { id?: string; values: Partial<Simulacao> }) => {
       const { data: auth } = await supabase.auth.getUser();
+      const { persona_ids: personaIds, ...campos } = values;
+
+      let salva: Simulacao;
       if (id) {
         const { data, error } = await supabase
           .from("simulacoes")
-          .update(values as never)
+          .update(campos as never)
           .eq("id", id)
           .select()
           .single();
         if (error) throw error;
-        return data as unknown as Simulacao;
+        salva = data as unknown as Simulacao;
+      } else {
+        const { data, error } = await supabase
+          .from("simulacoes")
+          .insert({ ...campos, created_by: auth.user?.id ?? null } as never)
+          .select()
+          .single();
+        if (error) throw error;
+        salva = data as unknown as Simulacao;
       }
-      const { data, error } = await supabase
-        .from("simulacoes")
-        .insert({ ...values, created_by: auth.user?.id ?? null } as never)
-        .select()
-        .single();
-      if (error) throw error;
-      return data as unknown as Simulacao;
+
+      if (personaIds) {
+        await sincronizarPersonasDoExercicio(salva.id, personaIds);
+        salva = { ...salva, persona_ids: personaIds };
+      }
+      return salva;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["simulacoes"] }),
   });
@@ -354,6 +406,7 @@ export function useExcluirSimulacao() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
+      // Os vínculos com personagens caem por cascata; os personagens permanecem.
       const { error } = await supabase.from("simulacoes").delete().eq("id", id);
       if (error) throw error;
     },
