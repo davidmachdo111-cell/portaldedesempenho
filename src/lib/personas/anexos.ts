@@ -170,6 +170,10 @@ async function urlAssinada(path: string, download?: string) {
   return data.signedUrl;
 }
 
+/** URL assinada para exibir o arquivo dentro da própria aplicação. */
+export const urlAnexo = (path: string) => urlAssinada(path);
+
+
 /** Abre o anexo em nova aba (visualização). */
 export async function visualizarAnexo(path: string) {
   window.open(await urlAssinada(path), "_blank", "noopener");
