@@ -442,6 +442,9 @@ export interface PersonaDoConteudo {
   id: string;
   nome: string;
   detalhe: string;
+  /** Dados cadastrais exibidos na visualização nativa (somente leitura). */
+  dados: { rotulo: string; valor: string }[];
+  objetivo: string;
   anexos: AnexoVinculado[];
 }
 
@@ -454,10 +457,25 @@ export interface ConteudoVinculado {
   status: StatusAtividade;
   concluidaEm: string | null;
   concluidoPorNome: string | null;
+  observacoes: string;
   anexos: AnexoVinculado[];
   /** Personagens que compõem o simulado (vazio quando o item já é um personagem). */
   personas: PersonaDoConteudo[];
 }
+
+type PersonaInfo = {
+  id: string;
+  nome: string;
+  exercicio: string | null;
+  idade: string | null;
+  sexo: string | null;
+  cidade: string | null;
+  tipo_cliente: string | null;
+  titularidade: string | null;
+  vertente: string | null;
+  complexidade: string | null;
+  objetivo: string | null;
+};
 
 type AnexoBruto = AnexoVinculado & { persona_id: string | null; simulacao_id: string | null };
 
@@ -491,7 +509,7 @@ export async function listarConteudosVinculados(
 
   const simulados = simuladoIds.length
     ? ((
-        await supabase.from("simulacoes").select("id, nome, exercicio, persona_ids").in("id", simuladoIds)
+        await supabase.from("simulacoes").select("id, nome, exercicio, observacoes, persona_ids").in("id", simuladoIds)
       ).data ?? []).map((s) => ({
         ...s,
         persona_ids: (s.persona_ids ?? []) as string[],
@@ -506,8 +524,13 @@ export async function listarConteudosVinculados(
 
   const [personasRes, anexosRes] = await Promise.all([
     personaIds.length
-      ? supabase.from("personas").select("id, nome, exercicio").in("id", personaIds)
-      : Promise.resolve({ data: [] as { id: string; nome: string; exercicio: string | null }[] }),
+      ? supabase
+          .from("personas")
+          .select(
+            "id, nome, exercicio, idade, sexo, cidade, tipo_cliente, titularidade, vertente, complexidade, objetivo",
+          )
+          .in("id", personaIds)
+      : Promise.resolve({ data: [] as PersonaInfo[] }),
     supabase
       .from("persona_materiais")
       .select(colunasAnexo)
@@ -528,10 +551,24 @@ export async function listarConteudosVinculados(
 
   const montarPersona = (personaId: string): PersonaDoConteudo => {
     const info = personasInfo.find((p) => p.id === personaId);
+    const campos: [string, string | null | undefined][] = [
+      ["Exercício", info?.exercicio],
+      ["Idade", info?.idade],
+      ["Sexo", info?.sexo],
+      ["Cidade", info?.cidade],
+      ["Tipo de cliente", info?.tipo_cliente],
+      ["Titularidade", info?.titularidade],
+      ["Vertente", info?.vertente],
+      ["Complexidade", info?.complexidade],
+    ];
     return {
       id: personaId,
       nome: info?.nome ?? "Personagem",
       detalhe: info?.exercicio || "Personagem",
+      dados: campos
+        .filter(([, v]) => Boolean(v))
+        .map(([rotulo, valor]) => ({ rotulo, valor: valor as string })),
+      objetivo: info?.objetivo ?? "",
       anexos: anexos.filter((m) => m.persona_id === personaId).map(limpar),
     };
   };
@@ -554,6 +591,7 @@ export async function listarConteudosVinculados(
         status: (a.status ?? "pendente") as StatusAtividade,
         concluidaEm: a.concluida_em ?? null,
         concluidoPorNome: a.concluido_por_nome ?? null,
+        observacoes: simulado?.observacoes ?? "",
         anexos:
           a.tipo === "simulado"
             ? anexos.filter((m) => m.simulacao_id === refId).map(limpar)
@@ -719,7 +757,7 @@ export interface VinculoExercicio {
 export async function listarExerciciosDisponiveis(): Promise<ExercicioDisponivel[]> {
   const { data, error } = await supabase
     .from("simulacoes")
-    .select("id, nome, exercicio, persona_ids")
+    .select("id, nome, exercicio, observacoes, persona_ids")
     .order("nome");
   if (error) throw new Error(error.message);
   return (data ?? []).map((s) => ({
