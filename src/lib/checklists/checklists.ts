@@ -158,7 +158,13 @@ export async function carregarEstrutura(id: string): Promise<EstruturaChecklist>
   const exercicios = check(
     await supabase.from("exercicios").select("*").eq("checklist_id", id).order("ordem"),
   ) as Exercicio[];
-  return { checklist, secoes, criterios, exercicios };
+  const vinculos = check(
+    await supabase
+      .from("checklist_exercicio_criterios")
+      .select("exercicio_id, criterio_id")
+      .eq("checklist_id", id),
+  ) as VinculoExercicioCriterio[];
+  return { checklist, secoes, criterios, exercicios, vinculos };
 }
 
 export async function salvarEstrutura(e: EstruturaChecklist) {
