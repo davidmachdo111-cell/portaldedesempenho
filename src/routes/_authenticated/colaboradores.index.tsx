@@ -31,6 +31,7 @@ import {
   excluirColaborador,
   formatarData,
   listarColaboradoresPagina,
+  listarNomesResponsaveis,
   resumoAtividades,
   type ColaboradorInput,
 } from "@/lib/colaboradores/api";
@@ -62,7 +63,7 @@ const POR_PAGINA = 20;
 
 function PaginaColaboradores() {
   const qc = useQueryClient();
-  const { podeGerenciarColaboradores, isAdmin } = useAuth();
+  const { podeGerenciarColaboradores, isAdmin, userId } = useAuth();
   const [busca, setBusca] = useState("");
   const [buscaAplicada, setBuscaAplicada] = useState("");
   const [pagina, setPagina] = useState(0);
@@ -99,12 +100,31 @@ function PaginaColaboradores() {
     enabled: ids.length > 0,
   });
 
-  // Vínculos com avaliadores/auxiliares — apenas o administrador gerencia.
-  const vinculos = useVinculosDaPagina(ids, isAdmin);
+  // Vínculos com avaliadores/auxiliares — visíveis a todos, gerenciados pelo administrador.
+  const vinculos = useVinculosDaPagina(ids, true);
   const { itens: usuariosVinculaveis } = useUsuariosVinculaveis();
+
+  // Ids dos responsáveis presentes na página, para exibir o nome também a não-admins.
+  const idsResponsaveis = useMemo(() => {
+    const set = new Set<string>();
+    for (const lista of Object.values(vinculos.data ?? {})) {
+      for (const v of lista) set.add(v.user_id);
+    }
+    return Array.from(set).sort();
+  }, [vinculos.data]);
+
+  const nomesResponsaveis = useQuery({
+    queryKey: ["colaboradores", "responsaveis", "nomes", idsResponsaveis],
+    queryFn: () => listarNomesResponsaveis(idsResponsaveis),
+    enabled: idsResponsaveis.length > 0,
+  });
+
   const nomesUsuarios = useMemo(
-    () => Object.fromEntries(usuariosVinculaveis.map((u) => [u.id, u.nome])),
-    [usuariosVinculaveis],
+    () => ({
+      ...Object.fromEntries(usuariosVinculaveis.map((u) => [u.id, u.nome])),
+      ...(nomesResponsaveis.data ?? {}),
+    }),
+    [usuariosVinculaveis, nomesResponsaveis.data],
   );
 
 
@@ -134,9 +154,7 @@ function PaginaColaboradores() {
   });
 
   // Classes completas (Tailwind não aceita interpolação parcial).
-  const grade = isAdmin
-    ? "lg:grid-cols-[1.6fr_1fr_1fr_0.8fr_1fr_1.4fr_auto]"
-    : "lg:grid-cols-[1.6fr_1fr_1fr_0.8fr_1fr_auto]";
+  const grade = "lg:grid-cols-[1.6fr_1fr_1fr_0.8fr_1fr_1.4fr_auto]";
 
 
   const metricas = (id: string) => {
@@ -179,24 +197,37 @@ function PaginaColaboradores() {
             <span>Setor / Célula</span>
             <span>Admissão</span>
             <span>Progresso</span>
-            {isAdmin && <span>Vínculos</span>}
+            <span>Vínculos</span>
             <span />
           </div>
           <ul className="divide-y">
             {lista.map((c) => {
               const m = metricas(c.id);
               const meus = vinculos.data?.[c.id] ?? [];
+              // Somente admin ou usuário vinculado pode abrir o painel do colaborador.
+              const podeAbrir = isAdmin || meus.some((v) => v.user_id === userId);
               return (
                 <li key={c.id} className={`grid gap-3 px-5 py-4 lg:items-center ${grade}`}>
                   <div className="min-w-0">
-                    <Link
-                      to="/colaboradores/$id"
-                      params={{ id: c.id }}
-                      className="flex items-center gap-2 font-medium hover:underline"
-                    >
-                      <UserRound className="size-4 shrink-0 text-primary" />
-                      <span className="truncate">{c.nome_completo}</span>
-                    </Link>
+                    {podeAbrir ? (
+                      <Link
+                        to="/colaboradores/$id"
+                        params={{ id: c.id }}
+                        className="flex items-center gap-2 font-medium hover:underline"
+                      >
+                        <UserRound className="size-4 shrink-0 text-primary" />
+                        <span className="truncate">{c.nome_completo}</span>
+                      </Link>
+                    ) : (
+                      <span
+                        className="flex cursor-not-allowed items-center gap-2 font-medium text-muted-foreground"
+                        title="Você não está vinculado a este colaborador"
+                        aria-disabled="true"
+                      >
+                        <UserRound className="size-4 shrink-0" />
+                        <span className="truncate">{c.nome_completo}</span>
+                      </span>
+                    )}
                     <p className="truncate text-xs text-muted-foreground">@{c.username}</p>
                   </div>
                   <span className="truncate text-sm">{c.cargo || "—"}</span>
@@ -216,7 +247,7 @@ function PaginaColaboradores() {
                       {m.concluidas}/{m.total}
                     </span>
                   </div>
-                  {isAdmin && <ResumoVinculos vinculos={meus} nomes={nomesUsuarios} />}
+                  <ResumoVinculos vinculos={meus} nomes={nomesUsuarios} />
                   <div className="flex items-center gap-2">
                     <Badge variant={c.status === "ativo" ? "default" : "secondary"}>
                       {c.status === "ativo" ? "Ativo" : "Inativo"}

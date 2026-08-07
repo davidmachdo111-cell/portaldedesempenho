@@ -1,4 +1,5 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import {
@@ -55,6 +56,7 @@ import {
   progresso,
   removerAtividade,
   reordenarAtividades,
+  souResponsavel,
   type AtividadeColaborador,
   type ColaboradorInput,
   type ItemCatalogo,
@@ -62,6 +64,13 @@ import {
 } from "@/lib/colaboradores/api";
 
 export const Route = createFileRoute("/_authenticated/colaboradores/$id")({
+  // Apenas o administrador ou o avaliador/auxiliar vinculado abre o painel do colaborador.
+  beforeLoad: async ({ params }) => {
+    const { data: admin } = await supabase.rpc("is_admin");
+    if (admin === true) return;
+    const permitido = await souResponsavel(params.id).catch(() => false);
+    if (!permitido) throw redirect({ to: "/colaboradores" });
+  },
   component: PainelColaborador,
 });
 

@@ -675,3 +675,27 @@ export async function desvincularResponsavel(vinculo: ResponsavelColaborador, no
     usuario: nome ?? vinculo.user_id,
   });
 }
+
+/** Nomes dos usuários responsáveis (visível a quem tem acesso ao módulo). */
+export async function listarNomesResponsaveis(
+  userIds: string[],
+): Promise<Record<string, string>> {
+  if (!userIds.length) return {};
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, username, full_name")
+    .in("id", userIds);
+  if (error) throw new Error(error.message);
+  return Object.fromEntries(
+    (data ?? []).map((p) => [p.id, p.full_name || p.username]),
+  );
+}
+
+/** O usuário atual é responsável (avaliador/auxiliar) por este colaborador? */
+export async function souResponsavel(colaboradorId: string): Promise<boolean> {
+  const { data, error } = await supabase.rpc("colaborador_sob_responsabilidade", {
+    _colaborador_id: colaboradorId,
+  });
+  if (error) throw new Error(error.message);
+  return data === true;
+}
