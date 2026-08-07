@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import * as Icons from "lucide-react";
 import { ArrowRight, LayoutGrid } from "lucide-react";
 
+import { usePermissions } from "@/hooks/usePermissions";
 import { PlatformShell } from "@/components/platform/PlatformShell";
 import { meQueryOptions, modulesQueryOptions } from "@/lib/platform-queries";
 import { Button } from "@/components/ui/button";
@@ -31,9 +32,9 @@ function PortalPage() {
   const { data: me } = useQuery(meQueryOptions);
   const { data: modules, isLoading } = useQuery(modulesQueryOptions);
 
-  const permissions = me?.permissions ?? [];
+  const { can } = usePermissions();
   const allowed = (modules ?? []).filter(
-    (m) => m.active && (!m.permission_key || permissions.includes(m.permission_key)),
+    (m) => m.active && (!m.permission_key || can(m.permission_key)),
   );
 
   return (

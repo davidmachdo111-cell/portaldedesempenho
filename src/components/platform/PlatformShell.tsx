@@ -14,6 +14,8 @@ import type { ReactNode } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { meQueryOptions } from "@/lib/platform-queries";
+import { usePermissions } from "@/hooks/usePermissions";
+import { PERM } from "@/lib/permissions";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -23,17 +25,22 @@ const navItems = [
     to: "/meus-conteudos",
     label: "Meus Conteúdos",
     icon: FolderOpen,
-    permission: "meus_conteudos",
+    permission: PERM.meusConteudos.ver,
   },
-  { to: "/checklists", label: "Checklists", icon: ClipboardCheck, permission: "checklists" },
+  { to: "/checklists", label: "Checklists", icon: ClipboardCheck, permission: PERM.checklists.ver },
   {
     to: "/personagens",
     label: "Personagens e Simulados",
     icon: Users,
-    permission: "personagens_simulados",
+    permission: PERM.personagens.ver,
   },
-  { to: "/colaboradores", label: "Colaboradores", icon: UserRound, permission: "colaboradores" },
-  { to: "/admin", label: "Administração", icon: ShieldCheck, permission: "administracao" },
+  {
+    to: "/colaboradores",
+    label: "Colaboradores",
+    icon: UserRound,
+    permission: PERM.colaboradores.ver,
+  },
+  { to: "/admin", label: "Administração", icon: ShieldCheck, permission: PERM.administracao.ver },
 ] as const;
 
 export function PlatformShell({
@@ -50,10 +57,8 @@ export function PlatformShell({
   const queryClient = useQueryClient();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  const permissions = me?.permissions ?? [];
-  const visible = navItems.filter(
-    (item) => !item.permission || permissions.includes(item.permission),
-  );
+  const { can } = usePermissions();
+  const visible = navItems.filter((item) => !item.permission || can(item.permission));
 
   async function handleSignOut() {
     await queryClient.cancelQueries();
