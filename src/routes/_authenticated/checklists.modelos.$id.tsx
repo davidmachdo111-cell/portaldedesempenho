@@ -84,6 +84,134 @@ function Arrastavel({ id, children }: { id: string; children: React.ReactNode })
     </div>
   );
 }
+/**
+ * Exercício como acordeão: cabeçalho com nome e contador de critérios
+ * vinculados; conteúdo com seleção rápida dos critérios do checklist.
+ * A relação é N:N — o mesmo critério pode pertencer a vários exercícios.
+ */
+function ItemExercicio({
+  exercicio,
+  secoes,
+  criterios,
+  vinculados,
+  aberto,
+  onAlternarAberto,
+  onRenomear,
+  onRemover,
+  onAlternarCriterio,
+  onMarcarTodos,
+}: {
+  exercicio: Exercicio;
+  secoes: Secao[];
+  criterios: Criterio[];
+  vinculados: Set<string>;
+  aberto: boolean;
+  onAlternarAberto: () => void;
+  onRenomear: (nome: string) => void;
+  onRemover: () => void;
+  onAlternarCriterio: (criterioId: string, marcado: boolean) => void;
+  onMarcarTodos: (marcar: boolean) => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: exercicio.id,
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      className={`rounded-lg border border-border bg-card ${isDragging ? "opacity-60 shadow-lift" : ""}`}
+    >
+      <div className="flex items-center gap-2 px-2 py-2">
+        <button
+          {...attributes}
+          {...listeners}
+          className="cursor-grab text-muted-foreground active:cursor-grabbing"
+          aria-label="Arrastar"
+        >
+          <GripVertical className="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          onClick={onAlternarAberto}
+          aria-expanded={aberto}
+          aria-label={aberto ? "Recolher exercício" : "Expandir exercício"}
+          className="shrink-0 text-muted-foreground hover:text-heading"
+        >
+          <ChevronDown className={`h-4 w-4 transition-transform ${aberto ? "rotate-180" : ""}`} />
+        </button>
+        <Input
+          value={exercicio.nome}
+          maxLength={120}
+          onChange={(e) => onRenomear(e.target.value)}
+          className="h-8 border-0 bg-transparent shadow-none focus-visible:bg-background"
+        />
+        <span className="shrink-0 whitespace-nowrap rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-brand-support">
+          Critérios vinculados: {vinculados.size}
+        </span>
+        <button
+          onClick={onRemover}
+          title="Remover exercício"
+          className="shrink-0 text-muted-foreground hover:text-heading"
+        >
+          <Trash2 className="h-4 w-4" />
+        </button>
+      </div>
+
+      {aberto && (
+        <div className="space-y-3 border-t border-border px-4 py-3">
+          {!criterios.length && (
+            <p className="text-sm text-muted-foreground">
+              Cadastre critérios nas seções acima para vinculá-los a este exercício.
+            </p>
+          )}
+          {criterios.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" size="sm" onClick={() => onMarcarTodos(true)}>
+                Selecionar todos
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => onMarcarTodos(false)}>
+                Limpar seleção
+              </Button>
+            </div>
+          )}
+          {secoes
+            .map((s) => ({ secao: s, itens: criterios.filter((c) => c.secao_id === s.id) }))
+            .concat([
+              {
+                secao: { id: "__sem", checklist_id: "", nome: "Sem seção", ordem: 999 } as Secao,
+                itens: criterios.filter((c) => !c.secao_id || !secoes.some((s) => s.id === c.secao_id)),
+              },
+            ])
+            .filter((g) => g.itens.length > 0)
+            .map((g) => (
+              <div key={g.secao.id} className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  {g.secao.nome}
+                </p>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {g.itens.map((c) => (
+                    <label
+                      key={c.id}
+                      className="flex cursor-pointer items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm"
+                    >
+                      <Checkbox
+                        checked={vinculados.has(c.id)}
+                        onCheckedChange={(v) => onAlternarCriterio(c.id, v === true)}
+                      />
+                      <span className="min-w-0 flex-1 truncate">{c.nome}</span>
+                      <span className="shrink-0 text-xs text-muted-foreground">Peso {c.peso}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 function EditorChecklist() {
   const { id } = Route.useParams();
