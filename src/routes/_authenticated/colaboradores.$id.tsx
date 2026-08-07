@@ -69,7 +69,7 @@ function PainelColaborador() {
   const { id } = Route.useParams();
   const qc = useQueryClient();
   const navigate = useNavigate();
-  const { podeGerenciarColaboradores, podeAvaliar } = useAuth();
+  const { podeGerenciarColaboradores, podeAvaliar, podeVerChecklists } = useAuth();
 
   const [liberar, setLiberar] = useState(false);
   const [selecionados, setSelecionados] = useState<string[]>([]);
