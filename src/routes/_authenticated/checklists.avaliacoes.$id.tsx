@@ -9,7 +9,12 @@ import { CabecalhoAvaliacao } from "@/components/checklists/avaliacao/CabecalhoA
 import { MatrizPreenchimento } from "@/components/checklists/avaliacao/MatrizPreenchimento";
 import { PainelObservacoes } from "@/components/checklists/avaliacao/PainelObservacoes";
 import { PainelResultados } from "@/components/checklists/avaliacao/PainelResultados";
-import { mediaGeral, type Avaliacao, type Observacao } from "@/lib/checklists/avaliacao";
+import {
+  mediaGeral,
+  totalMarcaveis,
+  type Avaliacao,
+  type Observacao,
+} from "@/lib/checklists/avaliacao";
 import { exportarExcel, exportarPDF } from "@/lib/checklists/exportar";
 import { listarSetoresAtivos } from "@/lib/checklists/setores";
 import { useAuth } from "@/hooks/useAuth";
