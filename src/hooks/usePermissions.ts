@@ -19,7 +19,8 @@ export function usePermissions() {
     const isAdmin = roleKeys.includes(ROLE_ADMIN) || (data?.isAdmin ?? false);
 
     const can = (key: string) => isAdmin || permissions.includes(key);
-    const canAny = (keys: readonly string[]) => isAdmin || keys.some((k) => permissions.includes(k));
+    const canAny = (keys: readonly string[]) =>
+      isAdmin || keys.some((k) => permissions.includes(k));
     const canAll = (keys: readonly string[]) =>
       isAdmin || keys.every((k) => permissions.includes(k));
 

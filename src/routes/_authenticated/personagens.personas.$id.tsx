@@ -134,7 +134,6 @@ function EditorPersona() {
 
   const salvando = salvar.isPending || enviandoAnexos;
 
-
   return (
     <AppShell
       titulo={novo ? "Criar Persona" : `Editar: ${form.nome || "persona"}`}
@@ -539,7 +538,6 @@ function EditorPersona() {
                 pendentes={pendentes}
                 onPendentesChange={setPendentes}
               />
-
             </SecaoFormulario>
 
             {!novo && (
