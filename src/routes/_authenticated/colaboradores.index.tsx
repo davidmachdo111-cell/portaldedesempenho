@@ -99,6 +99,16 @@ function PaginaColaboradores() {
     enabled: ids.length > 0,
   });
 
+  // Vínculos com avaliadores/auxiliares — apenas o administrador gerencia.
+  const vinculos = useVinculosDaPagina(ids, isAdmin);
+  const { itens: usuariosVinculaveis } = useUsuariosVinculaveis();
+  const nomesUsuarios = useMemo(
+    () => Object.fromEntries(usuariosVinculaveis.map((u) => [u.id, u.nome])),
+    [usuariosVinculaveis],
+  );
+
+
+
   const criar = useMutation({
     mutationFn: () =>
       criarColaborador({
