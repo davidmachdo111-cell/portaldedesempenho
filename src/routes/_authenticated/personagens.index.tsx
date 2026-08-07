@@ -14,6 +14,7 @@ import {
   YAxis,
 } from "recharts";
 import { AppShell } from "@/components/personas/PersonasShell";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { useHistorico, usePersonas, useSimulacoes } from "@/lib/personas/api";
 import {
@@ -115,11 +116,13 @@ function Dashboard() {
           <Button asChild variant="outline">
             <Link to="/personagens/biblioteca">Biblioteca</Link>
           </Button>
-          <Button asChild>
-            <Link to="/personagens/personas/$id" params={{ id: "nova" }}>
-              Nova persona
-            </Link>
-          </Button>
+          {podeGerenciarPersonagens && (
+            <Button asChild>
+              <Link to="/personagens/personas/$id" params={{ id: "nova" }}>
+                Nova persona
+              </Link>
+            </Button>
+          )}
         </>
       }
     >
