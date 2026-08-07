@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 
-import { supabase } from "@/integrations/supabase/client";
+import { exigirPermissao, PERM } from "@/lib/permissions";
 import { PlatformShell } from "@/components/platform/PlatformShell";
 import { UsersAdmin } from "@/components/platform/UsersAdmin";
 import {
@@ -38,15 +38,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
       },
     ],
   }),
-  beforeLoad: async () => {
-    const { data } = await supabase.auth.getUser();
-    if (!data.user) throw redirect({ to: "/auth" });
-    const { data: allowed } = await supabase.rpc("has_permission", {
-      _user_id: data.user.id,
-      _permission: "administracao",
-    });
-    if (allowed !== true) throw redirect({ to: "/portal" });
-  },
+  beforeLoad: () => exigirPermissao([PERM.administracao.ver], "/portal"),
   component: AdminPage,
 });
 
