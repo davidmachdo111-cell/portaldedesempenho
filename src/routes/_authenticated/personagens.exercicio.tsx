@@ -3,9 +3,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Copy, Printer, Save, Shuffle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/personas/PersonasShell";
-import { AnexosManager } from "@/components/personas/AnexosManager";
-import { enviarAnexosPendentes, type AnexoPendente } from "@/lib/personas/anexos";
-
+import { AcoesPdfPersona } from "@/components/personas/PdfPersonaAcoes";
+import { usePdfsDePersonas } from "@/lib/personas/pdf";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -75,9 +74,7 @@ function MontarSimulacao() {
   const [busca, setBusca] = useState("");
   const [selecionadas, setSelecionadas] = useState<string[]>([]);
   const [simulacaoId, setSimulacaoId] = useState<string | undefined>();
-  const [pendentes, setPendentes] = useState<AnexoPendente[]>([]);
-  const [enviandoAnexos, setEnviandoAnexos] = useState(false);
-
+  const { data: pdfs = {} } = usePdfsDePersonas(selecionadas);
 
   const filtradas = useMemo(
     () =>
@@ -141,22 +138,8 @@ function MontarSimulacao() {
     const salva = await salvar.mutateAsync(simulacaoId ? { id: simulacaoId, values } : { values });
     setSimulacaoId(salva.id);
 
-    // Anexos escolhidos antes de salvar sobem junto, em uma única operação.
-    if (pendentes.length) {
-      setEnviandoAnexos(true);
-      const { enviados, falhas } = await enviarAnexosPendentes(
-        { tipo: "simulado", id: salva.id },
-        pendentes,
-      );
-      setEnviandoAnexos(false);
-      setPendentes([]);
-      if (enviados) toast.success(`${enviados} anexo(s) enviado(s).`);
-      if (falhas.length) toast.error(`Falha em ${falhas.length} anexo(s): ${falhas[0]}`);
-    }
-
     toast.success("Exercício salvo.");
   }
-
 
   function carregar(simId: string) {
     const s = simulacoes.find((x) => x.id === simId);
@@ -201,17 +184,8 @@ function MontarSimulacao() {
       descricao="Selecione personas já cadastradas e gere o material de apoio"
       acoes={
         <>
-          <Button
-            variant="outline"
-            onClick={salvarSimulacao}
-            disabled={salvar.isPending || enviandoAnexos}
-          >
-            <Save className="size-4" />{" "}
-            {enviandoAnexos
-              ? "Enviando anexos…"
-              : !simulacaoId && pendentes.length
-                ? `Salvar com ${pendentes.length} anexo(s)`
-                : "Salvar exercício"}
+          <Button variant="outline" onClick={salvarSimulacao} disabled={salvar.isPending}>
+            <Save className="size-4" /> Salvar exercício
           </Button>
 
           <Button onClick={abrirPdf}>
@@ -249,15 +223,12 @@ function MontarSimulacao() {
           </SecaoFormulario>
 
           <SecaoFormulario
-            titulo="Anexos do exercício"
-            descricao="Arquivos de apoio vinculados exclusivamente a este exercício, com descrição, momento e orientações de uso."
+            titulo="Materiais do exercício"
+            descricao="O PDF pertence exclusivamente ao personagem. O exercício reutiliza o PDF das personas vinculadas — nenhuma cópia é criada."
           >
-            <AnexosManager
-              vinculo={simulacaoId ? { tipo: "simulado", id: simulacaoId } : null}
-              pendentes={pendentes}
-              onPendentesChange={setPendentes}
-            />
-
+            <p className="text-sm text-muted-foreground">
+              Para atualizar um documento, edite o personagem correspondente na biblioteca.
+            </p>
           </SecaoFormulario>
 
           <SecaoFormulario
@@ -370,23 +341,25 @@ function MontarSimulacao() {
                 const p = personas.find((x) => x.id === id);
                 if (!p) return null;
                 return (
-                  <li
-                    key={id}
-                    className="flex items-center gap-2 rounded-lg border border-border p-2.5 text-sm"
-                  >
-                    <Link
-                      to="/personagens/personas/$id"
-                      params={{ id }}
-                      className="min-w-0 flex-1 truncate hover:text-brand"
-                    >
-                      {p.nome}
-                    </Link>
-                    <button
-                      className="text-muted-foreground hover:text-destructive"
-                      onClick={() => setSelecionadas((s) => s.filter((x) => x !== id))}
-                    >
-                      <Trash2 className="size-4" />
-                    </button>
+                  <li key={id} className="rounded-lg border border-border p-2.5 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Link
+                        to="/personagens/personas/$id"
+                        params={{ id }}
+                        className="min-w-0 flex-1 truncate hover:text-brand"
+                      >
+                        {p.nome}
+                      </Link>
+                      <button
+                        className="text-muted-foreground hover:text-destructive"
+                        onClick={() => setSelecionadas((s) => s.filter((x) => x !== id))}
+                      >
+                        <Trash2 className="size-4" />
+                      </button>
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      <AcoesPdfPersona nome={p.nome} pdf={pdfs[id]} compacto />
+                    </div>
                   </li>
                 );
               })}

@@ -12,6 +12,8 @@ import {
   rotuloMomento,
   visualizarAnexo,
 } from "@/lib/personas/anexos";
+import { AcoesPdfPersona } from "@/components/personas/PdfPersonaAcoes";
+import { pdfDosAnexos } from "@/lib/personas/pdf";
 import {
   LABEL_STATUS_ATIVIDADE,
   listarConteudosVinculados,
@@ -131,25 +133,20 @@ export function ConteudosVinculados({ colaboradorId }: { colaboradorId: string }
             <Badge variant="secondary">
               {item.tipo === "simulado" ? "Exercício" : "Personagem"}
             </Badge>
-            <Badge variant={CORES_STATUS[item.status]}>
-              {LABEL_STATUS_ATIVIDADE[item.status]}
-            </Badge>
+            <Badge variant={CORES_STATUS[item.status]}>{LABEL_STATUS_ATIVIDADE[item.status]}</Badge>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="flex flex-wrap items-center gap-2">
               {item.tipo === "simulado" ? (
                 <Button asChild variant="outline" size="sm">
                   <Link to="/meus-conteudos/exercicio/$id" params={{ id: item.refId }}>
-                    <Printer className="size-4" /> Baixar exercício (PDF)
+                    <Printer className="size-4" /> Roteiro do exercício
                   </Link>
                 </Button>
               ) : (
-                <Button asChild variant="outline" size="sm">
-                  <Link to="/meus-conteudos/persona/$id" params={{ id: item.refId }}>
-                    <Printer className="size-4" /> Baixar persona (PDF)
-                  </Link>
-                </Button>
+                <AcoesPdfPersona nome={item.titulo} pdf={pdfDosAnexos(item.anexos)} />
               )}
+
               {item.status !== "em_andamento" && item.status !== "concluida" && (
                 <Button
                   variant="secondary"
@@ -199,11 +196,7 @@ export function ConteudosVinculados({ colaboradorId }: { colaboradorId: string }
                 <div className="mb-2 flex flex-wrap items-center gap-2">
                   <p className="min-w-0 flex-1 truncate text-sm font-semibold">{p.nome}</p>
                   <Badge variant="outline">{p.detalhe}</Badge>
-                  <Button asChild variant="outline" size="sm">
-                    <Link to="/meus-conteudos/persona/$id" params={{ id: p.id }}>
-                      <Printer className="size-4" /> PDF da persona
-                    </Link>
-                  </Button>
+                  <AcoesPdfPersona nome={p.nome} pdf={pdfDosAnexos(p.anexos)} compacto />
                 </div>
                 <ListaAnexos anexos={p.anexos} />
               </div>
