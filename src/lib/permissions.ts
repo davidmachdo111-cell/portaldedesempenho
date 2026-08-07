@@ -113,5 +113,5 @@ export const GRUPOS_PERMISSAO: GrupoPermissao[] = [
 /** Rótulo curto (ação) a partir da chave canônica. */
 export function rotuloAcao(nome: string) {
   const partes = nome.split(":");
-  return (partes[1] ?? partes[0]).trim();
+  return (partes.length > 1 ? partes.slice(1).join(":") : partes[0] ?? nome).trim();
 }
