@@ -27,14 +27,14 @@ import { Route as AuthenticatedColaboradoresIdRouteImport } from './routes/_auth
 import { Route as AuthenticatedMeusConteudosIndexRouteImport } from './routes/_authenticated/meus-conteudos.index'
 import { Route as AuthenticatedPersonagensIndexRouteImport } from './routes/_authenticated/personagens.index'
 import { Route as AuthenticatedPersonagensBibliotecaRouteImport } from './routes/_authenticated/personagens.biblioteca'
+import { Route as AuthenticatedPersonagensExercicioRouteImport } from './routes/_authenticated/personagens.exercicio'
 import { Route as AuthenticatedPersonagensImprimirRouteImport } from './routes/_authenticated/personagens.imprimir'
-import { Route as AuthenticatedPersonagensSimulacaoRouteImport } from './routes/_authenticated/personagens.simulacao'
 import { Route as AuthenticatedChecklistsAvaliacoesIndexRouteImport } from './routes/_authenticated/checklists.avaliacoes.index'
 import { Route as AuthenticatedChecklistsAvaliacoesIdRouteImport } from './routes/_authenticated/checklists.avaliacoes.$id'
 import { Route as AuthenticatedChecklistsModelosIndexRouteImport } from './routes/_authenticated/checklists.modelos.index'
 import { Route as AuthenticatedChecklistsModelosIdRouteImport } from './routes/_authenticated/checklists.modelos.$id'
+import { Route as AuthenticatedMeusConteudosExercicioIdRouteImport } from './routes/_authenticated/meus-conteudos.exercicio.$id'
 import { Route as AuthenticatedMeusConteudosPersonaIdRouteImport } from './routes/_authenticated/meus-conteudos.persona.$id'
-import { Route as AuthenticatedMeusConteudosSimuladoIdRouteImport } from './routes/_authenticated/meus-conteudos.simulado.$id'
 import { Route as AuthenticatedPersonagensPersonasIdRouteImport } from './routes/_authenticated/personagens.personas.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -138,16 +138,16 @@ const AuthenticatedPersonagensBibliotecaRoute =
     path: '/biblioteca',
     getParentRoute: () => AuthenticatedPersonagensRoute,
   } as any)
+const AuthenticatedPersonagensExercicioRoute =
+  AuthenticatedPersonagensExercicioRouteImport.update({
+    id: '/exercicio',
+    path: '/exercicio',
+    getParentRoute: () => AuthenticatedPersonagensRoute,
+  } as any)
 const AuthenticatedPersonagensImprimirRoute =
   AuthenticatedPersonagensImprimirRouteImport.update({
     id: '/imprimir',
     path: '/imprimir',
-    getParentRoute: () => AuthenticatedPersonagensRoute,
-  } as any)
-const AuthenticatedPersonagensSimulacaoRoute =
-  AuthenticatedPersonagensSimulacaoRouteImport.update({
-    id: '/simulacao',
-    path: '/simulacao',
     getParentRoute: () => AuthenticatedPersonagensRoute,
   } as any)
 const AuthenticatedChecklistsAvaliacoesIndexRoute =
@@ -174,16 +174,16 @@ const AuthenticatedChecklistsModelosIdRoute =
     path: '/modelos/$id',
     getParentRoute: () => AuthenticatedChecklistsRoute,
   } as any)
+const AuthenticatedMeusConteudosExercicioIdRoute =
+  AuthenticatedMeusConteudosExercicioIdRouteImport.update({
+    id: '/exercicio/$id',
+    path: '/exercicio/$id',
+    getParentRoute: () => AuthenticatedMeusConteudosRoute,
+  } as any)
 const AuthenticatedMeusConteudosPersonaIdRoute =
   AuthenticatedMeusConteudosPersonaIdRouteImport.update({
     id: '/persona/$id',
     path: '/persona/$id',
-    getParentRoute: () => AuthenticatedMeusConteudosRoute,
-  } as any)
-const AuthenticatedMeusConteudosSimuladoIdRoute =
-  AuthenticatedMeusConteudosSimuladoIdRouteImport.update({
-    id: '/simulado/$id',
-    path: '/simulado/$id',
     getParentRoute: () => AuthenticatedMeusConteudosRoute,
   } as any)
 const AuthenticatedPersonagensPersonasIdRoute =
@@ -207,16 +207,16 @@ export interface FileRoutesByFullPath {
   '/checklists/setores': typeof AuthenticatedChecklistsSetoresRoute
   '/colaboradores/$id': typeof AuthenticatedColaboradoresIdRoute
   '/personagens/biblioteca': typeof AuthenticatedPersonagensBibliotecaRoute
+  '/personagens/exercicio': typeof AuthenticatedPersonagensExercicioRoute
   '/personagens/imprimir': typeof AuthenticatedPersonagensImprimirRoute
-  '/personagens/simulacao': typeof AuthenticatedPersonagensSimulacaoRoute
   '/checklists/': typeof AuthenticatedChecklistsIndexRoute
   '/colaboradores/': typeof AuthenticatedColaboradoresIndexRoute
   '/meus-conteudos/': typeof AuthenticatedMeusConteudosIndexRoute
   '/personagens/': typeof AuthenticatedPersonagensIndexRoute
   '/checklists/avaliacoes/$id': typeof AuthenticatedChecklistsAvaliacoesIdRoute
   '/checklists/modelos/$id': typeof AuthenticatedChecklistsModelosIdRoute
+  '/meus-conteudos/exercicio/$id': typeof AuthenticatedMeusConteudosExercicioIdRoute
   '/meus-conteudos/persona/$id': typeof AuthenticatedMeusConteudosPersonaIdRoute
-  '/meus-conteudos/simulado/$id': typeof AuthenticatedMeusConteudosSimuladoIdRoute
   '/personagens/personas/$id': typeof AuthenticatedPersonagensPersonasIdRoute
   '/checklists/avaliacoes/': typeof AuthenticatedChecklistsAvaliacoesIndexRoute
   '/checklists/modelos/': typeof AuthenticatedChecklistsModelosIndexRoute
@@ -231,16 +231,16 @@ export interface FileRoutesByTo {
   '/checklists/setores': typeof AuthenticatedChecklistsSetoresRoute
   '/colaboradores/$id': typeof AuthenticatedColaboradoresIdRoute
   '/personagens/biblioteca': typeof AuthenticatedPersonagensBibliotecaRoute
+  '/personagens/exercicio': typeof AuthenticatedPersonagensExercicioRoute
   '/personagens/imprimir': typeof AuthenticatedPersonagensImprimirRoute
-  '/personagens/simulacao': typeof AuthenticatedPersonagensSimulacaoRoute
   '/checklists': typeof AuthenticatedChecklistsIndexRoute
   '/colaboradores': typeof AuthenticatedColaboradoresIndexRoute
   '/meus-conteudos': typeof AuthenticatedMeusConteudosIndexRoute
   '/personagens': typeof AuthenticatedPersonagensIndexRoute
   '/checklists/avaliacoes/$id': typeof AuthenticatedChecklistsAvaliacoesIdRoute
   '/checklists/modelos/$id': typeof AuthenticatedChecklistsModelosIdRoute
+  '/meus-conteudos/exercicio/$id': typeof AuthenticatedMeusConteudosExercicioIdRoute
   '/meus-conteudos/persona/$id': typeof AuthenticatedMeusConteudosPersonaIdRoute
-  '/meus-conteudos/simulado/$id': typeof AuthenticatedMeusConteudosSimuladoIdRoute
   '/personagens/personas/$id': typeof AuthenticatedPersonagensPersonasIdRoute
   '/checklists/avaliacoes': typeof AuthenticatedChecklistsAvaliacoesIndexRoute
   '/checklists/modelos': typeof AuthenticatedChecklistsModelosIndexRoute
@@ -261,16 +261,16 @@ export interface FileRoutesById {
   '/_authenticated/checklists/setores': typeof AuthenticatedChecklistsSetoresRoute
   '/_authenticated/colaboradores/$id': typeof AuthenticatedColaboradoresIdRoute
   '/_authenticated/personagens/biblioteca': typeof AuthenticatedPersonagensBibliotecaRoute
+  '/_authenticated/personagens/exercicio': typeof AuthenticatedPersonagensExercicioRoute
   '/_authenticated/personagens/imprimir': typeof AuthenticatedPersonagensImprimirRoute
-  '/_authenticated/personagens/simulacao': typeof AuthenticatedPersonagensSimulacaoRoute
   '/_authenticated/checklists/': typeof AuthenticatedChecklistsIndexRoute
   '/_authenticated/colaboradores/': typeof AuthenticatedColaboradoresIndexRoute
   '/_authenticated/meus-conteudos/': typeof AuthenticatedMeusConteudosIndexRoute
   '/_authenticated/personagens/': typeof AuthenticatedPersonagensIndexRoute
   '/_authenticated/checklists/avaliacoes/$id': typeof AuthenticatedChecklistsAvaliacoesIdRoute
   '/_authenticated/checklists/modelos/$id': typeof AuthenticatedChecklistsModelosIdRoute
+  '/_authenticated/meus-conteudos/exercicio/$id': typeof AuthenticatedMeusConteudosExercicioIdRoute
   '/_authenticated/meus-conteudos/persona/$id': typeof AuthenticatedMeusConteudosPersonaIdRoute
-  '/_authenticated/meus-conteudos/simulado/$id': typeof AuthenticatedMeusConteudosSimuladoIdRoute
   '/_authenticated/personagens/personas/$id': typeof AuthenticatedPersonagensPersonasIdRoute
   '/_authenticated/checklists/avaliacoes/': typeof AuthenticatedChecklistsAvaliacoesIndexRoute
   '/_authenticated/checklists/modelos/': typeof AuthenticatedChecklistsModelosIndexRoute
@@ -291,16 +291,16 @@ export interface FileRouteTypes {
     | '/checklists/setores'
     | '/colaboradores/$id'
     | '/personagens/biblioteca'
+    | '/personagens/exercicio'
     | '/personagens/imprimir'
-    | '/personagens/simulacao'
     | '/checklists/'
     | '/colaboradores/'
     | '/meus-conteudos/'
     | '/personagens/'
     | '/checklists/avaliacoes/$id'
     | '/checklists/modelos/$id'
+    | '/meus-conteudos/exercicio/$id'
     | '/meus-conteudos/persona/$id'
-    | '/meus-conteudos/simulado/$id'
     | '/personagens/personas/$id'
     | '/checklists/avaliacoes/'
     | '/checklists/modelos/'
@@ -315,16 +315,16 @@ export interface FileRouteTypes {
     | '/checklists/setores'
     | '/colaboradores/$id'
     | '/personagens/biblioteca'
+    | '/personagens/exercicio'
     | '/personagens/imprimir'
-    | '/personagens/simulacao'
     | '/checklists'
     | '/colaboradores'
     | '/meus-conteudos'
     | '/personagens'
     | '/checklists/avaliacoes/$id'
     | '/checklists/modelos/$id'
+    | '/meus-conteudos/exercicio/$id'
     | '/meus-conteudos/persona/$id'
-    | '/meus-conteudos/simulado/$id'
     | '/personagens/personas/$id'
     | '/checklists/avaliacoes'
     | '/checklists/modelos'
@@ -344,16 +344,16 @@ export interface FileRouteTypes {
     | '/_authenticated/checklists/setores'
     | '/_authenticated/colaboradores/$id'
     | '/_authenticated/personagens/biblioteca'
+    | '/_authenticated/personagens/exercicio'
     | '/_authenticated/personagens/imprimir'
-    | '/_authenticated/personagens/simulacao'
     | '/_authenticated/checklists/'
     | '/_authenticated/colaboradores/'
     | '/_authenticated/meus-conteudos/'
     | '/_authenticated/personagens/'
     | '/_authenticated/checklists/avaliacoes/$id'
     | '/_authenticated/checklists/modelos/$id'
+    | '/_authenticated/meus-conteudos/exercicio/$id'
     | '/_authenticated/meus-conteudos/persona/$id'
-    | '/_authenticated/meus-conteudos/simulado/$id'
     | '/_authenticated/personagens/personas/$id'
     | '/_authenticated/checklists/avaliacoes/'
     | '/_authenticated/checklists/modelos/'
@@ -493,18 +493,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPersonagensBibliotecaRouteImport
       parentRoute: typeof AuthenticatedPersonagensRoute
     }
+    '/_authenticated/personagens/exercicio': {
+      id: '/_authenticated/personagens/exercicio'
+      path: '/exercicio'
+      fullPath: '/personagens/exercicio'
+      preLoaderRoute: typeof AuthenticatedPersonagensExercicioRouteImport
+      parentRoute: typeof AuthenticatedPersonagensRoute
+    }
     '/_authenticated/personagens/imprimir': {
       id: '/_authenticated/personagens/imprimir'
       path: '/imprimir'
       fullPath: '/personagens/imprimir'
       preLoaderRoute: typeof AuthenticatedPersonagensImprimirRouteImport
-      parentRoute: typeof AuthenticatedPersonagensRoute
-    }
-    '/_authenticated/personagens/simulacao': {
-      id: '/_authenticated/personagens/simulacao'
-      path: '/simulacao'
-      fullPath: '/personagens/simulacao'
-      preLoaderRoute: typeof AuthenticatedPersonagensSimulacaoRouteImport
       parentRoute: typeof AuthenticatedPersonagensRoute
     }
     '/_authenticated/checklists/avaliacoes/': {
@@ -535,18 +535,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedChecklistsModelosIdRouteImport
       parentRoute: typeof AuthenticatedChecklistsRoute
     }
+    '/_authenticated/meus-conteudos/exercicio/$id': {
+      id: '/_authenticated/meus-conteudos/exercicio/$id'
+      path: '/exercicio/$id'
+      fullPath: '/meus-conteudos/exercicio/$id'
+      preLoaderRoute: typeof AuthenticatedMeusConteudosExercicioIdRouteImport
+      parentRoute: typeof AuthenticatedMeusConteudosRoute
+    }
     '/_authenticated/meus-conteudos/persona/$id': {
       id: '/_authenticated/meus-conteudos/persona/$id'
       path: '/persona/$id'
       fullPath: '/meus-conteudos/persona/$id'
       preLoaderRoute: typeof AuthenticatedMeusConteudosPersonaIdRouteImport
-      parentRoute: typeof AuthenticatedMeusConteudosRoute
-    }
-    '/_authenticated/meus-conteudos/simulado/$id': {
-      id: '/_authenticated/meus-conteudos/simulado/$id'
-      path: '/simulado/$id'
-      fullPath: '/meus-conteudos/simulado/$id'
-      preLoaderRoute: typeof AuthenticatedMeusConteudosSimuladoIdRouteImport
       parentRoute: typeof AuthenticatedMeusConteudosRoute
     }
     '/_authenticated/personagens/personas/$id': {
@@ -611,17 +611,17 @@ const AuthenticatedColaboradoresRouteWithChildren =
 
 interface AuthenticatedMeusConteudosRouteChildren {
   AuthenticatedMeusConteudosIndexRoute: typeof AuthenticatedMeusConteudosIndexRoute
+  AuthenticatedMeusConteudosExercicioIdRoute: typeof AuthenticatedMeusConteudosExercicioIdRoute
   AuthenticatedMeusConteudosPersonaIdRoute: typeof AuthenticatedMeusConteudosPersonaIdRoute
-  AuthenticatedMeusConteudosSimuladoIdRoute: typeof AuthenticatedMeusConteudosSimuladoIdRoute
 }
 
 const AuthenticatedMeusConteudosRouteChildren: AuthenticatedMeusConteudosRouteChildren =
   {
     AuthenticatedMeusConteudosIndexRoute: AuthenticatedMeusConteudosIndexRoute,
+    AuthenticatedMeusConteudosExercicioIdRoute:
+      AuthenticatedMeusConteudosExercicioIdRoute,
     AuthenticatedMeusConteudosPersonaIdRoute:
       AuthenticatedMeusConteudosPersonaIdRoute,
-    AuthenticatedMeusConteudosSimuladoIdRoute:
-      AuthenticatedMeusConteudosSimuladoIdRoute,
   }
 
 const AuthenticatedMeusConteudosRouteWithChildren =
@@ -631,8 +631,8 @@ const AuthenticatedMeusConteudosRouteWithChildren =
 
 interface AuthenticatedPersonagensRouteChildren {
   AuthenticatedPersonagensBibliotecaRoute: typeof AuthenticatedPersonagensBibliotecaRoute
+  AuthenticatedPersonagensExercicioRoute: typeof AuthenticatedPersonagensExercicioRoute
   AuthenticatedPersonagensImprimirRoute: typeof AuthenticatedPersonagensImprimirRoute
-  AuthenticatedPersonagensSimulacaoRoute: typeof AuthenticatedPersonagensSimulacaoRoute
   AuthenticatedPersonagensIndexRoute: typeof AuthenticatedPersonagensIndexRoute
   AuthenticatedPersonagensPersonasIdRoute: typeof AuthenticatedPersonagensPersonasIdRoute
 }
@@ -641,10 +641,10 @@ const AuthenticatedPersonagensRouteChildren: AuthenticatedPersonagensRouteChildr
   {
     AuthenticatedPersonagensBibliotecaRoute:
       AuthenticatedPersonagensBibliotecaRoute,
+    AuthenticatedPersonagensExercicioRoute:
+      AuthenticatedPersonagensExercicioRoute,
     AuthenticatedPersonagensImprimirRoute:
       AuthenticatedPersonagensImprimirRoute,
-    AuthenticatedPersonagensSimulacaoRoute:
-      AuthenticatedPersonagensSimulacaoRoute,
     AuthenticatedPersonagensIndexRoute: AuthenticatedPersonagensIndexRoute,
     AuthenticatedPersonagensPersonasIdRoute:
       AuthenticatedPersonagensPersonasIdRoute,
