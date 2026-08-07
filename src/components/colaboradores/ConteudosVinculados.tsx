@@ -199,11 +199,8 @@ export function ConteudosVinculados({ colaboradorId }: { colaboradorId: string }
                 <div className="mb-2 flex flex-wrap items-center gap-2">
                   <p className="min-w-0 flex-1 truncate text-sm font-semibold">{p.nome}</p>
                   <Badge variant="outline">{p.detalhe}</Badge>
-                  <Button asChild variant="outline" size="sm">
-                    <Link to="/meus-conteudos/persona/$id" params={{ id: p.id }}>
-                      <Printer className="size-4" /> PDF da persona
-                    </Link>
-                  </Button>
+                  <AcoesPdfPersona nome={p.nome} pdf={pdfDosAnexos(p.anexos)} compacto />
+
                 </div>
                 <ListaAnexos anexos={p.anexos} />
               </div>
