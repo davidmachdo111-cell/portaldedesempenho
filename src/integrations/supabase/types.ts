@@ -488,24 +488,59 @@ export type Database = {
         }
         Relationships: []
       }
+      permission_aliases: {
+        Row: {
+          legacy_key: string
+          permission_key: string
+        }
+        Insert: {
+          legacy_key: string
+          permission_key: string
+        }
+        Update: {
+          legacy_key?: string
+          permission_key?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "permission_aliases_permission_key_fkey"
+            columns: ["permission_key"]
+            isOneToOne: false
+            referencedRelation: "permissions"
+            referencedColumns: ["key"]
+          },
+        ]
+      }
       permissions: {
         Row: {
+          action_name: string
           created_at: string
           description: string
           key: string
+          module_key: string
+          module_name: string
           name: string
+          sort_order: number
         }
         Insert: {
+          action_name?: string
           created_at?: string
           description?: string
           key: string
+          module_key?: string
+          module_name?: string
           name: string
+          sort_order?: number
         }
         Update: {
+          action_name?: string
           created_at?: string
           description?: string
           key?: string
+          module_key?: string
+          module_name?: string
           name?: string
+          sort_order?: number
         }
         Relationships: []
       }
@@ -966,6 +1001,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      has_any_permission: {
+        Args: { _permissions: string[]; _user_id: string }
+        Returns: boolean
+      }
       has_permission: {
         Args: { _permission: string; _user_id: string }
         Returns: boolean
