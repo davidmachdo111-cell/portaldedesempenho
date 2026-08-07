@@ -77,14 +77,16 @@ export function MatrizPreenchimento({
                 </td>
                 {exercicios.map((ex) => (
                   <td key={ex.id} className="px-2 py-2.5 text-center">
-                    <div className="flex items-center justify-center">
-                      <Checkbox
-                        disabled={bloqueado}
-                        checked={!!avaliacao.marcados[chave(ex.id, c.id)]}
-                        onCheckedChange={() => onToggle(ex.id, c.id)}
-                        className="h-5 w-5 rounded-[6px] border-border data-[state=checked]:border-primary data-[state=checked]:bg-primary"
-                      />
-                    </div>
+                    {criterioVinculado(avaliacao, ex.id, c.id) && (
+                      <div className="flex items-center justify-center">
+                        <Checkbox
+                          disabled={bloqueado}
+                          checked={!!avaliacao.marcados[chave(ex.id, c.id)]}
+                          onCheckedChange={() => onToggle(ex.id, c.id)}
+                          className="h-5 w-5 rounded-[6px] border-border data-[state=checked]:border-primary data-[state=checked]:bg-primary"
+                        />
+                      </div>
+                    )}
                   </td>
                 ))}
               </tr>
