@@ -227,7 +227,7 @@ function PaginaColaboradores() {
                       {m.concluidas}/{m.total}
                     </span>
                   </div>
-                  {isAdmin && <ResumoVinculos vinculos={meus} nomes={nomesUsuarios} />}
+                  <ResumoVinculos vinculos={meus} nomes={nomesUsuarios} />
                   <div className="flex items-center gap-2">
                     <Badge variant={c.status === "ativo" ? "default" : "secondary"}>
                       {c.status === "ativo" ? "Ativo" : "Inativo"}
