@@ -76,6 +76,8 @@ function MontarSimulacao() {
   const [busca, setBusca] = useState("");
   const [selecionadas, setSelecionadas] = useState<string[]>([]);
   const [simulacaoId, setSimulacaoId] = useState<string | undefined>();
+  const { data: pdfs = {} } = usePdfsDePersonas(selecionadas);
+
 
 
 
