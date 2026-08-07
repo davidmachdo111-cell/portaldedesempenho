@@ -369,7 +369,7 @@ function EditorChecklist() {
               <div>
                 <h2 className="text-base font-semibold">Exercícios</h2>
                 <p className="text-xs text-muted-foreground">
-                  Cada exercício será avaliado contra todos os critérios.
+                  Expanda um exercício para escolher quais critérios pertencem a ele.
                 </p>
               </div>
               <Button variant="outline" size="sm" onClick={addExercicio}>
@@ -388,29 +388,55 @@ function EditorChecklist() {
                 >
                   <div className="space-y-2">
                     {exercicios.map((x) => (
-                      <Arrastavel key={x.id} id={x.id}>
-                        <Input
-                          value={x.nome}
-                          maxLength={120}
-                          onChange={(e) =>
-                            patch({
-                              exercicios: exercicios.map((y) =>
-                                y.id === x.id ? { ...y, nome: e.target.value } : y,
-                              ),
-                            })
-                          }
-                          className="h-8 border-0 bg-transparent shadow-none focus-visible:bg-background"
-                        />
-                        <button
-                          onClick={() =>
-                            patch({ exercicios: exercicios.filter((y) => y.id !== x.id) })
-                          }
-                          title="Remover exercício"
-                          className="shrink-0 text-muted-foreground hover:text-heading"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </Arrastavel>
+                      <ItemExercicio
+                        key={x.id}
+                        exercicio={x}
+                        secoes={secoes}
+                        criterios={criterios}
+                        vinculados={vinculadosPorExercicio.get(x.id) ?? new Set<string>()}
+                        aberto={expandidos.includes(x.id)}
+                        onAlternarAberto={() =>
+                          setExpandidos((atual) =>
+                            atual.includes(x.id)
+                              ? atual.filter((i) => i !== x.id)
+                              : [...atual, x.id],
+                          )
+                        }
+                        onRenomear={(nome) =>
+                          patch({
+                            exercicios: exercicios.map((y) => (y.id === x.id ? { ...y, nome } : y)),
+                          })
+                        }
+                        onRemover={() =>
+                          patch({
+                            exercicios: exercicios.filter((y) => y.id !== x.id),
+                            vinculos: vinculos.filter((v) => v.exercicio_id !== x.id),
+                          })
+                        }
+                        onAlternarCriterio={(criterioId, marcado) =>
+                          patch({
+                            vinculos: marcado
+                              ? [...vinculos, { exercicio_id: x.id, criterio_id: criterioId }]
+                              : vinculos.filter(
+                                  (v) =>
+                                    !(v.exercicio_id === x.id && v.criterio_id === criterioId),
+                                ),
+                          })
+                        }
+                        onMarcarTodos={(marcar) =>
+                          patch({
+                            vinculos: marcar
+                              ? [
+                                  ...vinculos.filter((v) => v.exercicio_id !== x.id),
+                                  ...criterios.map((c) => ({
+                                    exercicio_id: x.id,
+                                    criterio_id: c.id,
+                                  })),
+                                ]
+                              : vinculos.filter((v) => v.exercicio_id !== x.id),
+                          })
+                        }
+                      />
                     ))}
                   </div>
                 </SortableContext>
