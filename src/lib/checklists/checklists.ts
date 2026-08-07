@@ -314,27 +314,59 @@ export async function duplicarChecklist(id: string): Promise<Checklist> {
     ) as Secao;
     mapaSecoes.set(s.id, nova.id);
   }
+  const mapaCriterios = new Map<string, string>();
   if (criterios.length) {
-    await supabase.from("criterios").insert(
-      criterios.map((c) => ({
-        checklist_id: novo.id,
-        secao_id: c.secao_id ? (mapaSecoes.get(c.secao_id) ?? null) : null,
-        nome: c.nome,
-        peso: c.peso,
-        obrigatorio: c.obrigatorio,
-        ordem: c.ordem,
-      })),
-    );
+    const novos = check(
+      await supabase
+        .from("criterios")
+        .insert(
+          criterios.map((c) => ({
+            checklist_id: novo.id,
+            secao_id: c.secao_id ? (mapaSecoes.get(c.secao_id) ?? null) : null,
+            nome: c.nome,
+            peso: c.peso,
+            obrigatorio: c.obrigatorio,
+            ordem: c.ordem,
+          })),
+        )
+        .select(),
+    ) as Criterio[];
+    criterios.forEach((c, i) => {
+      const criado = novos[i];
+      if (criado) mapaCriterios.set(c.id, criado.id);
+    });
   }
+  const mapaExercicios = new Map<string, string>();
   if (exercicios.length) {
-    await supabase.from("exercicios").insert(
-      exercicios.map((x) => ({
-        checklist_id: novo.id,
-        nome: x.nome,
-        obrigatorio: x.obrigatorio,
-        ordem: x.ordem,
-      })),
+    const novos = check(
+      await supabase
+        .from("exercicios")
+        .insert(
+          exercicios.map((x) => ({
+            checklist_id: novo.id,
+            nome: x.nome,
+            obrigatorio: x.obrigatorio,
+            ordem: x.ordem,
+          })),
+        )
+        .select(),
+    ) as Exercicio[];
+    exercicios.forEach((x, i) => {
+      const criado = novos[i];
+      if (criado) mapaExercicios.set(x.id, criado.id);
+    });
+  }
+  const vinculosCopiados = vinculos
+    .map((v) => ({
+      checklist_id: novo.id,
+      exercicio_id: mapaExercicios.get(v.exercicio_id),
+      criterio_id: mapaCriterios.get(v.criterio_id),
+    }))
+    .filter((v): v is { checklist_id: string; exercicio_id: string; criterio_id: string } =>
+      Boolean(v.exercicio_id && v.criterio_id),
     );
+  if (vinculosCopiados.length) {
+    await supabase.from("checklist_exercicio_criterios").insert(vinculosCopiados);
   }
   return novo;
 }
