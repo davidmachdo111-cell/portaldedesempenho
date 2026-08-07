@@ -1,4 +1,5 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import {
@@ -55,6 +56,7 @@ import {
   progresso,
   removerAtividade,
   reordenarAtividades,
+  souResponsavel,
   type AtividadeColaborador,
   type ColaboradorInput,
   type ItemCatalogo,
