@@ -62,7 +62,7 @@ const POR_PAGINA = 20;
 
 function PaginaColaboradores() {
   const qc = useQueryClient();
-  const { podeGerenciarColaboradores, isAdmin } = useAuth();
+  const { podeGerenciarColaboradores, isAdmin, userId } = useAuth();
   const [busca, setBusca] = useState("");
   const [buscaAplicada, setBuscaAplicada] = useState("");
   const [pagina, setPagina] = useState(0);
