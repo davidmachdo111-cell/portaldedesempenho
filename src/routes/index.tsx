@@ -9,12 +9,12 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Portal único com acesso aos módulos Checklists e Personagens e Simulados, com usuários, perfis e permissões centralizados.",
+          "Portal único com acesso aos módulos Checklists e Personagens e Exercícios, com usuários, perfis e permissões centralizados.",
       },
       { property: "og:title", content: "Portal de Desempenho — Módulos corporativos" },
       {
         property: "og:description",
-        content: "Portal único com acesso aos módulos Checklists e Personagens e Simulados, com usuários, perfis e permissões centralizados.",
+        content: "Portal único com acesso aos módulos Checklists e Personagens e Exercícios, com usuários, perfis e permissões centralizados.",
       },
     ],
   }),

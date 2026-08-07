@@ -426,7 +426,7 @@ export async function resumoAtividades(
   return mapa;
 }
 
-/* ---------- conteúdos vinculados (simulados e personagens do colaborador) ---------- */
+/* ---------- conteúdos vinculados (exercícios e personagens do colaborador) ---------- */
 
 export interface AnexoVinculado {
   id: string;
@@ -462,7 +462,7 @@ export interface ConteudoVinculado {
 type AnexoBruto = AnexoVinculado & { persona_id: string | null; simulacao_id: string | null };
 
 /**
- * Simulados e personagens liberados para o colaborador selecionado, com os
+ * Exercícios e personagens liberados para o colaborador selecionado, com os
  * anexos enviados no cadastro e os personagens de cada simulado. As políticas
  * do banco garantem que apenas conteúdos vinculados fiquem visíveis.
  */

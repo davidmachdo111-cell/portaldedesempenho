@@ -46,12 +46,12 @@ export const Route = createFileRoute("/_authenticated/personagens/personas/$id")
       {
         name: "description",
         content:
-          "Cadastre identificação, classificação, dados técnicos, roteiro e materiais de apoio de uma persona de simulação.",
+          "Cadastre identificação, classificação, dados técnicos, roteiro e materiais de apoio de uma persona de exercício.",
       },
       { property: "og:title", content: "Criar / Editar Persona" },
       {
         property: "og:description",
-        content: "Formulário completo e totalmente editável de personas para simulações.",
+        content: "Formulário completo e totalmente editável de personas para exercícios.",
       },
     ],
   }),
@@ -286,7 +286,7 @@ function EditorPersona() {
 
             <SecaoFormulario
               titulo="Objetivo e contexto"
-              descricao="O contexto oculto é visível apenas para o auxiliar da simulação."
+              descricao="O contexto oculto é visível apenas para o auxiliar do exercício."
             >
               <div className="space-y-4">
                 <Campo label="Objetivo da persona">
@@ -379,7 +379,7 @@ function EditorPersona() {
               </div>
             </SecaoFormulario>
 
-            <SecaoFormulario titulo="Roteiro da simulação">
+            <SecaoFormulario titulo="Roteiro do exercício">
               <div className="space-y-8">
                 <div>
                   <h3 className="mb-3 text-sm font-semibold">Fala inicial</h3>

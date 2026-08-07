@@ -79,7 +79,7 @@ function ListaAnexos({ anexos }: { anexos: AnexoVinculado[] }) {
 }
 
 /**
- * Personagens e simulados vinculados ao colaborador selecionado.
+ * Personagens e exercícios vinculados ao colaborador selecionado.
  * Disponível para Administrador, Avaliador e Auxiliar — todos com o mesmo
  * botão de download (entrega exatamente o arquivo enviado no cadastro) e com o
  * controle de conclusão do treinamento.
@@ -113,7 +113,7 @@ export function ConteudosVinculados({ colaboradorId }: { colaboradorId: string }
   if (!itens.length) {
     return (
       <p className="rounded-xl border bg-card px-5 py-12 text-center text-sm text-muted-foreground">
-        Nenhum personagem ou simulado vinculado a este colaborador.
+        Nenhum personagem ou exercício vinculado a este colaborador.
       </p>
     );
   }
@@ -129,7 +129,7 @@ export function ConteudosVinculados({ colaboradorId }: { colaboradorId: string }
               <p className="truncate text-xs text-muted-foreground">{item.detalhe}</p>
             </div>
             <Badge variant="secondary">
-              {item.tipo === "simulado" ? "Simulado" : "Personagem"}
+              {item.tipo === "simulado" ? "Exercício" : "Personagem"}
             </Badge>
             <Badge variant={CORES_STATUS[item.status]}>
               {LABEL_STATUS_ATIVIDADE[item.status]}
@@ -140,7 +140,7 @@ export function ConteudosVinculados({ colaboradorId }: { colaboradorId: string }
               {item.tipo === "simulado" ? (
                 <Button asChild variant="outline" size="sm">
                   <Link to="/meus-conteudos/exercicio/$id" params={{ id: item.refId }}>
-                    <Printer className="size-4" /> Baixar simulado (PDF)
+                    <Printer className="size-4" /> Baixar exercício (PDF)
                   </Link>
                 </Button>
               ) : (
@@ -189,7 +189,7 @@ export function ConteudosVinculados({ colaboradorId }: { colaboradorId: string }
 
             <div>
               <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Anexos do {item.tipo === "simulado" ? "simulado" : "personagem"}
+                Anexos do {item.tipo === "simulado" ? "exercício" : "personagem"}
               </p>
               <ListaAnexos anexos={item.anexos} />
             </div>

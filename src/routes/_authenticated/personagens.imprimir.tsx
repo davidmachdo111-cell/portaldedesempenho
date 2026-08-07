@@ -23,12 +23,12 @@ export const Route = createFileRoute("/_authenticated/personagens/imprimir")({
   }),
   head: () => ({
     meta: [
-      { title: "Impressão de simulação | Portal de Desempenho" },
+      { title: "Impressão de exercício | Portal de Desempenho" },
       {
         name: "description",
         content: "Documento em A4 com capa e uma persona por página, pronto para impressão ou PDF.",
       },
-      { property: "og:title", content: "Impressão de simulação" },
+      { property: "og:title", content: "Impressão de exercício" },
       { property: "og:description", content: "Material de apoio das personas em formato A4." },
     ],
   }),
@@ -81,7 +81,7 @@ function Imprimir() {
             </div>
             <div>
               <h1 className="text-5xl font-bold leading-tight text-brand-dark">
-                {nome || "Simulação"}
+                {nome || "Exercício"}
               </h1>
               <dl className="mt-10 grid max-w-md grid-cols-2 gap-y-4 text-sm">
                 <dt className="font-semibold text-muted-foreground">Exercício</dt>
@@ -95,7 +95,7 @@ function Imprimir() {
               </dl>
             </div>
             <p className="text-xs text-muted-foreground">
-              Documento de uso interno — material de apoio para o auxiliar da simulação.
+              Documento de uso interno — material de apoio para o auxiliar do exercício.
             </p>
           </section>
 

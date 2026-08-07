@@ -56,7 +56,7 @@ export const Route = createFileRoute("/_authenticated/personagens/biblioteca")({
       {
         name: "description",
         content:
-          "Pesquise, filtre, duplique, arquive e imprima todas as personas cadastradas para simulações realísticas.",
+          "Pesquise, filtre, duplique, arquive e imprima todas as personas cadastradas para exercícios realísticas.",
       },
       { property: "og:title", content: "Biblioteca de Personas" },
       {

@@ -31,12 +31,12 @@ export const Route = createFileRoute("/_authenticated/personagens/")({
       {
         name: "description",
         content:
-          "Indicadores do Portal de Desempenho: totais por exercício, vertente e complexidade, últimas alterações e simulações montadas.",
+          "Indicadores do Portal de Desempenho: totais por exercício, vertente e complexidade, últimas alterações e exercícios montadas.",
       },
       { property: "og:title", content: "Dashboard | Portal de Desempenho" },
       {
         property: "og:description",
-        content: "Painel de indicadores das personas usadas em simulações realísticas.",
+        content: "Painel de indicadores das personas usadas em exercícios realísticos.",
       },
     ],
   }),
@@ -137,7 +137,7 @@ function Dashboard() {
               destaque="warning"
             />
             <Indicador
-              titulo="Simulações montadas"
+              titulo="Exercícios montados"
               valor={simulacoes.length}
               icone={ClipboardList}
               destaque="highlight"

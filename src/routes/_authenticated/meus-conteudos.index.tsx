@@ -23,12 +23,12 @@ export const Route = createFileRoute("/_authenticated/meus-conteudos/")({
       {
         name: "description",
         content:
-          "Veja os simulados e personagens liberados para você, baixe o material do simulado e acesse os anexos de cada personagem.",
+          "Veja os exercícios e personagens liberados para você, baixe o material do exercício e acesse os anexos de cada personagem.",
       },
       { property: "og:title", content: "Meus Conteúdos liberados — Portal de Desempenho" },
       {
         property: "og:description",
-        content: "Simulados, personagens e anexos atribuídos ao seu usuário.",
+        content: "Exercícios, personagens e anexos atribuídos ao seu usuário.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -94,7 +94,7 @@ function MeusConteudosPage() {
   return (
     <PlatformShell
       title="Meus Conteúdos"
-      subtitle="Simulados, personagens e anexos liberados para você"
+      subtitle="Exercícios, personagens e anexos liberados para você"
     >
       {isLoading ? (
         <div className="grid gap-5 md:grid-cols-2">
@@ -142,11 +142,11 @@ function MeusConteudosPage() {
                       )}
                       <Button asChild size="sm" variant="outline">
                         <Link to="/meus-conteudos/exercicio/$id" params={{ id: s.id }}>
-                          <FileText className="size-4" /> Baixar simulado (PDF)
+                          <FileText className="size-4" /> Baixar exercício (PDF)
                         </Link>
                       </Button>
                       <div>
-                        <p className="mb-2 text-sm font-medium">Anexos do simulado</p>
+                        <p className="mb-2 text-sm font-medium">Anexos do exercício</p>
                         <ListaAnexos anexos={data.anexosPorSimulado[s.id] ?? []} />
                       </div>
                     </CardContent>

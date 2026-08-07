@@ -231,7 +231,7 @@ function PainelColaborador() {
           <Tabs defaultValue="atividades">
             <TabsList>
               <TabsTrigger value="atividades">Treinamentos e Atividades</TabsTrigger>
-              <TabsTrigger value="conteudos">Personagens e Simulados</TabsTrigger>
+              <TabsTrigger value="conteudos">Personagens e Exercícios</TabsTrigger>
               <TabsTrigger value="dados">Dados cadastrais</TabsTrigger>
               {podeVerChecklists && <TabsTrigger value="avaliacoes">Avaliações</TabsTrigger>}
               <TabsTrigger value="historico">Histórico</TabsTrigger>

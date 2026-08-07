@@ -22,7 +22,7 @@ const NAV = [
   },
   {
     to: "/personagens/exercicio",
-    label: "Montar Simulação",
+    label: "Montar Exercício",
     icon: ClipboardList,
     exact: false,
     params: {},
@@ -31,7 +31,7 @@ const NAV = [
 
 
 /**
- * Casca do módulo Personagens e Simulados, agora dentro da navegação única da plataforma.
+ * Casca do módulo Personagens e Exercícios, agora dentro da navegação única da plataforma.
  */
 export function AppShell({
   children,
