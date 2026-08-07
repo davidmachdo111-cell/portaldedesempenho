@@ -184,17 +184,30 @@ function PaginaColaboradores() {
             {lista.map((c) => {
               const m = metricas(c.id);
               const meus = vinculos.data?.[c.id] ?? [];
+              // Somente admin ou usuário vinculado pode abrir o painel do colaborador.
+              const podeAbrir = isAdmin || meus.some((v) => v.user_id === userId);
               return (
                 <li key={c.id} className={`grid gap-3 px-5 py-4 lg:items-center ${grade}`}>
                   <div className="min-w-0">
-                    <Link
-                      to="/colaboradores/$id"
-                      params={{ id: c.id }}
-                      className="flex items-center gap-2 font-medium hover:underline"
-                    >
-                      <UserRound className="size-4 shrink-0 text-primary" />
-                      <span className="truncate">{c.nome_completo}</span>
-                    </Link>
+                    {podeAbrir ? (
+                      <Link
+                        to="/colaboradores/$id"
+                        params={{ id: c.id }}
+                        className="flex items-center gap-2 font-medium hover:underline"
+                      >
+                        <UserRound className="size-4 shrink-0 text-primary" />
+                        <span className="truncate">{c.nome_completo}</span>
+                      </Link>
+                    ) : (
+                      <span
+                        className="flex cursor-not-allowed items-center gap-2 font-medium text-muted-foreground"
+                        title="Você não está vinculado a este colaborador"
+                        aria-disabled="true"
+                      >
+                        <UserRound className="size-4 shrink-0" />
+                        <span className="truncate">{c.nome_completo}</span>
+                      </span>
+                    )}
                     <p className="truncate text-xs text-muted-foreground">@{c.username}</p>
                   </div>
                   <span className="truncate text-sm">{c.cargo || "—"}</span>
