@@ -253,7 +253,13 @@ function EditorChecklist() {
     );
   }
 
-  const { checklist, secoes, criterios, exercicios } = estrutura;
+  const { checklist, secoes, criterios, exercicios, vinculos } = estrutura;
+  const vinculadosPorExercicio = new Map<string, Set<string>>(
+    exercicios.map((x) => [
+      x.id,
+      new Set(vinculos.filter((v) => v.exercicio_id === x.id).map((v) => v.criterio_id)),
+    ]),
+  );
   const patch = (p: Partial<EstruturaChecklist>) => setEstrutura({ ...estrutura, ...p });
   const patchChecklist = (p: Partial<typeof checklist>) =>
     patch({ checklist: { ...checklist, ...p } });
