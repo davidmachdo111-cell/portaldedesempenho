@@ -15,6 +15,7 @@ import {
 } from "@/lib/personas/anexos";
 import { AcoesPdfPersona, VisualizadorPdf } from "@/components/personas/PdfPersonaAcoes";
 import { pdfDosAnexos } from "@/lib/personas/pdf";
+import { VisualizarExercicio } from "@/components/colaboradores/ExercicioVisualizacao";
 import {
   LABEL_STATUS_ATIVIDADE,
   listarConteudosVinculados,
@@ -125,7 +126,13 @@ export function ConteudosVinculados({ colaboradorId }: { colaboradorId: string }
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const [visualizando, setVisualizando] = useState<string | null>(null);
   const itens = conteudos.data ?? [];
+  const emFoco = itens.find((i) => i.atividadeId === visualizando) ?? null;
+
+  if (emFoco) {
+    return <VisualizarExercicio item={emFoco} onVoltar={() => setVisualizando(null)} />;
+  }
 
   if (conteudos.isLoading) {
     return <p className="text-sm text-muted-foreground">Carregando conteúdos…</p>;
@@ -156,6 +163,11 @@ export function ConteudosVinculados({ colaboradorId }: { colaboradorId: string }
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="flex flex-wrap items-center gap-2">
+              {item.tipo === "simulado" && (
+                <Button variant="outline" size="sm" onClick={() => setVisualizando(item.atividadeId)}>
+                  <Eye className="size-4" /> Visualizar
+                </Button>
+              )}
               {item.tipo === "simulado" ? (
                 <Button asChild variant="outline" size="sm">
                   <Link to="/meus-conteudos/exercicio/$id" params={{ id: item.refId }}>
