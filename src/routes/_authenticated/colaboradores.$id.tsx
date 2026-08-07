@@ -232,62 +232,62 @@ function PainelColaborador() {
               <div className="overflow-hidden rounded-xl border bg-card">
                 <ul className="divide-y">
                   {lista.map((a, index) => (
-                    <li key={a.id} className="flex flex-wrap items-center gap-3 px-5 py-4">
-                      {a.status === "concluida" ? (
-                        <CheckCircle2 className="size-5 shrink-0 text-primary" />
-                      ) : (
-                        <Circle className="size-5 shrink-0 text-muted-foreground" />
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium">{a.titulo}</p>
-                        <p className="truncate text-xs text-muted-foreground">
-                          {LABEL_TIPO[a.tipo]}
-                          {a.status === "concluida"
-                            ? ` · concluído em ${formatarDataHora(a.concluida_em)}`
-                            : " · pendente"}
-                        </p>
-                      </div>
-                      <Badge variant={a.status === "concluida" ? "default" : "secondary"}>
-                        {a.status === "concluida" ? "Concluído" : "Pendente"}
-                      </Badge>
-                      {podeAvaliar && a.tipo === "checklist" && a.status !== "concluida" && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          disabled={avaliar.isPending}
-                          onClick={() => avaliar.mutate(a)}
-                        >
-                          <PlayCircle className="size-4" /> Avaliar
-                        </Button>
-                      )}
-                      {podeGerenciarColaboradores && (
-                        <div className="flex items-center gap-1">
-                          <Button variant="ghost" size="icon" onClick={() => mover(index, -1)}>
-                            <ArrowUp className="size-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => mover(index, 1)}>
-                            <ArrowDown className="size-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            title="Alternar conclusão"
-                            onClick={() => alternarStatus.mutate(a)}
-                          >
-                            <ClipboardCheck className="size-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => remover.mutate(a)}
-                            title="Remover liberação"
-                          >
-                            <Trash2 className="size-4 text-destructive" />
-                          </Button>
+                      <li key={a.id} className="flex flex-wrap items-center gap-3 px-5 py-4">
+                        {a.status === "concluida" ? (
+                          <CheckCircle2 className="size-5 shrink-0 text-primary" />
+                        ) : (
+                          <Circle className="size-5 shrink-0 text-muted-foreground" />
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium">{a.titulo}</p>
+                          <p className="truncate text-xs text-muted-foreground">
+                            {LABEL_TIPO[a.tipo]}
+                            {a.status === "concluida"
+                              ? ` · concluído em ${formatarDataHora(a.concluida_em)}`
+                              : " · pendente"}
+                          </p>
                         </div>
-                      )}
-                    </li>
-                  ))}
+                        <Badge variant={a.status === "concluida" ? "default" : "secondary"}>
+                          {a.status === "concluida" ? "Concluído" : "Pendente"}
+                        </Badge>
+                        {podeAvaliar && a.tipo === "checklist" && a.status !== "concluida" && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={avaliar.isPending}
+                            onClick={() => avaliar.mutate(a)}
+                          >
+                            <PlayCircle className="size-4" /> Avaliar
+                          </Button>
+                        )}
+                        {podeGerenciarColaboradores && (
+                          <div className="flex items-center gap-1">
+                            <Button variant="ghost" size="icon" onClick={() => mover(index, -1)}>
+                              <ArrowUp className="size-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => mover(index, 1)}>
+                              <ArrowDown className="size-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              title="Alternar conclusão"
+                              onClick={() => alternarStatus.mutate(a)}
+                            >
+                              <ClipboardCheck className="size-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => remover.mutate(a)}
+                              title="Remover liberação"
+                            >
+                              <Trash2 className="size-4 text-destructive" />
+                            </Button>
+                          </div>
+                        )}
+                      </li>
+                    ))}
                   {!atividades.isLoading && !lista.length && (
                     <li className="px-5 py-12 text-center text-sm text-muted-foreground">
                       Nenhuma atividade liberada para este colaborador.

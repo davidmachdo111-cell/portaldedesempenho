@@ -1,5 +1,5 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { exigirPermissao, PERM } from "@/lib/permissions";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/meus-conteudos")({
   head: () => ({
@@ -19,6 +19,9 @@ export const Route = createFileRoute("/_authenticated/meus-conteudos")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  beforeLoad: () => exigirPermissao([PERM.meusConteudos.ver], "/portal"),
+  beforeLoad: async () => {
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) throw redirect({ to: "/auth" });
+  },
   component: () => <Outlet />,
 });

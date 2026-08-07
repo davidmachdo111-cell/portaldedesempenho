@@ -121,6 +121,7 @@ function PaginaColaboradores() {
     };
   };
 
+
   return (
     <PlatformShell
       title="Colaboradores"
@@ -240,6 +241,7 @@ function PaginaColaboradores() {
             </Button>
           </div>
         </div>
+
       </div>
 
       <Dialog open={aberto} onOpenChange={setAberto}>
