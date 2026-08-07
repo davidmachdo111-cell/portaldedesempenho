@@ -62,6 +62,13 @@ import {
 } from "@/lib/colaboradores/api";
 
 export const Route = createFileRoute("/_authenticated/colaboradores/$id")({
+  // Apenas o administrador ou o avaliador/auxiliar vinculado abre o painel do colaborador.
+  beforeLoad: async ({ params }) => {
+    const { data: admin } = await supabase.rpc("is_admin");
+    if (admin === true) return;
+    const permitido = await souResponsavel(params.id).catch(() => false);
+    if (!permitido) throw redirect({ to: "/colaboradores" });
+  },
   component: PainelColaborador,
 });
 
