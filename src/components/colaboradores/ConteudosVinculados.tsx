@@ -13,7 +13,7 @@ import {
   rotuloMomento,
   visualizarAnexo,
 } from "@/lib/personas/anexos";
-import { AcoesPdfPersona } from "@/components/personas/PdfPersonaAcoes";
+import { AcoesPdfPersona, VisualizadorPdf } from "@/components/personas/PdfPersonaAcoes";
 import { pdfDosAnexos } from "@/lib/personas/pdf";
 import {
   LABEL_STATUS_ATIVIDADE,
@@ -207,7 +207,7 @@ export function ConteudosVinculados({ colaboradorId }: { colaboradorId: string }
               <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 Anexos do {item.tipo === "simulado" ? "exercício" : "personagem"}
               </p>
-              <ListaAnexos anexos={item.anexos} />
+              <ListaAnexos anexos={item.anexos} contexto={item.titulo} />
             </div>
 
             {item.personas.map((p) => (
@@ -217,7 +217,7 @@ export function ConteudosVinculados({ colaboradorId }: { colaboradorId: string }
                   <Badge variant="outline">{p.detalhe}</Badge>
                   <AcoesPdfPersona nome={p.nome} pdf={pdfDosAnexos(p.anexos)} compacto />
                 </div>
-                <ListaAnexos anexos={p.anexos} />
+                <ListaAnexos anexos={p.anexos} contexto={`${item.titulo} · ${p.nome}`} />
               </div>
             ))}
           </CardContent>
