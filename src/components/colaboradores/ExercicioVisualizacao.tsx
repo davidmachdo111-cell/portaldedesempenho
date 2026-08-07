@@ -1,13 +1,25 @@
 import { useState } from "react";
-import { ArrowLeft, ChevronRight, Download, Eye, FileText, Paperclip, User } from "lucide-react";
+import {
+  ArrowLeft,
+  BookOpen,
+  ChevronRight,
+  Download,
+  Eye,
+  FileText,
+  Paperclip,
+  User,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { VisualizadorArquivo } from "@/components/personas/VisualizadorArquivo";
+import { RoteiroPersona } from "@/components/personas/RoteiroPersona";
+import { usePersona } from "@/lib/personas/api";
 import { baixarAnexo, formatarTamanho, rotuloMomento } from "@/lib/personas/anexos";
 import type { AnexoVinculado, ConteudoVinculado, PersonaDoConteudo } from "@/lib/colaboradores/api";
+
 
 /**
  * Fluxo dedicado de visualização de exercício dentro do módulo Colaboradores.
