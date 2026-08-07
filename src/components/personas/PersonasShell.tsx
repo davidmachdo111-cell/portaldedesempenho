@@ -3,15 +3,24 @@ import { Link } from "@tanstack/react-router";
 import { ClipboardList, LayoutDashboard, Library, UserPlus } from "lucide-react";
 
 import { PlatformShell } from "@/components/platform/PlatformShell";
+import { useAuth } from "@/hooks/useAuth";
 
 const NAV = [
-  { to: "/personagens", label: "Dashboard", icon: LayoutDashboard, exact: true, params: {} },
+  {
+    to: "/personagens",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    exact: true,
+    params: {},
+    gerenciar: false,
+  },
   {
     to: "/personagens/biblioteca",
     label: "Biblioteca de Personas",
     icon: Library,
     exact: false,
     params: {},
+    gerenciar: false,
   },
   {
     to: "/personagens/personas/$id",
@@ -19,6 +28,7 @@ const NAV = [
     icon: UserPlus,
     exact: false,
     params: { id: "nova" },
+    gerenciar: true,
   },
   {
     to: "/personagens/exercicio",
@@ -26,6 +36,7 @@ const NAV = [
     icon: ClipboardList,
     exact: false,
     params: {},
+    gerenciar: true,
   },
 ] as const;
 
@@ -44,11 +55,15 @@ export function AppShell({
   descricao?: string;
   acoes?: ReactNode;
 }) {
+  const { podeGerenciarPersonagens } = useAuth();
+  const itens = NAV.filter((item) => !item.gerenciar || podeGerenciarPersonagens);
+
   return (
     <PlatformShell title={titulo} {...(descricao ? { subtitle: descricao } : {})}>
       <div className="no-print mb-5 flex flex-wrap items-center gap-2">
         <nav className="flex flex-wrap gap-1">
-          {NAV.map((item) => (
+          {itens.map((item) => (
+
             <Link
               key={item.to}
               to={item.to}
