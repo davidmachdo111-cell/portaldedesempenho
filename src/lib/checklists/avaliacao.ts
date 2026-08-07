@@ -104,9 +104,10 @@ export function avaliacaoInicial(): Avaliacao {
 }
 
 export function notaExercicio(a: Avaliacao, exId: string): number {
-  const total = a.criterios.reduce((s, c) => s + c.peso, 0);
+  const vinculados = criteriosDoExercicio(a, exId);
+  const total = vinculados.reduce((s, c) => s + c.peso, 0);
   if (!total) return 0;
-  const obtido = a.criterios.reduce(
+  const obtido = vinculados.reduce(
     (s, c) => s + (a.marcados[chave(exId, c.id)] ? c.peso : 0),
     0,
   );
@@ -121,10 +122,14 @@ export function mediaGeral(a: Avaliacao): number {
 }
 
 export function indiceCriterio(a: Avaliacao, critId: string): number {
-  if (!a.exercicios.length) return 0;
-  const acertos = a.exercicios.filter((e) => a.marcados[chave(e.id, critId)]).length;
-  return (acertos / a.exercicios.length) * 100;
+  const total = frequenciaCriterio(a, critId);
+  if (!total) return 0;
+  const acertos = a.exercicios.filter(
+    (e) => criterioVinculado(a, e.id, critId) && a.marcados[chave(e.id, critId)],
+  ).length;
+  return (acertos / total) * 100;
 }
+
 
 export function classificacao(nota: number): string {
   if (nota >= 90) return "Excelente";
