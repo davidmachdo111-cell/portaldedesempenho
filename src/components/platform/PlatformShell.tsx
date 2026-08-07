@@ -45,15 +45,22 @@ export function PlatformShell({
   subtitle?: string;
   children: ReactNode;
 }) {
-  const { data: me } = useQuery(meQueryOptions);
+  const { data: me, isLoading, isError } = useQuery(meQueryOptions);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const permissions = me?.permissions ?? [];
-  const visible = navItems.filter(
-    (item) => !item.permission || permissions.includes(item.permission),
-  );
+  const isAdmin = me?.isAdmin ?? false;
+  // Se o perfil ainda está carregando ou falhou, mantemos os itens básicos visíveis:
+  // as rotas continuam protegidas por guardas, então a navegação nunca fica vazia.
+  const perfilIndisponivel = isLoading || isError || !me;
+  const visible = navItems.filter((item) => {
+    if (!item.permission) return true;
+    if (isAdmin) return true;
+    if (perfilIndisponivel) return item.permission === "colaboradores";
+    return permissions.includes(item.permission);
+  });
 
   async function handleSignOut() {
     await queryClient.cancelQueries();

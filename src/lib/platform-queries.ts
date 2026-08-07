@@ -1,5 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { expandirPermissoes } from "@/lib/permissions";
 
 export type PlatformProfile = {
   id: string;
@@ -45,16 +46,22 @@ export const meQueryOptions = queryOptions({
       rolePerms = (data ?? []).map((r) => r.permission_key);
     }
 
-    const permissions = Array.from(
+    const canonicas = Array.from(
       new Set([...(permsRes.data ?? []).map((p) => p.permission_key), ...rolePerms]),
     );
+
+    const isAdmin =
+      roleKeys.includes("administrador") ||
+      roleKeys.includes("admin") ||
+      canonicas.includes("administracao.ver");
 
     return {
       userId: user.id,
       profile: (profileRes.data as PlatformProfile | null) ?? null,
       roleKeys,
-      permissions,
-      isAdmin: roleKeys.includes("administrador") || permissions.includes("administracao"),
+      permissions: expandirPermissoes(canonicas, isAdmin),
+      canonicalPermissions: canonicas,
+      isAdmin,
     };
   },
 });
