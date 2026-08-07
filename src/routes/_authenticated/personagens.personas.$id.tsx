@@ -37,6 +37,7 @@ import {
   personaVazia,
   type Persona,
 } from "@/lib/personas/constants";
+import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/personagens/personas/$id")({
@@ -61,6 +62,7 @@ export const Route = createFileRoute("/_authenticated/personagens/personas/$id")
 type Form = ReturnType<typeof personaVazia>;
 
 function EditorPersona() {
+  const { podeGerenciarPersonagens } = useAuth();
   const { id } = Route.useParams();
   const novo = id === "nova";
   const navigate = useNavigate();

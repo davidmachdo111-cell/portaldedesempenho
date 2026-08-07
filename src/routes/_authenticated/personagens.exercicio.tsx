@@ -59,7 +59,7 @@ const TODOS = "__todos__";
 
 function MontarSimulacao() {
   const navigate = useNavigate();
-  const { nome: usuario } = useAuth();
+  const { nome: usuario, podeGerenciarPersonagens } = useAuth();
   const { data: personas = [] } = usePersonas();
   const { data: simulacoes = [] } = useSimulacoes();
   const salvar = useSalvarSimulacao();
@@ -183,6 +183,16 @@ function MontarSimulacao() {
       },
     });
     toast.success("Exercício duplicado.");
+  }
+
+  if (!podeGerenciarPersonagens) {
+    return (
+      <AppShell titulo="Montar Exercício" descricao="Acesso restrito">
+        <div className="surface-card p-8 text-center text-sm text-muted-foreground">
+          Seu perfil permite apenas visualizar e baixar os exercícios vinculados a você.
+        </div>
+      </AppShell>
+    );
   }
 
   return (
