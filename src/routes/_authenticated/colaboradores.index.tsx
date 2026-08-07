@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { Plus, Search, Trash2, UserRound } from "lucide-react";
+import { Link2, Plus, Search, Trash2, UserRound } from "lucide-react";
 import { toast } from "sonner";
+
 
 import { PlatformShell } from "@/components/platform/PlatformShell";
 import { useAuth } from "@/hooks/useAuth";
