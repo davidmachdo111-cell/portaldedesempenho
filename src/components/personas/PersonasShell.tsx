@@ -21,7 +21,7 @@ const NAV = [
     params: { id: "nova" },
   },
   {
-    to: "/personagens/simulacao",
+    to: "/personagens/exercicio",
     label: "Montar Simulação",
     icon: ClipboardList,
     exact: false,

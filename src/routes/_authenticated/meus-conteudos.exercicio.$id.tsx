@@ -8,7 +8,7 @@ import { formatarData } from "@/lib/personas/constants";
 import { useSimuladoParaDownload } from "@/lib/meus-conteudos/api";
 import { rotuloMomento } from "@/lib/personas/anexos";
 
-export const Route = createFileRoute("/_authenticated/meus-conteudos/simulado/$id")({
+export const Route = createFileRoute("/_authenticated/meus-conteudos/exercicio/$id")({
   head: () => ({
     meta: [
       { title: "Simulado liberado para download — Portal de Desempenho" },

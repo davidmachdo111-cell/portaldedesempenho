@@ -139,7 +139,7 @@ export function ConteudosVinculados({ colaboradorId }: { colaboradorId: string }
             <div className="flex flex-wrap items-center gap-2">
               {item.tipo === "simulado" ? (
                 <Button asChild variant="outline" size="sm">
-                  <Link to="/meus-conteudos/simulado/$id" params={{ id: item.refId }}>
+                  <Link to="/meus-conteudos/exercicio/$id" params={{ id: item.refId }}>
                     <Printer className="size-4" /> Baixar simulado (PDF)
                   </Link>
                 </Button>

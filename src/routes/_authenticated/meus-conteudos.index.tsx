@@ -141,7 +141,7 @@ function MeusConteudosPage() {
                         <p className="text-sm text-muted-foreground">{s.observacoes}</p>
                       )}
                       <Button asChild size="sm" variant="outline">
-                        <Link to="/meus-conteudos/simulado/$id" params={{ id: s.id }}>
+                        <Link to="/meus-conteudos/exercicio/$id" params={{ id: s.id }}>
                           <FileText className="size-4" /> Baixar simulado (PDF)
                         </Link>
                       </Button>

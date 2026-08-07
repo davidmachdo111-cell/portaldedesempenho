@@ -36,7 +36,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/personagens/simulacao")({
+export const Route = createFileRoute("/_authenticated/personagens/exercicio")({
   head: () => ({
     meta: [
       { title: "Montar Simulação | Portal de Desempenho" },
