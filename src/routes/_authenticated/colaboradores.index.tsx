@@ -31,6 +31,7 @@ import {
   excluirColaborador,
   formatarData,
   listarColaboradoresPagina,
+  listarNomesResponsaveis,
   resumoAtividades,
   type ColaboradorInput,
 } from "@/lib/colaboradores/api";
