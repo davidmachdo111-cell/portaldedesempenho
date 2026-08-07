@@ -348,26 +348,29 @@ function MontarSimulacao() {
                 const p = personas.find((x) => x.id === id);
                 if (!p) return null;
                 return (
-                  <li
-                    key={id}
-                    className="flex items-center gap-2 rounded-lg border border-border p-2.5 text-sm"
-                  >
-                    <Link
-                      to="/personagens/personas/$id"
-                      params={{ id }}
-                      className="min-w-0 flex-1 truncate hover:text-brand"
-                    >
-                      {p.nome}
-                    </Link>
-                    <button
-                      className="text-muted-foreground hover:text-destructive"
-                      onClick={() => setSelecionadas((s) => s.filter((x) => x !== id))}
-                    >
-                      <Trash2 className="size-4" />
-                    </button>
+                  <li key={id} className="rounded-lg border border-border p-2.5 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Link
+                        to="/personagens/personas/$id"
+                        params={{ id }}
+                        className="min-w-0 flex-1 truncate hover:text-brand"
+                      >
+                        {p.nome}
+                      </Link>
+                      <button
+                        className="text-muted-foreground hover:text-destructive"
+                        onClick={() => setSelecionadas((s) => s.filter((x) => x !== id))}
+                      >
+                        <Trash2 className="size-4" />
+                      </button>
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      <AcoesPdfPersona nome={p.nome} pdf={pdfs[id]} compacto />
+                    </div>
                   </li>
                 );
               })}
+
             </ul>
           </SecaoFormulario>
 
