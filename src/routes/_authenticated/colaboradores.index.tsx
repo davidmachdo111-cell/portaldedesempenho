@@ -35,6 +35,14 @@ import {
   type ColaboradorInput,
 } from "@/lib/colaboradores/api";
 import { normalizeUsername } from "@/lib/platform";
+import {
+  DialogVinculos,
+  PainelVinculosGeral,
+  ResumoVinculos,
+  useUsuariosVinculaveis,
+  useVinculosDaPagina,
+} from "@/components/colaboradores/VinculosResponsaveis";
+
 
 export const Route = createFileRoute("/_authenticated/colaboradores/")({
   component: PaginaColaboradores,
