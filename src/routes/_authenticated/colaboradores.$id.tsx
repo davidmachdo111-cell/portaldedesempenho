@@ -158,7 +158,10 @@ function PainelColaborador() {
   });
 
   const dados = colaborador.data;
-  const lista = atividades.data ?? [];
+  // Auxiliar não tem acesso a checklists: as atividades desse tipo ficam ocultas.
+  const lista = (atividades.data ?? []).filter(
+    (a) => podeVerChecklists || a.tipo !== "checklist",
+  );
   const m = progresso(lista);
   const porTipo = (tipo: TipoAtividade) => lista.filter((a) => a.tipo === tipo);
   const ultima =
