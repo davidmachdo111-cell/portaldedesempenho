@@ -177,7 +177,7 @@ function PaginaColaboradores() {
             <span>Setor / Célula</span>
             <span>Admissão</span>
             <span>Progresso</span>
-            {isAdmin && <span>Vínculos</span>}
+            <span>Vínculos</span>
             <span />
           </div>
           <ul className="divide-y">
