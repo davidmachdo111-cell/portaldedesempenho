@@ -187,7 +187,7 @@ function PaginaColaboradores() {
               const m = metricas(c.id);
               const meus = vinculos.data?.[c.id] ?? [];
               return (
-                <li key={c.id} className={`grid gap-3 px-5 py-4 lg:items-center lg:${grade}`}>
+                <li key={c.id} className={`grid gap-3 px-5 py-4 lg:items-center ${grade}`}>
                   <div className="min-w-0">
                     <Link
                       to="/colaboradores/$id"
