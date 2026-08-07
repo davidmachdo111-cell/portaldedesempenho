@@ -205,11 +205,13 @@ function PainelColaborador() {
               valor={String(m.pendentes)}
               detalhe="Aguardando conclusão"
             />
-            <Metrica
-              titulo="Checklists"
-              valor={`${porTipo("checklist").filter((a) => a.status === "concluida").length}/${porTipo("checklist").length}`}
-              detalhe="Concluídos / liberados"
-            />
+            {podeVerChecklists && (
+              <Metrica
+                titulo="Checklists"
+                valor={`${porTipo("checklist").filter((a) => a.status === "concluida").length}/${porTipo("checklist").length}`}
+                detalhe="Concluídos / liberados"
+              />
+            )}
             <Metrica
               titulo="Simulados"
               valor={`${porTipo("simulado").filter((a) => a.status === "concluida").length}/${porTipo("simulado").length}`}
@@ -222,7 +224,7 @@ function PainelColaborador() {
               <TabsTrigger value="atividades">Treinamentos e Atividades</TabsTrigger>
               <TabsTrigger value="conteudos">Personagens e Simulados</TabsTrigger>
               <TabsTrigger value="dados">Dados cadastrais</TabsTrigger>
-              <TabsTrigger value="avaliacoes">Avaliações</TabsTrigger>
+              {podeVerChecklists && <TabsTrigger value="avaliacoes">Avaliações</TabsTrigger>}
               <TabsTrigger value="historico">Histórico</TabsTrigger>
             </TabsList>
 
