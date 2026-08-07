@@ -598,3 +598,80 @@ export async function registrarAndamentoAtividade(
   });
 }
 
+
+/* ---------- vínculos com avaliadores e auxiliares ---------- */
+
+export type PapelResponsavel = "avaliador" | "auxiliar";
+
+export interface ResponsavelColaborador {
+  id: string;
+  colaborador_id: string;
+  user_id: string;
+  papel: PapelResponsavel;
+  created_at: string;
+}
+
+/** Vínculos dos colaboradores informados (usado na listagem paginada). */
+export async function listarResponsaveis(
+  colaboradorIds: string[],
+): Promise<Record<string, ResponsavelColaborador[]>> {
+  if (!colaboradorIds.length) return {};
+  const { data, error } = await supabase
+    .from("colaborador_responsaveis")
+    .select("id, colaborador_id, user_id, papel, created_at")
+    .in("colaborador_id", colaboradorIds);
+  if (error) throw new Error(error.message);
+  const mapa: Record<string, ResponsavelColaborador[]> = {};
+  for (const r of (data ?? []) as ResponsavelColaborador[]) {
+    (mapa[r.colaborador_id] ??= []).push(r);
+  }
+  return mapa;
+}
+
+/** Todos os vínculos ativos — visão geral do administrador. */
+export async function listarTodosVinculos(): Promise<
+  (ResponsavelColaborador & { colaborador_nome: string })[]
+> {
+  const { data, error } = await supabase
+    .from("colaborador_responsaveis")
+    .select("id, colaborador_id, user_id, papel, created_at, colaboradores(nome_completo)")
+    .order("created_at", { ascending: false });
+  if (error) throw new Error(error.message);
+  return ((data ?? []) as unknown[]).map((r) => {
+    const row = r as ResponsavelColaborador & { colaboradores?: { nome_completo?: string } | null };
+    return { ...row, colaborador_nome: row.colaboradores?.nome_completo ?? "—" };
+  });
+}
+
+export async function vincularResponsavel(input: {
+  colaborador_id: string;
+  user_id: string;
+  papel: PapelResponsavel;
+  nome_colaborador?: string;
+  nome_usuario?: string;
+}) {
+  const a = await autor();
+  const { error } = await supabase.from("colaborador_responsaveis").insert({
+    colaborador_id: input.colaborador_id,
+    user_id: input.user_id,
+    papel: input.papel,
+    created_by: a.id,
+  });
+  if (error) throw new Error(error.message);
+  await registrar(input.colaborador_id, "vinculo_responsavel_criado", {
+    papel: input.papel,
+    usuario: input.nome_usuario ?? input.user_id,
+  });
+}
+
+export async function desvincularResponsavel(vinculo: ResponsavelColaborador, nome?: string) {
+  const { error } = await supabase
+    .from("colaborador_responsaveis")
+    .delete()
+    .eq("id", vinculo.id);
+  if (error) throw new Error(error.message);
+  await registrar(vinculo.colaborador_id, "vinculo_responsavel_removido", {
+    papel: vinculo.papel,
+    usuario: nome ?? vinculo.user_id,
+  });
+}
