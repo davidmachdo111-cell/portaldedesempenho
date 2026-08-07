@@ -222,7 +222,7 @@ function PainelColaborador() {
               />
             )}
             <Metrica
-              titulo="Simulados"
+              titulo="Exercícios"
               valor={`${porTipo("simulado").filter((a) => a.status === "concluida").length}/${porTipo("simulado").length}`}
               detalhe={`Última atividade: ${formatarData(ultima)}`}
             />

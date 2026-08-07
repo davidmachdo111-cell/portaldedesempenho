@@ -130,7 +130,7 @@ export function PersonaPrint({ persona, indice }: { persona: Persona; indice: nu
       {persona.encerramento && <Bloco titulo="Encerramento">{persona.encerramento}</Bloco>}
 
       <footer className="mt-6 border-t border-border pt-2 text-[10px] text-muted-foreground">
-        Portal de Desempenho • Material de apoio para simulação — uso interno
+        Portal de Desempenho • Material de apoio para o exercício — uso interno
       </footer>
     </article>
   );

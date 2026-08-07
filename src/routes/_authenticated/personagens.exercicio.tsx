@@ -43,7 +43,7 @@ export const Route = createFileRoute("/_authenticated/personagens/exercicio")({
       {
         name: "description",
         content:
-          "Selecione personas manualmente ou por sorteio automático, salve a simulação e gere o PDF profissional em A4.",
+          "Selecione personas manualmente ou por sorteio automático, salve o exercício e gere o PDF profissional em A4.",
       },
       { property: "og:title", content: "Montar Exercício" },
       {

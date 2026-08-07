@@ -116,7 +116,7 @@ function MeusConteudosPage() {
           <CardHeader>
             <CardTitle>Nenhum conteúdo liberado</CardTitle>
             <CardDescription>
-              Assim que um simulado ou personagem for liberado para você, ele aparece aqui.
+              Assim que um exercício ou personagem for liberado para você, ele aparece aqui.
             </CardDescription>
           </CardHeader>
         </Card>
@@ -125,7 +125,7 @@ function MeusConteudosPage() {
           {data.simulados.length > 0 && (
             <section className="space-y-4">
               <h2 className="flex items-center gap-2 text-base font-semibold">
-                <FolderOpen className="size-4 text-muted-foreground" /> Simulados liberados
+                <FolderOpen className="size-4 text-muted-foreground" /> Exercícios liberados
               </h2>
               <div className="grid gap-5 lg:grid-cols-2">
                 {data.simulados.map((s) => (

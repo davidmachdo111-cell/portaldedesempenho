@@ -8,7 +8,7 @@ export const Route = createFileRoute("/_authenticated/personagens")({
       {
         name: "description",
         content:
-          "Módulo Personagens e Exercícios: personagens, roteiros, cenários, simulações e PDFs para treinamentos.",
+          "Módulo Personagens e Exercícios: personagens, roteiros, cenários, exercícios e PDFs para treinamentos.",
       },
       { property: "og:title", content: "Personagens e Exercícios — Portal de Desempenho" },
       {
