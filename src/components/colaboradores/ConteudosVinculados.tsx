@@ -23,7 +23,6 @@ import {
   type StatusAtividade,
 } from "@/lib/colaboradores/api";
 
-
 const CORES_STATUS: Record<StatusAtividade, "secondary" | "outline" | "default"> = {
   pendente: "outline",
   em_andamento: "secondary",
@@ -134,9 +133,7 @@ export function ConteudosVinculados({ colaboradorId }: { colaboradorId: string }
             <Badge variant="secondary">
               {item.tipo === "simulado" ? "Exercício" : "Personagem"}
             </Badge>
-            <Badge variant={CORES_STATUS[item.status]}>
-              {LABEL_STATUS_ATIVIDADE[item.status]}
-            </Badge>
+            <Badge variant={CORES_STATUS[item.status]}>{LABEL_STATUS_ATIVIDADE[item.status]}</Badge>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="flex flex-wrap items-center gap-2">
@@ -200,7 +197,6 @@ export function ConteudosVinculados({ colaboradorId }: { colaboradorId: string }
                   <p className="min-w-0 flex-1 truncate text-sm font-semibold">{p.nome}</p>
                   <Badge variant="outline">{p.detalhe}</Badge>
                   <AcoesPdfPersona nome={p.nome} pdf={pdfDosAnexos(p.anexos)} compacto />
-
                 </div>
                 <ListaAnexos anexos={p.anexos} />
               </div>

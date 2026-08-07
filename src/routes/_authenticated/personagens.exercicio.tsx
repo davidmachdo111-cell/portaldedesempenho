@@ -6,8 +6,6 @@ import { AppShell } from "@/components/personas/PersonasShell";
 import { AcoesPdfPersona } from "@/components/personas/PdfPersonaAcoes";
 import { usePdfsDePersonas } from "@/lib/personas/pdf";
 
-
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -78,9 +76,6 @@ function MontarSimulacao() {
   const [simulacaoId, setSimulacaoId] = useState<string | undefined>();
   const { data: pdfs = {} } = usePdfsDePersonas(selecionadas);
 
-
-
-
   const filtradas = useMemo(
     () =>
       personas.filter((p) => {
@@ -144,9 +139,7 @@ function MontarSimulacao() {
     setSimulacaoId(salva.id);
 
     toast.success("Exercício salvo.");
-
   }
-
 
   function carregar(simId: string) {
     const s = simulacoes.find((x) => x.id === simId);
@@ -195,7 +188,6 @@ function MontarSimulacao() {
             <Save className="size-4" /> Salvar exercício
           </Button>
 
-
           <Button onClick={abrirPdf}>
             <Printer className="size-4" /> Gerar PDF
           </Button>
@@ -238,7 +230,6 @@ function MontarSimulacao() {
               Para atualizar um documento, edite o personagem correspondente na biblioteca.
             </p>
           </SecaoFormulario>
-
 
           <SecaoFormulario
             titulo="Filtros e seleção"
@@ -372,7 +363,6 @@ function MontarSimulacao() {
                   </li>
                 );
               })}
-
             </ul>
           </SecaoFormulario>
 

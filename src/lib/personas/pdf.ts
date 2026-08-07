@@ -12,9 +12,9 @@ const ehPdf = (nome: string, tipo: string | null) =>
   (tipo ?? "").includes("pdf") || nome.toLowerCase().endsWith(".pdf");
 
 /** Escolhe o PDF de uma lista de anexos já carregada. */
-export function pdfDosAnexos<T extends { id: string; nome: string; path: string; tipo?: string | null }>(
-  anexos: T[],
-): PdfPersona | null {
+export function pdfDosAnexos<
+  T extends { id: string; nome: string; path: string; tipo?: string | null },
+>(anexos: T[]): PdfPersona | null {
   const achado = anexos.find((a) => ehPdf(a.nome, a.tipo ?? null)) ?? null;
   return achado ? { id: achado.id, nome: achado.nome, path: achado.path } : null;
 }
