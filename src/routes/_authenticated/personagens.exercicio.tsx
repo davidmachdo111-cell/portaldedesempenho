@@ -201,18 +201,10 @@ function MontarSimulacao() {
       descricao="Selecione personas já cadastradas e gere o material de apoio"
       acoes={
         <>
-          <Button
-            variant="outline"
-            onClick={salvarSimulacao}
-            disabled={salvar.isPending || enviandoAnexos}
-          >
-            <Save className="size-4" />{" "}
-            {enviandoAnexos
-              ? "Enviando anexos…"
-              : !simulacaoId && pendentes.length
-                ? `Salvar com ${pendentes.length} anexo(s)`
-                : "Salvar exercício"}
+          <Button variant="outline" onClick={salvarSimulacao} disabled={salvar.isPending}>
+            <Save className="size-4" /> Salvar exercício
           </Button>
+
 
           <Button onClick={abrirPdf}>
             <Printer className="size-4" /> Gerar PDF
