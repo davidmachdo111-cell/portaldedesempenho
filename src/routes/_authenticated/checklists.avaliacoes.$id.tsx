@@ -9,7 +9,12 @@ import { CabecalhoAvaliacao } from "@/components/checklists/avaliacao/CabecalhoA
 import { MatrizPreenchimento } from "@/components/checklists/avaliacao/MatrizPreenchimento";
 import { PainelObservacoes } from "@/components/checklists/avaliacao/PainelObservacoes";
 import { PainelResultados } from "@/components/checklists/avaliacao/PainelResultados";
-import { mediaGeral, type Avaliacao, type Observacao } from "@/lib/checklists/avaliacao";
+import {
+  mediaGeral,
+  totalMarcaveis,
+  type Avaliacao,
+  type Observacao,
+} from "@/lib/checklists/avaliacao";
 import { exportarExcel, exportarPDF } from "@/lib/checklists/exportar";
 import { listarSetoresAtivos } from "@/lib/checklists/setores";
 import { useAuth } from "@/hooks/useAuth";
@@ -99,7 +104,7 @@ function PaginaPreenchimento() {
   const mostrarFortes = (checklist?.pontos_fortes_modo ?? "opcional") !== "oculto";
   const mostrarDesenv = (checklist?.pontos_desenvolvimento_modo ?? "opcional") !== "oculto";
 
-  const totalItens = avaliacao.criterios.length * avaliacao.exercicios.length;
+  const totalItens = totalMarcaveis(avaliacao);
   const feitos = Object.values(registro.marcados).filter(Boolean).length;
   const percentual = totalItens ? (feitos / totalItens) * 100 : 0;
   const avaliadorNome = registro.tutor || (proprio ? nome : "");

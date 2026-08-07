@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { CheckCircle2, Clock, Download, Eye, FileText, Paperclip, Printer } from "lucide-react";
@@ -12,7 +13,7 @@ import {
   rotuloMomento,
   visualizarAnexo,
 } from "@/lib/personas/anexos";
-import { AcoesPdfPersona } from "@/components/personas/PdfPersonaAcoes";
+import { AcoesPdfPersona, VisualizadorPdf } from "@/components/personas/PdfPersonaAcoes";
 import { pdfDosAnexos } from "@/lib/personas/pdf";
 import {
   LABEL_STATUS_ATIVIDADE,
@@ -42,43 +43,61 @@ async function acao(fn: () => Promise<void>) {
   }
 }
 
-function ListaAnexos({ anexos }: { anexos: AnexoVinculado[] }) {
+const ehPdf = (anexo: AnexoVinculado) => anexo.nome.toLowerCase().endsWith(".pdf");
+
+function ListaAnexos({ anexos, contexto }: { anexos: AnexoVinculado[]; contexto: string }) {
+  const [aberto, setAberto] = useState<AnexoVinculado | null>(null);
+
   if (!anexos.length) {
     return <p className="text-sm text-muted-foreground">Nenhum arquivo anexado.</p>;
   }
   return (
-    <ul className="divide-y">
-      {anexos.map((anexo) => (
-        <li key={anexo.id} className="flex flex-wrap items-center gap-3 py-3">
-          <Paperclip className="size-4 shrink-0 text-muted-foreground" />
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium">{anexo.nome}</p>
-            <p className="text-xs text-muted-foreground">
-              {rotuloMomento(anexo.momento)}
-              {anexo.tamanho ? ` · ${formatarTamanho(anexo.tamanho)}` : ""}
-            </p>
-            {anexo.descricao && (
-              <p className="mt-1 text-xs text-muted-foreground">{anexo.descricao}</p>
-            )}
-            {anexo.orientacoes && (
-              <p className="mt-1 text-xs italic text-muted-foreground">{anexo.orientacoes}</p>
-            )}
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => void acao(() => visualizarAnexo(anexo.path))}
-          >
-            <Eye className="size-4" /> Visualizar
-          </Button>
-          <Button size="sm" onClick={() => void acao(() => baixarAnexo(anexo.path, anexo.nome))}>
-            <Download className="size-4" /> Baixar
-          </Button>
-        </li>
-      ))}
-    </ul>
+    <>
+      <ul className="divide-y">
+        {anexos.map((anexo) => (
+          <li key={anexo.id} className="flex flex-wrap items-center gap-3 py-3">
+            <Paperclip className="size-4 shrink-0 text-muted-foreground" />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium">{anexo.nome}</p>
+              <p className="text-xs text-muted-foreground">
+                {rotuloMomento(anexo.momento)}
+                {anexo.tamanho ? ` · ${formatarTamanho(anexo.tamanho)}` : ""}
+              </p>
+              {anexo.descricao && (
+                <p className="mt-1 text-xs text-muted-foreground">{anexo.descricao}</p>
+              )}
+              {anexo.orientacoes && (
+                <p className="mt-1 text-xs italic text-muted-foreground">{anexo.orientacoes}</p>
+              )}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                ehPdf(anexo)
+                  ? setAberto(anexo)
+                  : void acao(() => visualizarAnexo(anexo.path))
+              }
+            >
+              <Eye className="size-4" /> Visualizar
+            </Button>
+            <Button size="sm" onClick={() => void acao(() => baixarAnexo(anexo.path, anexo.nome))}>
+              <Download className="size-4" /> Baixar
+            </Button>
+          </li>
+        ))}
+      </ul>
+      {aberto && (
+        <VisualizadorPdf
+          titulo={contexto}
+          pdf={{ id: aberto.id, nome: aberto.nome, path: aberto.path }}
+          onVoltar={() => setAberto(null)}
+        />
+      )}
+    </>
   );
 }
+
 
 /**
  * Personagens e exercícios vinculados ao colaborador selecionado.
@@ -188,7 +207,7 @@ export function ConteudosVinculados({ colaboradorId }: { colaboradorId: string }
               <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 Anexos do {item.tipo === "simulado" ? "exercício" : "personagem"}
               </p>
-              <ListaAnexos anexos={item.anexos} />
+              <ListaAnexos anexos={item.anexos} contexto={item.titulo} />
             </div>
 
             {item.personas.map((p) => (
@@ -198,7 +217,7 @@ export function ConteudosVinculados({ colaboradorId }: { colaboradorId: string }
                   <Badge variant="outline">{p.detalhe}</Badge>
                   <AcoesPdfPersona nome={p.nome} pdf={pdfDosAnexos(p.anexos)} compacto />
                 </div>
-                <ListaAnexos anexos={p.anexos} />
+                <ListaAnexos anexos={p.anexos} contexto={`${item.titulo} · ${p.nome}`} />
               </div>
             ))}
           </CardContent>

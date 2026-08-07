@@ -1,6 +1,14 @@
 import { MessageSquare } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { type Avaliacao, chave, corFaixa, faixa, notaExercicio } from "@/lib/checklists/avaliacao";
+import {
+  type Avaliacao,
+  chave,
+  corFaixa,
+  criterioVinculado,
+  criteriosOrdenados,
+  faixa,
+  notaExercicio,
+} from "@/lib/checklists/avaliacao";
 
 /** Matriz somente de preenchimento: o avaliador marca critérios, sem editar a estrutura. */
 export function MatrizPreenchimento({
@@ -14,7 +22,10 @@ export function MatrizPreenchimento({
   onAbrirObservacoes: (exId: string) => void;
   bloqueado?: boolean;
 }) {
-  const { criterios, exercicios } = avaliacao;
+  const { exercicios } = avaliacao;
+  // Critérios presentes em mais exercícios aparecem no topo da matriz.
+  const criterios = criteriosOrdenados(avaliacao);
+
 
   return (
     <section className="surface overflow-hidden">
@@ -66,14 +77,16 @@ export function MatrizPreenchimento({
                 </td>
                 {exercicios.map((ex) => (
                   <td key={ex.id} className="px-2 py-2.5 text-center">
-                    <div className="flex items-center justify-center">
-                      <Checkbox
-                        disabled={bloqueado}
-                        checked={!!avaliacao.marcados[chave(ex.id, c.id)]}
-                        onCheckedChange={() => onToggle(ex.id, c.id)}
-                        className="h-5 w-5 rounded-[6px] border-border data-[state=checked]:border-primary data-[state=checked]:bg-primary"
-                      />
-                    </div>
+                    {criterioVinculado(avaliacao, ex.id, c.id) && (
+                      <div className="flex items-center justify-center">
+                        <Checkbox
+                          disabled={bloqueado}
+                          checked={!!avaliacao.marcados[chave(ex.id, c.id)]}
+                          onCheckedChange={() => onToggle(ex.id, c.id)}
+                          className="h-5 w-5 rounded-[6px] border-border data-[state=checked]:border-primary data-[state=checked]:bg-primary"
+                        />
+                      </div>
+                    )}
                   </td>
                 ))}
               </tr>

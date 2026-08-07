@@ -191,6 +191,10 @@ export function paraAvaliacao(
       peso: clampPeso(c.peso),
     })),
     exercicios: estrutura.exercicios.map((e) => ({ id: e.id, nome: e.nome })),
+    vinculos: (estrutura.vinculos ?? []).map((v) => ({
+      exercicioId: v.exercicio_id,
+      criterioId: v.criterio_id,
+    })),
     marcados: registro.marcados,
     observacoes: registro.observacoes,
   };
