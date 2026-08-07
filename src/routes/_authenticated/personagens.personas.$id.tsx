@@ -134,8 +134,18 @@ function EditorPersona() {
 
   const salvando = salvar.isPending || enviandoAnexos;
 
+  if (!podeGerenciarPersonagens) {
+    return (
+      <AppShell titulo="Personagens" descricao="Acesso restrito">
+        <div className="surface-card p-8 text-center text-sm text-muted-foreground">
+          Seu perfil permite apenas visualizar e baixar os personagens vinculados a você.
+        </div>
+      </AppShell>
+    );
+  }
 
   return (
+
     <AppShell
       titulo={novo ? "Criar Persona" : `Editar: ${form.nome || "persona"}`}
       descricao={
