@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAcoesPersona, usePersonas } from "@/lib/personas/api";
+import { useAuth } from "@/hooks/useAuth";
 import {
   COMPLEXIDADES,
   COMPLEXIDADE_TOM,
@@ -100,6 +101,7 @@ function Selecao({
 
 function Biblioteca() {
   const navigate = useNavigate();
+  const { podeGerenciarPersonagens } = useAuth();
   const { data: personas = [], isLoading } = usePersonas();
   const { duplicar, alternarStatus, alternarFavorita, excluir } = useAcoesPersona();
 
@@ -169,11 +171,13 @@ function Biblioteca() {
           <Button variant="outline" onClick={imprimirSelecionadas}>
             <Printer className="size-4" /> Imprimir ({selecionadas.length})
           </Button>
-          <Button asChild>
-            <Link to="/personagens/personas/$id" params={{ id: "nova" }}>
-              Nova persona
-            </Link>
-          </Button>
+          {podeGerenciarPersonagens && (
+            <Button asChild>
+              <Link to="/personagens/personas/$id" params={{ id: "nova" }}>
+                Nova persona
+              </Link>
+            </Button>
+          )}
         </>
       }
     >
@@ -255,13 +259,17 @@ function Biblioteca() {
         <div className="surface-card p-12 text-center">
           <p className="font-medium">Nenhuma persona encontrada</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Ajuste os filtros ou cadastre uma nova persona.
+            {podeGerenciarPersonagens
+              ? "Ajuste os filtros ou cadastre uma nova persona."
+              : "Ajuste os filtros para encontrar os personagens liberados para você."}
           </p>
-          <Button asChild className="mt-5">
-            <Link to="/personagens/personas/$id" params={{ id: "nova" }}>
-              Criar persona
-            </Link>
-          </Button>
+          {podeGerenciarPersonagens && (
+            <Button asChild className="mt-5">
+              <Link to="/personagens/personas/$id" params={{ id: "nova" }}>
+                Criar persona
+              </Link>
+            </Button>
+          )}
         </div>
       ) : visual === "cards" ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -321,39 +329,43 @@ function Biblioteca() {
                 <Button size="sm" variant="ghost" onClick={() => setVisualizando(p)}>
                   <Eye className="size-4" /> Ver
                 </Button>
-                <Button size="sm" variant="ghost" asChild>
-                  <Link to="/personagens/personas/$id" params={{ id: p.id }}>
-                    <Pencil className="size-4" /> Editar
-                  </Link>
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() =>
-                    duplicar.mutate(p, { onSuccess: () => toast.success("Persona duplicada.") })
-                  }
-                >
-                  <Copy className="size-4" /> Duplicar
-                </Button>
-                <Button size="sm" variant="ghost" onClick={() => alternarStatus.mutate(p)}>
-                  {p.status === "ativa" ? (
-                    <>
-                      <Archive className="size-4" /> Arquivar
-                    </>
-                  ) : (
-                    <>
-                      <ArchiveRestore className="size-4" /> Reativar
-                    </>
-                  )}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="text-destructive hover:text-destructive"
-                  onClick={() => setAExcluir(p)}
-                >
-                  <Trash2 className="size-4" />
-                </Button>
+                {podeGerenciarPersonagens && (
+                  <>
+                    <Button size="sm" variant="ghost" asChild>
+                      <Link to="/personagens/personas/$id" params={{ id: p.id }}>
+                        <Pencil className="size-4" /> Editar
+                      </Link>
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() =>
+                        duplicar.mutate(p, { onSuccess: () => toast.success("Persona duplicada.") })
+                      }
+                    >
+                      <Copy className="size-4" /> Duplicar
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => alternarStatus.mutate(p)}>
+                      {p.status === "ativa" ? (
+                        <>
+                          <Archive className="size-4" /> Arquivar
+                        </>
+                      ) : (
+                        <>
+                          <ArchiveRestore className="size-4" /> Reativar
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-destructive hover:text-destructive"
+                      onClick={() => setAExcluir(p)}
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </>
+                )}
               </div>
             </article>
           ))}
@@ -403,25 +415,33 @@ function Biblioteca() {
                       <Button size="icon" variant="ghost" onClick={() => setVisualizando(p)}>
                         <Eye className="size-4" />
                       </Button>
-                      <Button size="icon" variant="ghost" asChild>
-                        <Link to="/personagens/personas/$id" params={{ id: p.id }}>
-                          <Pencil className="size-4" />
-                        </Link>
-                      </Button>
-                      <Button size="icon" variant="ghost" onClick={() => duplicar.mutate(p)}>
-                        <Copy className="size-4" />
-                      </Button>
-                      <Button size="icon" variant="ghost" onClick={() => alternarStatus.mutate(p)}>
-                        <Archive className="size-4" />
-                      </Button>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="text-destructive"
-                        onClick={() => setAExcluir(p)}
-                      >
-                        <Trash2 className="size-4" />
-                      </Button>
+                      {podeGerenciarPersonagens && (
+                        <>
+                          <Button size="icon" variant="ghost" asChild>
+                            <Link to="/personagens/personas/$id" params={{ id: p.id }}>
+                              <Pencil className="size-4" />
+                            </Link>
+                          </Button>
+                          <Button size="icon" variant="ghost" onClick={() => duplicar.mutate(p)}>
+                            <Copy className="size-4" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => alternarStatus.mutate(p)}
+                          >
+                            <Archive className="size-4" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="text-destructive"
+                            onClick={() => setAExcluir(p)}
+                          >
+                            <Trash2 className="size-4" />
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </td>
                 </tr>

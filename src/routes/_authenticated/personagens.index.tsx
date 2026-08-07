@@ -89,6 +89,7 @@ function contar(personas: Persona[], chave: keyof Persona, valores: readonly str
 }
 
 function Dashboard() {
+  const { podeGerenciarPersonagens } = useAuth();
   const { data: personas = [], isLoading } = usePersonas();
   const { data: historico = [] } = useHistorico(undefined, 8);
   const { data: simulacoes = [] } = useSimulacoes();
