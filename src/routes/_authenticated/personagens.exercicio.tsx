@@ -249,16 +249,14 @@ function MontarSimulacao() {
           </SecaoFormulario>
 
           <SecaoFormulario
-            titulo="Anexos do exercício"
-            descricao="Arquivos de apoio vinculados exclusivamente a este exercício, com descrição, momento e orientações de uso."
+            titulo="Materiais do exercício"
+            descricao="O PDF pertence exclusivamente ao personagem. O exercício reutiliza o PDF das personas vinculadas — nenhuma cópia é criada."
           >
-            <AnexosManager
-              vinculo={simulacaoId ? { tipo: "simulado", id: simulacaoId } : null}
-              pendentes={pendentes}
-              onPendentesChange={setPendentes}
-            />
-
+            <p className="text-sm text-muted-foreground">
+              Para atualizar um documento, edite o personagem correspondente na biblioteca.
+            </p>
           </SecaoFormulario>
+
 
           <SecaoFormulario
             titulo="Filtros e seleção"
