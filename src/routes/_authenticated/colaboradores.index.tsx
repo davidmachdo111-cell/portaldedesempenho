@@ -62,12 +62,14 @@ const POR_PAGINA = 20;
 
 function PaginaColaboradores() {
   const qc = useQueryClient();
-  const { podeGerenciarColaboradores } = useAuth();
+  const { podeGerenciarColaboradores, isAdmin } = useAuth();
   const [busca, setBusca] = useState("");
   const [buscaAplicada, setBuscaAplicada] = useState("");
   const [pagina, setPagina] = useState(0);
   const [aberto, setAberto] = useState(false);
+  const [vinculando, setVinculando] = useState<{ id: string; nome_completo: string } | null>(null);
   const [form, setForm] = useState<ColaboradorInput>(vazio);
+
 
   // Busca com debounce: evita uma consulta por tecla digitada.
   useEffect(() => {
