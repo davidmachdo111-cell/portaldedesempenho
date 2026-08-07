@@ -26,7 +26,7 @@ export function useAuth() {
     // gestão
     podeGerenciarColaboradores: can("colaboradores_gerenciar"),
     podeGerenciarChecklists: can("checklists_gerenciar"),
-    podeGerenciarPersonagens: can("personagens_simulados"),
+    podeGerenciarPersonagens: can("personagens_gerenciar"),
     podeAvaliar: can("checklists"),
     isAvaliador: can("checklists"),
     username: data?.profile?.username ?? "",
