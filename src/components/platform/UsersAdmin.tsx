@@ -14,6 +14,7 @@ import {
   adminDeleteUser,
   adminSetPassword,
 } from "@/lib/platform-admin.functions";
+import { GRUPOS_PERMISSAO, rotuloAcao } from "@/lib/permissions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
