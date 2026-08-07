@@ -282,7 +282,7 @@ export async function salvarEstrutura(e: EstruturaChecklist) {
 }
 
 export async function duplicarChecklist(id: string): Promise<Checklist> {
-  const { checklist, secoes, criterios, exercicios } = await carregarEstrutura(id);
+  const { checklist, secoes, criterios, exercicios, vinculos } = await carregarEstrutura(id);
   const { data: userData } = await supabase.auth.getUser();
 
   const novo = check(
