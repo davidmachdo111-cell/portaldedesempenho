@@ -133,6 +133,12 @@ function PaginaColaboradores() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  // Classes completas (Tailwind não aceita interpolação parcial).
+  const grade = isAdmin
+    ? "lg:grid-cols-[1.6fr_1fr_1fr_0.8fr_1fr_1.4fr_auto]"
+    : "lg:grid-cols-[1.6fr_1fr_1fr_0.8fr_1fr_auto]";
+
+
   const metricas = (id: string) => {
     const r = resumos.data?.[id] ?? { total: 0, concluidas: 0 };
     return {
