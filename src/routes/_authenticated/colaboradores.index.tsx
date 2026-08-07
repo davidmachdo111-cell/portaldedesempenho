@@ -167,22 +167,21 @@ function PaginaColaboradores() {
         </div>
 
         <div className="overflow-hidden rounded-xl border bg-card">
-          <div className="hidden grid-cols-[1.6fr_1fr_1fr_0.8fr_1fr_auto] gap-3 border-b px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground lg:grid">
+          <div className={`hidden ${grade} gap-3 border-b px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground lg:grid`}>
             <span>Colaborador</span>
             <span>Cargo</span>
             <span>Setor / Célula</span>
             <span>Admissão</span>
             <span>Progresso</span>
+            {isAdmin && <span>Vínculos</span>}
             <span />
           </div>
           <ul className="divide-y">
             {lista.map((c) => {
               const m = metricas(c.id);
+              const meus = vinculos.data?.[c.id] ?? [];
               return (
-                <li
-                  key={c.id}
-                  className="grid gap-3 px-5 py-4 lg:grid-cols-[1.6fr_1fr_1fr_0.8fr_1fr_auto] lg:items-center"
-                >
+                <li key={c.id} className={`grid gap-3 px-5 py-4 lg:items-center lg:${grade}`}>
                   <div className="min-w-0">
                     <Link
                       to="/colaboradores/$id"
@@ -211,10 +210,21 @@ function PaginaColaboradores() {
                       {m.concluidas}/{m.total}
                     </span>
                   </div>
+                  {isAdmin && <ResumoVinculos vinculos={meus} nomes={nomesUsuarios} />}
                   <div className="flex items-center gap-2">
                     <Badge variant={c.status === "ativo" ? "default" : "secondary"}>
                       {c.status === "ativo" ? "Ativo" : "Inativo"}
                     </Badge>
+                    {isAdmin && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        title="Gerenciar vínculos"
+                        onClick={() => setVinculando({ id: c.id, nome_completo: c.nome_completo })}
+                      >
+                        <Link2 className="size-4" />
+                      </Button>
+                    )}
                     {podeGerenciarColaboradores && (
                       <Button
                         variant="ghost"
@@ -228,6 +238,7 @@ function PaginaColaboradores() {
                       </Button>
                     )}
                   </div>
+
                 </li>
               );
             })}
