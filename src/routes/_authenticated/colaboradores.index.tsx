@@ -280,7 +280,18 @@ function PaginaColaboradores() {
           </div>
         </div>
 
+        {isAdmin && <PainelVinculosGeral />}
       </div>
+
+      <DialogVinculos
+        colaborador={vinculando}
+        vinculos={vinculando ? (vinculos.data?.[vinculando.id] ?? []) : []}
+        onOpenChange={(aberto) => {
+          if (!aberto) setVinculando(null);
+        }}
+      />
+
+
 
       <Dialog open={aberto} onOpenChange={setAberto}>
         <DialogContent>
