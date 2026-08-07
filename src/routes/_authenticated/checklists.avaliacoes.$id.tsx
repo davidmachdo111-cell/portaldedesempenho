@@ -99,7 +99,7 @@ function PaginaPreenchimento() {
   const mostrarFortes = (checklist?.pontos_fortes_modo ?? "opcional") !== "oculto";
   const mostrarDesenv = (checklist?.pontos_desenvolvimento_modo ?? "opcional") !== "oculto";
 
-  const totalItens = avaliacao.criterios.length * avaliacao.exercicios.length;
+  const totalItens = totalMarcaveis(avaliacao);
   const feitos = Object.values(registro.marcados).filter(Boolean).length;
   const percentual = totalItens ? (feitos / totalItens) * 100 : 0;
   const avaliadorNome = registro.tutor || (proprio ? nome : "");
