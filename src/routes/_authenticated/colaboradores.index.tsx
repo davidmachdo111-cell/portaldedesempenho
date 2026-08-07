@@ -134,9 +134,7 @@ function PaginaColaboradores() {
   });
 
   // Classes completas (Tailwind não aceita interpolação parcial).
-  const grade = isAdmin
-    ? "lg:grid-cols-[1.6fr_1fr_1fr_0.8fr_1fr_1.4fr_auto]"
-    : "lg:grid-cols-[1.6fr_1fr_1fr_0.8fr_1fr_auto]";
+  const grade = "lg:grid-cols-[1.6fr_1fr_1fr_0.8fr_1fr_1.4fr_auto]";
 
 
   const metricas = (id: string) => {
