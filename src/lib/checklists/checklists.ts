@@ -168,7 +168,7 @@ export async function carregarEstrutura(id: string): Promise<EstruturaChecklist>
 }
 
 export async function salvarEstrutura(e: EstruturaChecklist) {
-  const { checklist, secoes, criterios, exercicios } = e;
+  const { checklist, secoes, criterios, exercicios, vinculos } = e;
 
   const upd = await supabase
     .from("checklists")
