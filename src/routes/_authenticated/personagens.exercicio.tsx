@@ -3,8 +3,9 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Copy, Printer, Save, Shuffle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/personas/PersonasShell";
-import { AnexosManager } from "@/components/personas/AnexosManager";
-import { enviarAnexosPendentes, type AnexoPendente } from "@/lib/personas/anexos";
+import { AcoesPdfPersona } from "@/components/personas/PdfPersonaAcoes";
+import { usePdfsDePersonas } from "@/lib/personas/pdf";
+
 
 
 import { Button } from "@/components/ui/button";
