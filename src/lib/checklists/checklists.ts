@@ -256,6 +256,29 @@ export async function salvarEstrutura(e: EstruturaChecklist) {
     );
     if (r.error) throw new Error(r.error.message);
   }
+
+  // Vínculos N:N exercício x critério: regravados por checklist, mantendo
+  // intactos critérios, exercícios e avaliações já existentes.
+  const idsExercicios = new Set(exercicios.map((x) => x.id));
+  const idsCriterios = new Set(criterios.map((c) => c.id));
+  const validos = (vinculos ?? []).filter(
+    (v) => idsExercicios.has(v.exercicio_id) && idsCriterios.has(v.criterio_id),
+  );
+  const del = await supabase
+    .from("checklist_exercicio_criterios")
+    .delete()
+    .eq("checklist_id", checklist.id);
+  if (del.error) throw new Error(del.error.message);
+  if (validos.length) {
+    const r = await supabase.from("checklist_exercicio_criterios").insert(
+      validos.map((v) => ({
+        checklist_id: checklist.id,
+        exercicio_id: v.exercicio_id,
+        criterio_id: v.criterio_id,
+      })),
+    );
+    if (r.error) throw new Error(r.error.message);
+  }
 }
 
 export async function duplicarChecklist(id: string): Promise<Checklist> {
