@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { Plus, Search, Trash2, UserRound } from "lucide-react";
+import { Link2, Plus, Search, Trash2, UserRound } from "lucide-react";
 import { toast } from "sonner";
+
 
 import { PlatformShell } from "@/components/platform/PlatformShell";
 import { useAuth } from "@/hooks/useAuth";
@@ -34,6 +35,14 @@ import {
   type ColaboradorInput,
 } from "@/lib/colaboradores/api";
 import { normalizeUsername } from "@/lib/platform";
+import {
+  DialogVinculos,
+  PainelVinculosGeral,
+  ResumoVinculos,
+  useUsuariosVinculaveis,
+  useVinculosDaPagina,
+} from "@/components/colaboradores/VinculosResponsaveis";
+
 
 export const Route = createFileRoute("/_authenticated/colaboradores/")({
   component: PaginaColaboradores,
@@ -53,12 +62,14 @@ const POR_PAGINA = 20;
 
 function PaginaColaboradores() {
   const qc = useQueryClient();
-  const { podeGerenciarColaboradores } = useAuth();
+  const { podeGerenciarColaboradores, isAdmin } = useAuth();
   const [busca, setBusca] = useState("");
   const [buscaAplicada, setBuscaAplicada] = useState("");
   const [pagina, setPagina] = useState(0);
   const [aberto, setAberto] = useState(false);
+  const [vinculando, setVinculando] = useState<{ id: string; nome_completo: string } | null>(null);
   const [form, setForm] = useState<ColaboradorInput>(vazio);
+
 
   // Busca com debounce: evita uma consulta por tecla digitada.
   useEffect(() => {
@@ -88,6 +99,16 @@ function PaginaColaboradores() {
     enabled: ids.length > 0,
   });
 
+  // Vínculos com avaliadores/auxiliares — apenas o administrador gerencia.
+  const vinculos = useVinculosDaPagina(ids, isAdmin);
+  const { itens: usuariosVinculaveis } = useUsuariosVinculaveis();
+  const nomesUsuarios = useMemo(
+    () => Object.fromEntries(usuariosVinculaveis.map((u) => [u.id, u.nome])),
+    [usuariosVinculaveis],
+  );
+
+
+
   const criar = useMutation({
     mutationFn: () =>
       criarColaborador({
@@ -111,6 +132,12 @@ function PaginaColaboradores() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  // Classes completas (Tailwind não aceita interpolação parcial).
+  const grade = isAdmin
+    ? "lg:grid-cols-[1.6fr_1fr_1fr_0.8fr_1fr_1.4fr_auto]"
+    : "lg:grid-cols-[1.6fr_1fr_1fr_0.8fr_1fr_auto]";
+
 
   const metricas = (id: string) => {
     const r = resumos.data?.[id] ?? { total: 0, concluidas: 0 };
@@ -146,22 +173,21 @@ function PaginaColaboradores() {
         </div>
 
         <div className="overflow-hidden rounded-xl border bg-card">
-          <div className="hidden grid-cols-[1.6fr_1fr_1fr_0.8fr_1fr_auto] gap-3 border-b px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground lg:grid">
+          <div className={`hidden ${grade} gap-3 border-b px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground lg:grid`}>
             <span>Colaborador</span>
             <span>Cargo</span>
             <span>Setor / Célula</span>
             <span>Admissão</span>
             <span>Progresso</span>
+            {isAdmin && <span>Vínculos</span>}
             <span />
           </div>
           <ul className="divide-y">
             {lista.map((c) => {
               const m = metricas(c.id);
+              const meus = vinculos.data?.[c.id] ?? [];
               return (
-                <li
-                  key={c.id}
-                  className="grid gap-3 px-5 py-4 lg:grid-cols-[1.6fr_1fr_1fr_0.8fr_1fr_auto] lg:items-center"
-                >
+                <li key={c.id} className={`grid gap-3 px-5 py-4 lg:items-center ${grade}`}>
                   <div className="min-w-0">
                     <Link
                       to="/colaboradores/$id"
@@ -190,10 +216,21 @@ function PaginaColaboradores() {
                       {m.concluidas}/{m.total}
                     </span>
                   </div>
+                  {isAdmin && <ResumoVinculos vinculos={meus} nomes={nomesUsuarios} />}
                   <div className="flex items-center gap-2">
                     <Badge variant={c.status === "ativo" ? "default" : "secondary"}>
                       {c.status === "ativo" ? "Ativo" : "Inativo"}
                     </Badge>
+                    {isAdmin && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        title="Gerenciar vínculos"
+                        onClick={() => setVinculando({ id: c.id, nome_completo: c.nome_completo })}
+                      >
+                        <Link2 className="size-4" />
+                      </Button>
+                    )}
                     {podeGerenciarColaboradores && (
                       <Button
                         variant="ghost"
@@ -207,6 +244,7 @@ function PaginaColaboradores() {
                       </Button>
                     )}
                   </div>
+
                 </li>
               );
             })}
@@ -242,7 +280,18 @@ function PaginaColaboradores() {
           </div>
         </div>
 
+        {isAdmin && <PainelVinculosGeral />}
       </div>
+
+      <DialogVinculos
+        colaborador={vinculando}
+        vinculos={vinculando ? (vinculos.data?.[vinculando.id] ?? []) : []}
+        onOpenChange={(aberto) => {
+          if (!aberto) setVinculando(null);
+        }}
+      />
+
+
 
       <Dialog open={aberto} onOpenChange={setAberto}>
         <DialogContent>

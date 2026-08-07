@@ -289,6 +289,44 @@ export type Database = {
           },
         ]
       }
+      colaborador_responsaveis: {
+        Row: {
+          colaborador_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          papel: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          colaborador_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          papel?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          colaborador_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          papel?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "colaborador_responsaveis_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       colaboradores: {
         Row: {
           campos_extras: Json
@@ -1001,6 +1039,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      colaborador_sob_responsabilidade: {
+        Args: { _colaborador_id: string }
+        Returns: boolean
+      }
       has_any_permission: {
         Args: { _permissions: string[]; _user_id: string }
         Returns: boolean
