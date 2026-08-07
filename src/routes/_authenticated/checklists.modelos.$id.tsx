@@ -218,6 +218,7 @@ function EditorChecklist() {
   const { id } = Route.useParams();
   const qc = useQueryClient();
   const [estrutura, setEstrutura] = useState<EstruturaChecklist | null>(null);
+  const [expandidos, setExpandidos] = useState<string[]>([]);
 
   const consulta = useQuery({
     queryKey: ["checklist", id],
