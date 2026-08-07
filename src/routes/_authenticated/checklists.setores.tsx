@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { exigirPermissao, GERENCIAR } from "@/lib/permissions";
 import { AdminShell } from "@/components/checklists/ChecklistsShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,15 +18,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/_authenticated/checklists/setores")({
-  beforeLoad: async () => {
-    const { data } = await supabase.auth.getUser();
-    if (!data.user) throw redirect({ to: "/auth" });
-    const { data: allowed } = await supabase.rpc("has_permission", {
-      _user_id: data.user.id,
-      _permission: "checklists_gerenciar",
-    });
-    if (allowed !== true) throw redirect({ to: "/checklists/avaliacoes" });
-  },
+  beforeLoad: () => exigirPermissao(GERENCIAR.checklistsMestre, "/checklists/avaliacoes"),
   component: PaginaSetores,
   head: () => ({
     meta: [

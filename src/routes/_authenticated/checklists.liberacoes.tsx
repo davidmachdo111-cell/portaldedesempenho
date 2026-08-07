@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Send } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { exigirPermissao, GERENCIAR } from "@/lib/permissions";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AdminShell } from "@/components/checklists/ChecklistsShell";
 import { useAuth } from "@/hooks/useAuth";
@@ -12,15 +12,7 @@ import { listarAvaliadores } from "@/lib/checklists/avaliadores";
 import { liberarChecklist, listarAtribuicoes, revogarChecklist } from "@/lib/checklists/avaliacoes";
 
 export const Route = createFileRoute("/_authenticated/checklists/liberacoes")({
-  beforeLoad: async () => {
-    const { data } = await supabase.auth.getUser();
-    if (!data.user) throw redirect({ to: "/auth" });
-    const { data: allowed } = await supabase.rpc("has_permission", {
-      _user_id: data.user.id,
-      _permission: "checklists_gerenciar",
-    });
-    if (allowed !== true) throw redirect({ to: "/checklists/avaliacoes" });
-  },
+  beforeLoad: () => exigirPermissao(GERENCIAR.checklistsMestre, "/checklists/avaliacoes"),
   component: PaginaLiberacoes,
 });
 

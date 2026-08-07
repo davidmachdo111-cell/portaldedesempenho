@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { exigirPermissao, PERM } from "@/lib/permissions";
 import { Copy, Printer, Save, Shuffle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/personas/PersonasShell";
 import { AnexosManager } from "@/components/personas/AnexosManager";
 import { enviarAnexosPendentes, type AnexoPendente } from "@/lib/personas/anexos";
-
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,6 +52,7 @@ export const Route = createFileRoute("/_authenticated/personagens/simulacao")({
       },
     ],
   }),
+  beforeLoad: () => exigirPermissao([PERM.personagens.criar, PERM.personagens.editar], "/portal"),
   component: MontarSimulacao,
 });
 
@@ -77,7 +78,6 @@ function MontarSimulacao() {
   const [simulacaoId, setSimulacaoId] = useState<string | undefined>();
   const [pendentes, setPendentes] = useState<AnexoPendente[]>([]);
   const [enviandoAnexos, setEnviandoAnexos] = useState(false);
-
 
   const filtradas = useMemo(
     () =>
@@ -156,7 +156,6 @@ function MontarSimulacao() {
 
     toast.success("Simulação salva.");
   }
-
 
   function carregar(simId: string) {
     const s = simulacoes.find((x) => x.id === simId);
@@ -247,7 +246,6 @@ function MontarSimulacao() {
               pendentes={pendentes}
               onPendentesChange={setPendentes}
             />
-
           </SecaoFormulario>
 
           <SecaoFormulario

@@ -38,6 +38,7 @@ import {
   type Persona,
 } from "@/lib/personas/constants";
 import { cn } from "@/lib/utils";
+import { exigirPermissao, PERM } from "@/lib/permissions";
 
 export const Route = createFileRoute("/_authenticated/personagens/personas/$id")({
   head: () => ({
@@ -55,6 +56,7 @@ export const Route = createFileRoute("/_authenticated/personagens/personas/$id")
       },
     ],
   }),
+  beforeLoad: () => exigirPermissao([PERM.personagens.criar, PERM.personagens.editar], "/portal"),
   component: EditorPersona,
 });
 
@@ -131,7 +133,6 @@ function EditorPersona() {
   }
 
   const salvando = salvar.isPending || enviandoAnexos;
-
 
   return (
     <AppShell
@@ -537,7 +538,6 @@ function EditorPersona() {
                 pendentes={pendentes}
                 onPendentesChange={setPendentes}
               />
-
             </SecaoFormulario>
 
             {!novo && (

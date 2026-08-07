@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
+import { exigirPermissao, PERM } from "@/lib/permissions";
 
 export const Route = createFileRoute("/_authenticated/personagens")({
   head: () => ({
@@ -17,14 +17,6 @@ export const Route = createFileRoute("/_authenticated/personagens")({
       },
     ],
   }),
-  beforeLoad: async () => {
-    const { data } = await supabase.auth.getUser();
-    if (!data.user) throw redirect({ to: "/auth" });
-    const { data: allowed } = await supabase.rpc("has_permission", {
-      _user_id: data.user.id,
-      _permission: "personagens_simulados",
-    });
-    if (allowed !== true) throw redirect({ to: "/portal" });
-  },
+  beforeLoad: () => exigirPermissao([PERM.personagens.ver], "/portal"),
   component: () => <Outlet />,
 });

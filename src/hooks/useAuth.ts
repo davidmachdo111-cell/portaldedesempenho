@@ -1,38 +1,40 @@
-import { useQuery } from "@tanstack/react-query";
-import { meQueryOptions } from "@/lib/platform-queries";
+import { usePermissions } from "@/hooks/usePermissions";
 
 /**
- * Ponte entre os módulos e a autenticação central da plataforma.
- * Expõe as permissões granulares usadas pelas telas (visualizar x gerenciar),
- * sempre lendo do controle de acesso único (perfis + permissões).
+ * Compatibilidade: mantém a API antiga usada pelas telas, delegando toda a
+ * lógica ao motor unificado (`usePermissions`).
  */
 export function useAuth() {
-  const { data, isLoading } = useQuery(meQueryOptions);
-
-  const permissions = data?.permissions ?? [];
-  const isAdmin = data?.isAdmin ?? false;
-  const can = (key: string) => isAdmin || permissions.includes(key);
+  const p = usePermissions();
 
   return {
-    userId: data?.userId ?? null,
-    user: data ? { id: data.userId } : null,
-    isAdmin,
-    isSuperAdmin: isAdmin,
-    can,
+    userId: p.userId,
+    user: p.userId ? { id: p.userId } : null,
+    isAdmin: p.isAdmin,
+    isSuperAdmin: p.isAdmin,
+    can: p.can,
+    canAny: p.canAny,
     // visualização
-    podeVerColaboradores: can("colaboradores"),
-    podeVerChecklists: can("checklists"),
-    podeVerPersonagens: can("personagens_simulados"),
+    podeVerColaboradores: p.colaboradoresPerm.ver,
+    podeVerChecklists: p.checklistsPerm.ver,
+    podeVerPersonagens: p.personagensPerm.ver,
+    podeVerTreinamentos: p.treinamentosPerm.ver,
+    podeBaixarMateriais: p.personagensPerm.download,
+    podeConcluirTreinamento: p.treinamentosPerm.concluir,
     // gestão
-    podeGerenciarColaboradores: can("colaboradores_gerenciar"),
-    podeGerenciarChecklists: can("checklists_gerenciar"),
-    podeGerenciarPersonagens: can("personagens_simulados"),
-    podeAvaliar: can("checklists"),
-    isAvaliador: can("checklists"),
-    username: data?.profile?.username ?? "",
-    nome: data?.profile?.full_name || data?.profile?.username || "",
-    permissions,
-    roleKeys: data?.roleKeys ?? [],
-    loading: isLoading,
+    podeGerenciarColaboradores: p.colaboradoresPerm.gerenciar,
+    podeCriarColaboradores: p.colaboradoresPerm.criar,
+    podeExcluirColaboradores: p.colaboradoresPerm.excluir,
+    podeGerenciarChecklists: p.checklistsPerm.gerenciarMestre,
+    podeGerenciarPersonagens: p.personagensPerm.gerenciar,
+    podeExcluirPersonagens: p.personagensPerm.excluir,
+    podeAvaliar: p.checklistsPerm.aplicar,
+    isAvaliador: p.checklistsPerm.aplicar,
+    podeAcessarAdmin: p.administracao.ver,
+    username: p.username,
+    nome: p.nome,
+    permissions: p.permissions,
+    roleKeys: p.roleKeys,
+    loading: p.loading,
   };
 }
