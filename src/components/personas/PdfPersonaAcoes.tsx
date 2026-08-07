@@ -96,7 +96,7 @@ export function AcoesPdfPersona({
   compacto = false,
 }: {
   nome: string;
-  pdf?: PdfPersona | null;
+  pdf?: PdfPersona | null | undefined;
   size?: "sm" | "default";
   compacto?: boolean;
 }) {
