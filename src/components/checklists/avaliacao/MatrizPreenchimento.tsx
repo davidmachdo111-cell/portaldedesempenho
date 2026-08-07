@@ -1,6 +1,14 @@
 import { MessageSquare } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { type Avaliacao, chave, corFaixa, faixa, notaExercicio } from "@/lib/checklists/avaliacao";
+import {
+  type Avaliacao,
+  chave,
+  corFaixa,
+  criterioVinculado,
+  criteriosOrdenados,
+  faixa,
+  notaExercicio,
+} from "@/lib/checklists/avaliacao";
 
 /** Matriz somente de preenchimento: o avaliador marca critérios, sem editar a estrutura. */
 export function MatrizPreenchimento({
@@ -14,7 +22,10 @@ export function MatrizPreenchimento({
   onAbrirObservacoes: (exId: string) => void;
   bloqueado?: boolean;
 }) {
-  const { criterios, exercicios } = avaliacao;
+  const { exercicios } = avaliacao;
+  // Critérios presentes em mais exercícios aparecem no topo da matriz.
+  const criterios = criteriosOrdenados(avaliacao);
+
 
   return (
     <section className="surface overflow-hidden">
