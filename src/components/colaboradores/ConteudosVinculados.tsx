@@ -140,16 +140,13 @@ export function ConteudosVinculados({ colaboradorId }: { colaboradorId: string }
               {item.tipo === "simulado" ? (
                 <Button asChild variant="outline" size="sm">
                   <Link to="/meus-conteudos/exercicio/$id" params={{ id: item.refId }}>
-                    <Printer className="size-4" /> Baixar exercício (PDF)
+                    <Printer className="size-4" /> Roteiro do exercício
                   </Link>
                 </Button>
               ) : (
-                <Button asChild variant="outline" size="sm">
-                  <Link to="/meus-conteudos/persona/$id" params={{ id: item.refId }}>
-                    <Printer className="size-4" /> Baixar persona (PDF)
-                  </Link>
-                </Button>
+                <AcoesPdfPersona nome={item.titulo} pdf={pdfDosAnexos(item.anexos)} />
               )}
+
               {item.status !== "em_andamento" && item.status !== "concluida" && (
                 <Button
                   variant="secondary"
