@@ -148,6 +148,8 @@ function DetalhePersona({
   onVoltar: () => void;
   onAbrir: (a: AnexoVinculado) => void;
 }) {
+  const roteiro = usePersona(persona.id);
+
   return (
     <div className="space-y-5">
       <Cabecalho
@@ -158,28 +160,38 @@ function DetalhePersona({
       />
 
       <Card className="shadow-[var(--shadow-card)]">
-        <CardHeader>
-          <CardTitle className="text-base">Dados cadastrais</CardTitle>
+        <CardHeader className="flex flex-row items-center gap-2">
+          <BookOpen className="size-4 text-primary" />
+          <CardTitle className="text-base">Roteiro completo do personagem</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {persona.dados.length ? (
-            <dl className="grid gap-3 sm:grid-cols-2">
-              {persona.dados.map((d) => (
-                <div key={d.rotulo}>
-                  <dt className="text-xs uppercase tracking-wide text-muted-foreground">
-                    {d.rotulo}
-                  </dt>
-                  <dd className="text-sm font-medium">{d.valor}</dd>
-                </div>
-              ))}
-            </dl>
+        <CardContent>
+          {roteiro.isLoading ? (
+            <p className="text-sm text-muted-foreground">Carregando roteiro…</p>
+          ) : roteiro.data ? (
+            <RoteiroPersona persona={roteiro.data} />
           ) : (
-            <p className="text-sm text-muted-foreground">Sem dados cadastrais informados.</p>
-          )}
-          {persona.objetivo && (
-            <div>
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">Objetivo</p>
-              <p className="whitespace-pre-wrap text-sm">{persona.objetivo}</p>
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Roteiro completo indisponível. Exibindo os dados cadastrais liberados.
+              </p>
+              {persona.dados.length > 0 && (
+                <dl className="grid gap-3 sm:grid-cols-2">
+                  {persona.dados.map((d) => (
+                    <div key={d.rotulo}>
+                      <dt className="text-xs uppercase tracking-wide text-muted-foreground">
+                        {d.rotulo}
+                      </dt>
+                      <dd className="text-sm font-medium">{d.valor}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+              {persona.objetivo && (
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">Objetivo</p>
+                  <p className="whitespace-pre-wrap text-sm">{persona.objetivo}</p>
+                </div>
+              )}
             </div>
           )}
         </CardContent>
@@ -188,7 +200,7 @@ function DetalhePersona({
       <Card className="shadow-[var(--shadow-card)]">
         <CardHeader className="flex flex-row items-center gap-2">
           <FileText className="size-4 text-primary" />
-          <CardTitle className="text-base">Arquivos do personagem</CardTitle>
+          <CardTitle className="text-base">PDFs e anexos do personagem</CardTitle>
         </CardHeader>
         <CardContent>
           <ListaArquivos anexos={persona.anexos} onAbrir={onAbrir} />
@@ -197,6 +209,7 @@ function DetalhePersona({
     </div>
   );
 }
+
 
 function ListaArquivos({
   anexos,
