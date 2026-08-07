@@ -133,6 +133,52 @@ export type Database = {
         }
         Relationships: []
       }
+      checklist_exercicio_criterios: {
+        Row: {
+          checklist_id: string
+          created_at: string
+          criterio_id: string
+          exercicio_id: string
+          id: string
+        }
+        Insert: {
+          checklist_id: string
+          created_at?: string
+          criterio_id: string
+          exercicio_id: string
+          id?: string
+        }
+        Update: {
+          checklist_id?: string
+          created_at?: string
+          criterio_id?: string
+          exercicio_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checklist_exercicio_criterios_checklist_id_fkey"
+            columns: ["checklist_id"]
+            isOneToOne: false
+            referencedRelation: "checklists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "checklist_exercicio_criterios_criterio_id_fkey"
+            columns: ["criterio_id"]
+            isOneToOne: false
+            referencedRelation: "criterios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "checklist_exercicio_criterios_exercicio_id_fkey"
+            columns: ["exercicio_id"]
+            isOneToOne: false
+            referencedRelation: "exercicios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       checklists: {
         Row: {
           ativo: boolean

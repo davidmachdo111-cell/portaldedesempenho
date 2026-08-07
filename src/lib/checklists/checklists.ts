@@ -51,11 +51,19 @@ export interface Exercicio {
   ordem: number;
 }
 
+/** Vínculo N:N entre um exercício do checklist e um critério. */
+export interface VinculoExercicioCriterio {
+  exercicio_id: string;
+  criterio_id: string;
+}
+
 export interface EstruturaChecklist {
   checklist: Checklist;
   secoes: Secao[];
   criterios: Criterio[];
   exercicios: Exercicio[];
+  /** Critérios vinculados a cada exercício (N:N, sem duplicar critérios). */
+  vinculos: VinculoExercicioCriterio[];
 }
 
 const check = <T,>(res: { data: T | null; error: { message: string } | null }): T => {
@@ -150,11 +158,17 @@ export async function carregarEstrutura(id: string): Promise<EstruturaChecklist>
   const exercicios = check(
     await supabase.from("exercicios").select("*").eq("checklist_id", id).order("ordem"),
   ) as Exercicio[];
-  return { checklist, secoes, criterios, exercicios };
+  const vinculos = check(
+    await supabase
+      .from("checklist_exercicio_criterios")
+      .select("exercicio_id, criterio_id")
+      .eq("checklist_id", id),
+  ) as VinculoExercicioCriterio[];
+  return { checklist, secoes, criterios, exercicios, vinculos };
 }
 
 export async function salvarEstrutura(e: EstruturaChecklist) {
-  const { checklist, secoes, criterios, exercicios } = e;
+  const { checklist, secoes, criterios, exercicios, vinculos } = e;
 
   const upd = await supabase
     .from("checklists")
@@ -242,10 +256,33 @@ export async function salvarEstrutura(e: EstruturaChecklist) {
     );
     if (r.error) throw new Error(r.error.message);
   }
+
+  // Vínculos N:N exercício x critério: regravados por checklist, mantendo
+  // intactos critérios, exercícios e avaliações já existentes.
+  const idsExercicios = new Set(exercicios.map((x) => x.id));
+  const idsCriterios = new Set(criterios.map((c) => c.id));
+  const validos = (vinculos ?? []).filter(
+    (v) => idsExercicios.has(v.exercicio_id) && idsCriterios.has(v.criterio_id),
+  );
+  const del = await supabase
+    .from("checklist_exercicio_criterios")
+    .delete()
+    .eq("checklist_id", checklist.id);
+  if (del.error) throw new Error(del.error.message);
+  if (validos.length) {
+    const r = await supabase.from("checklist_exercicio_criterios").insert(
+      validos.map((v) => ({
+        checklist_id: checklist.id,
+        exercicio_id: v.exercicio_id,
+        criterio_id: v.criterio_id,
+      })),
+    );
+    if (r.error) throw new Error(r.error.message);
+  }
 }
 
 export async function duplicarChecklist(id: string): Promise<Checklist> {
-  const { checklist, secoes, criterios, exercicios } = await carregarEstrutura(id);
+  const { checklist, secoes, criterios, exercicios, vinculos } = await carregarEstrutura(id);
   const { data: userData } = await supabase.auth.getUser();
 
   const novo = check(
@@ -277,27 +314,59 @@ export async function duplicarChecklist(id: string): Promise<Checklist> {
     ) as Secao;
     mapaSecoes.set(s.id, nova.id);
   }
+  const mapaCriterios = new Map<string, string>();
   if (criterios.length) {
-    await supabase.from("criterios").insert(
-      criterios.map((c) => ({
-        checklist_id: novo.id,
-        secao_id: c.secao_id ? (mapaSecoes.get(c.secao_id) ?? null) : null,
-        nome: c.nome,
-        peso: c.peso,
-        obrigatorio: c.obrigatorio,
-        ordem: c.ordem,
-      })),
-    );
+    const novos = check(
+      await supabase
+        .from("criterios")
+        .insert(
+          criterios.map((c) => ({
+            checklist_id: novo.id,
+            secao_id: c.secao_id ? (mapaSecoes.get(c.secao_id) ?? null) : null,
+            nome: c.nome,
+            peso: c.peso,
+            obrigatorio: c.obrigatorio,
+            ordem: c.ordem,
+          })),
+        )
+        .select(),
+    ) as Criterio[];
+    criterios.forEach((c, i) => {
+      const criado = novos[i];
+      if (criado) mapaCriterios.set(c.id, criado.id);
+    });
   }
+  const mapaExercicios = new Map<string, string>();
   if (exercicios.length) {
-    await supabase.from("exercicios").insert(
-      exercicios.map((x) => ({
-        checklist_id: novo.id,
-        nome: x.nome,
-        obrigatorio: x.obrigatorio,
-        ordem: x.ordem,
-      })),
+    const novos = check(
+      await supabase
+        .from("exercicios")
+        .insert(
+          exercicios.map((x) => ({
+            checklist_id: novo.id,
+            nome: x.nome,
+            obrigatorio: x.obrigatorio,
+            ordem: x.ordem,
+          })),
+        )
+        .select(),
+    ) as Exercicio[];
+    exercicios.forEach((x, i) => {
+      const criado = novos[i];
+      if (criado) mapaExercicios.set(x.id, criado.id);
+    });
+  }
+  const vinculosCopiados = vinculos
+    .map((v) => ({
+      checklist_id: novo.id,
+      exercicio_id: mapaExercicios.get(v.exercicio_id),
+      criterio_id: mapaCriterios.get(v.criterio_id),
+    }))
+    .filter((v): v is { checklist_id: string; exercicio_id: string; criterio_id: string } =>
+      Boolean(v.exercicio_id && v.criterio_id),
     );
+  if (vinculosCopiados.length) {
+    await supabase.from("checklist_exercicio_criterios").insert(vinculosCopiados);
   }
   return novo;
 }
