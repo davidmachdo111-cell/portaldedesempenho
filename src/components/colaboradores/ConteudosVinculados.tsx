@@ -43,8 +43,7 @@ async function acao(fn: () => Promise<void>) {
   }
 }
 
-const ehPdf = (anexo: AnexoVinculado) =>
-  (anexo.tipo ?? "").includes("pdf") || anexo.nome.toLowerCase().endsWith(".pdf");
+const ehPdf = (anexo: AnexoVinculado) => anexo.nome.toLowerCase().endsWith(".pdf");
 
 function ListaAnexos({ anexos, contexto }: { anexos: AnexoVinculado[]; contexto: string }) {
   const [aberto, setAberto] = useState<AnexoVinculado | null>(null);
