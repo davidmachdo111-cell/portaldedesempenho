@@ -48,6 +48,8 @@ import {
   type Persona,
 } from "@/lib/personas/constants";
 import { PersonaPrint } from "@/components/personas/PersonaPrint";
+import { AcoesPdfPersona } from "@/components/personas/PdfPersonaAcoes";
+import { usePdfsDePersonas } from "@/lib/personas/pdf";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/personagens/biblioteca")({
@@ -144,6 +146,8 @@ function Biblioteca() {
       return alvo.includes(termo);
     });
   }, [personas, busca, exercicio, vertente, complexidade, status, cidade, tipoCliente]);
+
+  const { data: pdfs = {} } = usePdfsDePersonas(filtradas.map((p) => p.id));
 
   const selecionadasObj = personas.filter((p) => selecionadas.includes(p.id));
 
@@ -329,6 +333,7 @@ function Biblioteca() {
                 <Button size="sm" variant="ghost" onClick={() => setVisualizando(p)}>
                   <Eye className="size-4" /> Ver
                 </Button>
+                <AcoesPdfPersona nome={p.nome} pdf={pdfs[p.id]} compacto />
                 {podeGerenciarPersonagens && (
                   <>
                     <Button size="sm" variant="ghost" asChild>
@@ -415,6 +420,7 @@ function Biblioteca() {
                       <Button size="icon" variant="ghost" onClick={() => setVisualizando(p)}>
                         <Eye className="size-4" />
                       </Button>
+                      <AcoesPdfPersona nome={p.nome} pdf={pdfs[p.id]} compacto />
                       {podeGerenciarPersonagens && (
                         <>
                           <Button size="icon" variant="ghost" asChild>
