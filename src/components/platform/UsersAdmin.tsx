@@ -237,6 +237,15 @@ type FormValues = {
   permissionKeys: string[];
 };
 
+type PermissionRow = {
+  key: string;
+  name: string;
+  description?: string | null;
+  module_key?: string | null;
+  module_name?: string | null;
+  action_name?: string | null;
+};
+
 function UserFormDialog({
   open,
   onOpenChange,
@@ -252,7 +261,7 @@ function UserFormDialog({
   onOpenChange: (open: boolean) => void;
   title: string;
   roles: { key: string; name: string }[];
-  permissions: { key: string; name: string }[];
+  permissions: PermissionRow[];
   initial?: Partial<FormValues>;
   onSubmit: (values: FormValues) => void;
   withPassword?: boolean;
@@ -270,73 +279,134 @@ function UserFormDialog({
     return list.includes(key) ? list.filter((k) => k !== key) : [...list, key];
   }
 
+  // Permissões pontuais agrupadas por módulo, em cards limpos.
+  const grupos = GRUPOS_PERMISSAO.map((grupo) => ({
+    ...grupo,
+    itens: permissions.filter((p) => (p.module_key ?? "") === grupo.moduleKey),
+  })).filter((g) => g.itens.length > 0);
+
+  const semGrupo = permissions.filter(
+    (p) => !GRUPOS_PERMISSAO.some((g) => g.moduleKey === (p.module_key ?? "")),
+  );
+  if (semGrupo.length) {
+    grupos.push({
+      moduleKey: "outros",
+      titulo: "Outras permissões",
+      descricao: "Permissões avulsas do sistema.",
+      itens: semGrupo,
+    });
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+      <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
-            Perfis organizam os usuários; as permissões controlam o acesso aos módulos.
+            Perfis definem o acesso padrão; as permissões individuais ajustam pontos específicos.
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Usuário</Label>
-            <Input
-              value={values.username}
-              disabled={lockUsername}
-              placeholder="joao.silva"
-              onChange={(e) => setValues((v) => ({ ...v, username: e.target.value }))}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Nome completo</Label>
-            <Input
-              value={values.fullName}
-              onChange={(e) => setValues((v) => ({ ...v, fullName: e.target.value }))}
-            />
-          </div>
-          {withPassword && (
+        <div className="space-y-6">
+          <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label>Senha</Label>
+              <Label>Usuário</Label>
               <Input
-                value={values.password}
-                onChange={(e) => setValues((v) => ({ ...v, password: e.target.value }))}
+                value={values.username}
+                disabled={lockUsername}
+                placeholder="joao.silva"
+                onChange={(e) => setValues((v) => ({ ...v, username: e.target.value }))}
               />
             </div>
-          )}
-          <div className="space-y-2">
-            <Label>Perfis</Label>
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label>Nome completo</Label>
+              <Input
+                value={values.fullName}
+                onChange={(e) => setValues((v) => ({ ...v, fullName: e.target.value }))}
+              />
+            </div>
+            {withPassword && (
+              <div className="space-y-2">
+                <Label>Senha</Label>
+                <Input
+                  value={values.password}
+                  onChange={(e) => setValues((v) => ({ ...v, password: e.target.value }))}
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-3">
+            <div>
+              <Label>Perfis de acesso</Label>
+              <p className="text-xs text-muted-foreground">
+                Administrador tem acesso total; Avaliador aplica checklists; Auxiliar apenas
+                consulta colaboradores e materiais.
+              </p>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-3">
               {roles.map((role) => (
-                <label key={role.key} className="flex items-center gap-2 text-sm">
+                <label
+                  key={role.key}
+                  className="flex items-center gap-2 rounded-lg border bg-card px-3 py-2 text-sm"
+                >
                   <Checkbox
                     checked={values.roleKeys.includes(role.key)}
                     onCheckedChange={() =>
                       setValues((v) => ({ ...v, roleKeys: toggle(v.roleKeys, role.key) }))
                     }
                   />
-                  {role.name}
+                  <span className="truncate">{role.name}</span>
                 </label>
               ))}
             </div>
           </div>
-          <div className="space-y-2">
-            <Label>Permissões individuais</Label>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {permissions.map((permission) => (
-                <label key={permission.key} className="flex items-center gap-2 text-sm">
-                  <Checkbox
-                    checked={values.permissionKeys.includes(permission.key)}
-                    onCheckedChange={() =>
-                      setValues((v) => ({
-                        ...v,
-                        permissionKeys: toggle(v.permissionKeys, permission.key),
-                      }))
-                    }
-                  />
-                  {permission.name}
-                </label>
+
+          <div className="space-y-3">
+            <div>
+              <Label>Permissões individuais</Label>
+              <p className="text-xs text-muted-foreground">
+                Liberações extras concedidas apenas a este usuário, organizadas por módulo.
+              </p>
+            </div>
+            <div className="grid gap-4 lg:grid-cols-2">
+              {grupos.map((grupo) => (
+                <Card key={grupo.moduleKey} className="shadow-none">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm">{grupo.titulo}</CardTitle>
+                    <CardDescription className="text-xs">{grupo.descricao}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {grupo.itens.map((permission) => {
+                      const ativo = values.permissionKeys.includes(permission.key);
+                      return (
+                        <div
+                          key={permission.key}
+                          className="flex items-start justify-between gap-3"
+                        >
+                          <div className="min-w-0">
+                            <p className="text-sm leading-none font-medium">
+                              {permission.action_name || rotuloAcao(permission.name)}
+                            </p>
+                            {permission.description && (
+                              <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                                {permission.description}
+                              </p>
+                            )}
+                          </div>
+                          <Switch
+                            checked={ativo}
+                            onCheckedChange={() =>
+                              setValues((v) => ({
+                                ...v,
+                                permissionKeys: toggle(v.permissionKeys, permission.key),
+                              }))
+                            }
+                          />
+                        </div>
+                      );
+                    })}
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </div>
