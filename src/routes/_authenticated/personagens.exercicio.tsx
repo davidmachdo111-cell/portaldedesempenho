@@ -199,9 +199,16 @@ function MontarSimulacao() {
       descricao="Selecione personas já cadastradas e gere o material de apoio"
       acoes={
         <>
+          {simulacaoId && (
+            <Button variant="ghost" onClick={() => novoExercicio()}>
+              Novo exercício
+            </Button>
+          )}
           <Button variant="outline" onClick={salvarSimulacao} disabled={salvar.isPending}>
-            <Save className="size-4" /> Salvar exercício
+            <Save className="size-4" />{" "}
+            {simulacaoId ? "Salvar alterações" : "Criar exercício"}
           </Button>
+
 
           <Button onClick={abrirPdf}>
             <Printer className="size-4" /> Gerar PDF
