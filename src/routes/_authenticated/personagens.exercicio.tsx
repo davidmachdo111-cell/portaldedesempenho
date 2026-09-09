@@ -123,6 +123,20 @@ function MontarSimulacao() {
     });
   }
 
+  function novoExercicio(silencioso = false) {
+    setSimulacaoId(undefined);
+    setNome("");
+    setResponsavel("");
+    setObservacoes("");
+    setExercicio(TODOS);
+    setVertente(TODOS);
+    setComplexidade(TODOS);
+    setStatus("ativa");
+    setBusca("");
+    setSelecionadas([]);
+    if (!silencioso) toast.success("Formulário limpo para um novo exercício.");
+  }
+
   async function salvarSimulacao() {
     if (selecionadas.length === 0) {
       toast.error("Selecione ao menos uma persona.");
@@ -135,10 +149,11 @@ function MontarSimulacao() {
       observacoes,
       persona_ids: selecionadas,
     };
-    const salva = await salvar.mutateAsync(simulacaoId ? { id: simulacaoId, values } : { values });
-    setSimulacaoId(salva.id);
+    const editando = Boolean(simulacaoId);
+    await salvar.mutateAsync(editando ? { id: simulacaoId!, values } : { values });
 
-    toast.success("Exercício salvo.");
+    toast.success(editando ? "Exercício atualizado." : "Exercício criado.");
+    novoExercicio(true);
   }
 
   function carregar(simId: string) {
@@ -184,9 +199,16 @@ function MontarSimulacao() {
       descricao="Selecione personas já cadastradas e gere o material de apoio"
       acoes={
         <>
+          {simulacaoId && (
+            <Button variant="ghost" onClick={() => novoExercicio()}>
+              Novo exercício
+            </Button>
+          )}
           <Button variant="outline" onClick={salvarSimulacao} disabled={salvar.isPending}>
-            <Save className="size-4" /> Salvar exercício
+            <Save className="size-4" />{" "}
+            {simulacaoId ? "Salvar alterações" : "Criar exercício"}
           </Button>
+
 
           <Button onClick={abrirPdf}>
             <Printer className="size-4" /> Gerar PDF
