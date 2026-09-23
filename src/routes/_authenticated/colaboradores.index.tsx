@@ -104,7 +104,6 @@ function PaginaColaboradores() {
 
   // Vínculos com avaliadores/auxiliares — visíveis a todos, gerenciados pelo administrador.
   const vinculos = useVinculosDaPagina(ids, true);
-  const { itens: usuariosVinculaveis } = useUsuariosVinculaveis();
 
   // Ids dos responsáveis presentes na página, para exibir o nome também a não-admins.
   const idsResponsaveis = useMemo(() => {
@@ -122,11 +121,8 @@ function PaginaColaboradores() {
   });
 
   const nomesUsuarios = useMemo(
-    () => ({
-      ...Object.fromEntries(usuariosVinculaveis.map((u) => [u.id, u.nome])),
-      ...(nomesResponsaveis.data ?? {}),
-    }),
-    [usuariosVinculaveis, nomesResponsaveis.data],
+    () => nomesResponsaveis.data ?? {},
+    [nomesResponsaveis.data],
   );
 
 

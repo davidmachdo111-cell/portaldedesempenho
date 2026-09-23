@@ -25,13 +25,18 @@ export type PlatformModule = {
 /** Identidade + permissões do usuário autenticado (base de todo o controle de acesso). */
 export const meQueryOptions = queryOptions({
   queryKey: ["platform", "me"],
+  staleTime: 5 * 60_000,
   queryFn: async () => {
     const { data: auth } = await supabase.auth.getUser();
     const user = auth.user;
     if (!user) return null;
 
     const [profileRes, rolesRes, permsRes] = await Promise.all([
-      supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
+      supabase
+        .from("profiles")
+        .select("id, username, full_name, active, created_at")
+        .eq("id", user.id)
+        .maybeSingle(),
       supabase.from("user_roles").select("role_key").eq("user_id", user.id),
       supabase.from("user_permissions").select("permission_key").eq("user_id", user.id),
     ]);
@@ -68,10 +73,11 @@ export const meQueryOptions = queryOptions({
 
 export const modulesQueryOptions = queryOptions({
   queryKey: ["platform", "modules"],
+  staleTime: 10 * 60_000,
   queryFn: async () => {
     const { data, error } = await supabase
       .from("modules")
-      .select("*")
+      .select("id, key, name, description, icon, route, permission_key, active, sort_order")
       .order("sort_order", { ascending: true });
     if (error) throw error;
     return (data ?? []) as PlatformModule[];
@@ -80,9 +86,10 @@ export const modulesQueryOptions = queryOptions({
 
 export const usersQueryOptions = queryOptions({
   queryKey: ["platform", "users"],
+  staleTime: 5 * 60_000,
   queryFn: async () => {
     const [profiles, roles, perms] = await Promise.all([
-      supabase.from("profiles").select("*").order("username"),
+      supabase.from("profiles").select("id, username, full_name, active, created_at").order("username"),
       supabase.from("user_roles").select("user_id, role_key"),
       supabase.from("user_permissions").select("user_id, permission_key"),
     ]);

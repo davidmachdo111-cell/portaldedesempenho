@@ -81,6 +81,7 @@ function PainelColaborador() {
   const { podeGerenciarColaboradores, podeAvaliar, podeVerChecklists } = useAuth();
 
   const [liberar, setLiberar] = useState(false);
+  const [aba, setAba] = useState("atividades");
   const [selecionados, setSelecionados] = useState<string[]>([]);
   const [edicao, setEdicao] = useState<Partial<ColaboradorInput> | null>(null);
 
@@ -95,10 +96,12 @@ function PainelColaborador() {
   const historico = useQuery({
     queryKey: ["colaboradores", id, "historico"],
     queryFn: () => listarHistorico(id),
+    enabled: aba === "historico",
   });
   const avaliacoes = useQuery({
     queryKey: ["colaboradores", id, "avaliacoes"],
     queryFn: () => listarAvaliacoesDoColaborador(id),
+    enabled: aba === "avaliacoes" && podeVerChecklists,
   });
   const catalogo = useQuery({
     queryKey: ["colaboradores", "catalogo"],
@@ -228,7 +231,7 @@ function PainelColaborador() {
             />
           </div>
 
-          <Tabs defaultValue="atividades">
+          <Tabs value={aba} onValueChange={setAba}>
             <TabsList>
               <TabsTrigger value="atividades">Treinamentos e Atividades</TabsTrigger>
               <TabsTrigger value="conteudos">Personagens e Exercícios</TabsTrigger>

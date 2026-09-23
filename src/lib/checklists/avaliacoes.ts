@@ -99,7 +99,7 @@ export async function listarMinhasAvaliacoes(): Promise<RegistroAvaliacao[]> {
   const rows = check(
     await supabase
       .from("avaliacoes")
-      .select("*")
+      .select("id, checklist_id, avaliador_id, colaborador_nome, setor, tutor, data_inicio, data_avaliacao, status, media, created_at, updated_at")
       .eq("avaliador_id", id)
       .order("updated_at", { ascending: false }),
   ) as Record<string, unknown>[];
@@ -108,7 +108,10 @@ export async function listarMinhasAvaliacoes(): Promise<RegistroAvaliacao[]> {
 
 export async function listarTodasAvaliacoes(): Promise<RegistroAvaliacao[]> {
   const rows = check(
-    await supabase.from("avaliacoes").select("*").order("updated_at", { ascending: false }),
+    await supabase
+      .from("avaliacoes")
+      .select("id, checklist_id, avaliador_id, colaborador_nome, setor, tutor, data_inicio, data_avaliacao, status, media, created_at, updated_at")
+      .order("updated_at", { ascending: false }),
   ) as Record<string, unknown>[];
   return rows.map(normalizar);
 }

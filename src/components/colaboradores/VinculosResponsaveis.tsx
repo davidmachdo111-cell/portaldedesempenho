@@ -35,8 +35,8 @@ function papelDoUsuario(roleKeys: string[]): PapelResponsavel | null {
 }
 
 /** Usuários elegíveis a receber vínculos (avaliadores e auxiliares). */
-export function useUsuariosVinculaveis() {
-  const users = useQuery(usersQueryOptions);
+export function useUsuariosVinculaveis(habilitado = true) {
+  const users = useQuery({ ...usersQueryOptions, enabled: habilitado });
   const itens = useMemo(
     () =>
       (users.data ?? [])
@@ -72,7 +72,7 @@ export function DialogVinculos({
   onOpenChange: (aberto: boolean) => void;
 }) {
   const qc = useQueryClient();
-  const { itens, isLoading } = useUsuariosVinculaveis();
+  const { itens, isLoading } = useUsuariosVinculaveis(Boolean(colaborador));
 
   const invalidar = () => qc.invalidateQueries({ queryKey: ["colaboradores"] });
 
