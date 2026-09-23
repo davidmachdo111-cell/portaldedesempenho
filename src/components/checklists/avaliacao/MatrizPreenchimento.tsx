@@ -1,4 +1,5 @@
 import { MessageSquare } from "lucide-react";
+import { useMemo } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   type Avaliacao,
@@ -24,7 +25,11 @@ export function MatrizPreenchimento({
 }) {
   const { exercicios } = avaliacao;
   // Critérios presentes em mais exercícios aparecem no topo da matriz.
-  const criterios = criteriosOrdenados(avaliacao);
+  const criterios = useMemo(() => criteriosOrdenados(avaliacao), [avaliacao]);
+  const notas = useMemo(
+    () => Object.fromEntries(exercicios.map((ex) => [ex.id, notaExercicio(avaliacao, ex.id)])),
+    [avaliacao, exercicios],
+  );
 
 
   return (
@@ -104,7 +109,7 @@ export function MatrizPreenchimento({
               </td>
               <td />
               {exercicios.map((ex) => {
-                const nota = notaExercicio(avaliacao, ex.id);
+                const nota = notas[ex.id] ?? 0;
                 return (
                   <td key={ex.id} className="px-2 py-3 text-center">
                     <span

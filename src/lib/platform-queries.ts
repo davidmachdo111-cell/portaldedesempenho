@@ -1,6 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { expandirPermissoes } from "@/lib/permissions";
+import { carregarMeuAcesso } from "@/lib/platform-me.functions";
 
 export type PlatformProfile = {
   id: string;
@@ -27,33 +28,9 @@ export const meQueryOptions = queryOptions({
   queryKey: ["platform", "me"],
   staleTime: 5 * 60_000,
   queryFn: async () => {
-    const { data: auth } = await supabase.auth.getUser();
-    const user = auth.user;
-    if (!user) return null;
-
-    const [profileRes, rolesRes, permsRes] = await Promise.all([
-      supabase
-        .from("profiles")
-        .select("id, username, full_name, active, created_at")
-        .eq("id", user.id)
-        .maybeSingle(),
-      supabase.from("user_roles").select("role_key").eq("user_id", user.id),
-      supabase.from("user_permissions").select("permission_key").eq("user_id", user.id),
-    ]);
-
-    const roleKeys = (rolesRes.data ?? []).map((r) => r.role_key);
-    let rolePerms: string[] = [];
-    if (roleKeys.length > 0) {
-      const { data } = await supabase
-        .from("role_permissions")
-        .select("permission_key")
-        .in("role_key", roleKeys);
-      rolePerms = (data ?? []).map((r) => r.permission_key);
-    }
-
-    const canonicas = Array.from(
-      new Set([...(permsRes.data ?? []).map((p) => p.permission_key), ...rolePerms]),
-    );
+    const acesso = await carregarMeuAcesso();
+    const roleKeys = acesso.roleKeys;
+    const canonicas = acesso.canonicalPermissions;
 
     const isAdmin =
       roleKeys.includes("administrador") ||
@@ -61,8 +38,8 @@ export const meQueryOptions = queryOptions({
       canonicas.includes("administracao.ver");
 
     return {
-      userId: user.id,
-      profile: (profileRes.data as PlatformProfile | null) ?? null,
+      userId: acesso.userId,
+      profile: (acesso.profile as PlatformProfile | null) ?? null,
       roleKeys,
       permissions: expandirPermissoes(canonicas, isAdmin),
       canonicalPermissions: canonicas,
