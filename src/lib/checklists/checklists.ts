@@ -74,7 +74,7 @@ const check = <T,>(res: { data: T | null; error: { message: string } | null }): 
 /* ---------- categorias ---------- */
 
 export async function listarCategorias(): Promise<Categoria[]> {
-  return check(await supabase.from("categorias").select("*").order("nome"));
+  return check(await supabase.from("categorias").select("id, nome, cor").order("nome"));
 }
 
 export async function criarCategoria(nome: string): Promise<Categoria> {
@@ -98,7 +98,10 @@ export interface ChecklistResumo extends Checklist {
 
 export async function listarChecklists(): Promise<ChecklistResumo[]> {
   const checklists = check(
-    await supabase.from("checklists").select("*").order("created_at", { ascending: false }),
+    await supabase
+      .from("checklists")
+      .select("id, nome, descricao, categoria_id, nota_minima, permite_observacoes, observacoes_obrigatorias, pontos_fortes_modo, pontos_desenvolvimento_modo, ativo, created_at, updated_at")
+      .order("created_at", { ascending: false }),
   ) as Checklist[];
   const categorias = await listarCategorias();
   const criterios = check(await supabase.from("criterios").select("id, checklist_id")) as {
@@ -146,24 +149,18 @@ export async function criarChecklist(nome = "Novo checklist"): Promise<Checklist
 }
 
 export async function carregarEstrutura(id: string): Promise<EstruturaChecklist> {
-  const checklist = check(
-    await supabase.from("checklists").select("*").eq("id", id).single(),
-  ) as Checklist;
-  const secoes = check(
-    await supabase.from("secoes").select("*").eq("checklist_id", id).order("ordem"),
-  ) as Secao[];
-  const criterios = check(
-    await supabase.from("criterios").select("*").eq("checklist_id", id).order("ordem"),
-  ) as Criterio[];
-  const exercicios = check(
-    await supabase.from("exercicios").select("*").eq("checklist_id", id).order("ordem"),
-  ) as Exercicio[];
-  const vinculos = check(
-    await supabase
-      .from("checklist_exercicio_criterios")
-      .select("exercicio_id, criterio_id")
-      .eq("checklist_id", id),
-  ) as VinculoExercicioCriterio[];
+  const [checklistRes, secoesRes, criteriosRes, exerciciosRes, vinculosRes] = await Promise.all([
+    supabase.from("checklists").select("*").eq("id", id).single(),
+    supabase.from("secoes").select("id, checklist_id, nome, ordem").eq("checklist_id", id).order("ordem"),
+    supabase.from("criterios").select("id, checklist_id, secao_id, nome, peso, obrigatorio, ordem").eq("checklist_id", id).order("ordem"),
+    supabase.from("exercicios").select("id, checklist_id, nome, obrigatorio, ordem").eq("checklist_id", id).order("ordem"),
+    supabase.from("checklist_exercicio_criterios").select("exercicio_id, criterio_id").eq("checklist_id", id),
+  ]);
+  const checklist = check(checklistRes) as Checklist;
+  const secoes = check(secoesRes) as Secao[];
+  const criterios = check(criteriosRes) as Criterio[];
+  const exercicios = check(exerciciosRes) as Exercicio[];
+  const vinculos = check(vinculosRes) as VinculoExercicioCriterio[];
   return { checklist, secoes, criterios, exercicios, vinculos };
 }
 

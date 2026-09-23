@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ClipboardCheck, ClipboardList, FolderTree, Plus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AdminShell } from "@/components/checklists/ChecklistsShell";
-import { listarChecklists, listarCategorias } from "@/lib/checklists/checklists";
+import { listarChecklists } from "@/lib/checklists/checklists";
 import { listarTodasAvaliacoes } from "@/lib/checklists/avaliacoes";
 import { listarAvaliadores } from "@/lib/checklists/avaliadores";
 import { classificacao } from "@/lib/checklists/avaliacao";
@@ -26,7 +26,6 @@ function Painel() {
     queryKey: ["avaliadores"],
     queryFn: listarAvaliadores,
   });
-  const categorias = useQuery({ queryKey: ["categorias"], queryFn: listarCategorias });
   const avaliacoes = useQuery({ queryKey: ["avaliacoes-todas"], queryFn: listarTodasAvaliacoes });
 
   const lista = avaliacoes.data ?? [];
@@ -56,7 +55,7 @@ function Painel() {
     },
     {
       label: "Categorias",
-      valor: categorias.data?.length ?? 0,
+      valor: new Set((checklists.data ?? []).map((c) => c.categoria_id).filter(Boolean)).size,
       icon: FolderTree,
       to: "/checklists/modelos" as const,
     },

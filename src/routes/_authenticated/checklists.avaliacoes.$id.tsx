@@ -15,7 +15,6 @@ import {
   type Avaliacao,
   type Observacao,
 } from "@/lib/checklists/avaliacao";
-import { exportarExcel, exportarPDF } from "@/lib/checklists/exportar";
 import { listarSetoresAtivos } from "@/lib/checklists/setores";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -155,6 +154,12 @@ function PaginaPreenchimento() {
 
   const podeEditar = proprio || isAdmin;
 
+  const exportar = async (tipo: "excel" | "pdf") => {
+    const modulo = await import("@/lib/checklists/exportar");
+    if (tipo === "excel") modulo.exportarExcel(avaliacao, ctxRelatorio);
+    else modulo.exportarPDF(avaliacao, ctxRelatorio);
+  };
+
   return (
     <AdminShell
       titulo={
@@ -170,11 +175,11 @@ function PaginaPreenchimento() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => exportarExcel(avaliacao, ctxRelatorio)}
+            onClick={() => void exportar("excel")}
           >
             <SheetIcon className="h-4 w-4" /> Excel
           </Button>
-          <Button variant="outline" size="sm" onClick={() => exportarPDF(avaliacao, ctxRelatorio)}>
+          <Button variant="outline" size="sm" onClick={() => void exportar("pdf")}>
             <FileDown className="h-4 w-4" /> PDF
           </Button>
           {acompanhando && (

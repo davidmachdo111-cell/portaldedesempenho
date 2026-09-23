@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Link2, Users } from "lucide-react";
@@ -35,8 +35,8 @@ function papelDoUsuario(roleKeys: string[]): PapelResponsavel | null {
 }
 
 /** Usuários elegíveis a receber vínculos (avaliadores e auxiliares). */
-export function useUsuariosVinculaveis() {
-  const users = useQuery(usersQueryOptions);
+export function useUsuariosVinculaveis(habilitado = true) {
+  const users = useQuery({ ...usersQueryOptions, enabled: habilitado });
   const itens = useMemo(
     () =>
       (users.data ?? [])
@@ -72,7 +72,7 @@ export function DialogVinculos({
   onOpenChange: (aberto: boolean) => void;
 }) {
   const qc = useQueryClient();
-  const { itens, isLoading } = useUsuariosVinculaveis();
+  const { itens, isLoading } = useUsuariosVinculaveis(Boolean(colaborador));
 
   const invalidar = () => qc.invalidateQueries({ queryKey: ["colaboradores"] });
 
@@ -185,7 +185,8 @@ export function ResumoVinculos({
 
 /** Visão geral do administrador: todos os vínculos ativos. */
 export function PainelVinculosGeral() {
-  const { itens } = useUsuariosVinculaveis();
+  const [carregar, setCarregar] = useState(false);
+  const { itens } = useUsuariosVinculaveis(carregar);
   const nomes = useMemo(
     () => Object.fromEntries(itens.map((u) => [u.id, u.nome])),
     [itens],
@@ -193,6 +194,7 @@ export function PainelVinculosGeral() {
   const vinculos = useQuery({
     queryKey: ["colaboradores", "vinculos", "todos"],
     queryFn: listarTodosVinculos,
+    enabled: carregar,
   });
 
   const porUsuario = useMemo(() => {
@@ -210,10 +212,22 @@ export function PainelVinculosGeral() {
       <header className="flex items-center gap-2 border-b px-5 py-3">
         <Users className="size-4 text-primary" />
         <h2 className="text-sm font-semibold">Vínculos ativos por usuário</h2>
-        <span className="ml-auto text-xs text-muted-foreground">
-          {vinculos.data?.length ?? 0} vínculo(s)
-        </span>
+        {carregar ? (
+          <span className="ml-auto text-xs text-muted-foreground">
+            {vinculos.data?.length ?? 0} vínculo(s)
+          </span>
+        ) : (
+          <Button className="ml-auto" variant="outline" size="sm" onClick={() => setCarregar(true)}>
+            Carregar visão geral
+          </Button>
+        )}
       </header>
+      {!carregar ? (
+        <p className="px-5 py-6 text-sm text-muted-foreground">
+          A visão geral será carregada quando solicitada.
+        </p>
+      ) : (
+        <>
       <ul className="divide-y">
         {porUsuario.map((u) => (
           <li key={u.nome} className="grid gap-2 px-5 py-3 lg:grid-cols-[1fr_2fr] lg:items-center">
@@ -255,6 +269,8 @@ export function PainelVinculosGeral() {
           Atualizar
         </Button>
       </div>
+        </>
+      )}
     </div>
   );
 }
