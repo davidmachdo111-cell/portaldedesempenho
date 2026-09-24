@@ -38,6 +38,7 @@ function PaginaPreenchimento() {
   const [salvando, setSalvando] = useState(false);
   const [modoEdicaoAdmin, setModoEdicaoAdmin] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const filaSalvamento = useRef<Promise<void>>(Promise.resolve());
 
   const dados = useQuery({
     queryKey: ["avaliacao", id],
@@ -61,13 +62,14 @@ function PaginaPreenchimento() {
     async (r: RegistroAvaliacao, est = estrutura) => {
       if (!est) return;
       setSalvando(true);
-      try {
-        await salvarAvaliacao({ ...r, media: mediaGeral(paraAvaliacao(r, est)) });
-      } catch (e) {
-        toast.error(e instanceof Error ? e.message : "Falha ao salvar.");
-      } finally {
-        setSalvando(false);
-      }
+      filaSalvamento.current = filaSalvamento.current
+        .catch(() => undefined)
+        .then(() => salvarAvaliacao({ ...r, media: mediaGeral(paraAvaliacao(r, est)) }))
+        .catch((e: unknown) => {
+          toast.error(e instanceof Error ? e.message : "Falha ao salvar.");
+        });
+      await filaSalvamento.current;
+      setSalvando(false);
     },
     [estrutura],
   );
@@ -139,6 +141,7 @@ function PaginaPreenchimento() {
       toast.error("Selecione o setor.");
       return;
     }
+    if (timer.current) clearTimeout(timer.current);
     const novo = { ...registro, status: "concluida" as const };
     setRegistro(novo);
     await persistir(novo);
@@ -146,6 +149,7 @@ function PaginaPreenchimento() {
   };
 
   const reabrir = async () => {
+    if (timer.current) clearTimeout(timer.current);
     const novo = { ...registro, status: "rascunho" as const };
     setRegistro(novo);
     setModoEdicaoAdmin(true);
@@ -198,7 +202,10 @@ function PaginaPreenchimento() {
                 size="sm"
                 variant="secondary"
                 disabled={salvando}
-                onClick={() => persistir(registro)}
+                 onClick={() => {
+                   if (timer.current) clearTimeout(timer.current);
+                   void persistir(registro);
+                 }}
               >
                 <Save className="h-4 w-4" /> {salvando ? "Salvando…" : "Salvar"}
               </Button>
