@@ -16,13 +16,12 @@ import {
 import { AppShell } from "@/components/personas/PersonasShell";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { useHistorico, useResumoPersonas, useTotalSimulacoes } from "@/lib/personas/api";
+import { useHistorico, useResumoPersonas, useTotalSimulacoes, type PersonaResumo } from "@/lib/personas/api";
 import {
   COMPLEXIDADES,
   EXERCICIOS,
   VERTENTES,
   formatarData,
-  type Persona,
 } from "@/lib/personas/constants";
 
 export const Route = createFileRoute("/_authenticated/personagens/")({
@@ -82,7 +81,11 @@ function Indicador({
   );
 }
 
-function contar(personas: Persona[], chave: keyof Persona, valores: readonly string[]) {
+function contar(
+  personas: PersonaResumo[],
+  chave: "exercicio" | "vertente" | "complexidade",
+  valores: readonly string[],
+) {
   return valores
     .map((v) => ({ nome: v, total: personas.filter((p) => p[chave] === v).length }))
     .filter((d) => d.total > 0);
