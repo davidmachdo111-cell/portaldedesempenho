@@ -112,6 +112,33 @@ export function usePersonasPorIds(ids: string[]) {
   });
 }
 
+export function useResumoPersonas() {
+  return useQuery({
+    queryKey: ["personas", "resumo-dashboard"],
+    queryFn: async (): Promise<PersonaResumo[]> => {
+      const { data, error } = await supabase
+        .from("personas")
+        .select(COLUNAS_RESUMO)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as PersonaResumo[];
+    },
+  });
+}
+
+export function useTotalSimulacoes() {
+  return useQuery({
+    queryKey: ["simulacoes", "total"],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("simulacoes")
+        .select("id", { count: "exact", head: true });
+      if (error) throw error;
+      return count ?? 0;
+    },
+  });
+}
+
 export function usePersonas() {
   return useQuery({
     queryKey: ["personas"],
@@ -282,7 +309,7 @@ export function useHistorico(personaId?: string, limite = 30) {
     queryFn: async (): Promise<HistoricoItem[]> => {
       let q = supabase
         .from("persona_historico")
-        .select("*")
+        .select("id, persona_id, persona_nome, acao, detalhes, user_id, user_nome, created_at")
         .order("created_at", { ascending: false })
         .limit(limite);
       if (personaId) q = q.eq("persona_id", personaId);

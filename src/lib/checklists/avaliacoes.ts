@@ -121,6 +121,28 @@ export async function listarTodasAvaliacoes(): Promise<RegistroAvaliacao[]> {
   return rows.map(normalizar);
 }
 
+export async function resumoAvaliacoes() {
+  const { data, error, count } = await supabase
+    .from("avaliacoes")
+    .select("id, colaborador_nome, setor, data_avaliacao, status, media, updated_at", {
+      count: "exact",
+    })
+    .order("updated_at", { ascending: false })
+    .limit(6);
+  if (error) throw new Error(error.message);
+  const recentes = data ?? [];
+  const concluidasRecentes = recentes.filter((row) => row.status === "concluida");
+  return {
+    total: count ?? 0,
+    concluidas: concluidasRecentes.length,
+    media: concluidasRecentes.length
+      ? concluidasRecentes.reduce((soma, row) => soma + Number(row.media ?? 0), 0) /
+        concluidasRecentes.length
+      : 0,
+    recentes,
+  };
+}
+
 export async function criarAvaliacao(checklist_id: string): Promise<RegistroAvaliacao> {
   const avaliador_id = await meuId();
   const { data: perfil } = await supabase
