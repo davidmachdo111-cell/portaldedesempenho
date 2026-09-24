@@ -61,13 +61,13 @@ const COLUNAS_RESUMO =
 export type FiltrosPersonas = {
   pagina: number;
   porPagina?: number;
-  busca?: string;
-  exercicio?: string;
-  vertente?: string;
-  complexidade?: string;
-  status?: string;
-  cidade?: string;
-  tipoCliente?: string;
+  busca?: string | undefined;
+  exercicio?: string | undefined;
+  vertente?: string | undefined;
+  complexidade?: string | undefined;
+  status?: string | undefined;
+  cidade?: string | undefined;
+  tipoCliente?: string | undefined;
 };
 
 export function usePersonasPaginadas(filtros: FiltrosPersonas) {
