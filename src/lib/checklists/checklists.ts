@@ -103,8 +103,11 @@ export async function listarChecklists(): Promise<ChecklistResumo[]> {
       .select("id, nome, descricao, categoria_id, nota_minima, permite_observacoes, observacoes_obrigatorias, pontos_fortes_modo, pontos_desenvolvimento_modo, ativo, created_at, updated_at")
       .order("created_at", { ascending: false }),
   ) as Checklist[];
-  const categorias = await listarCategorias();
-  const criterios = check(await supabase.from("criterios").select("id, checklist_id")) as {
+  const [categorias, criteriosRes] = await Promise.all([
+    listarCategorias(),
+    supabase.from("criterios").select("id, checklist_id"),
+  ]);
+  const criterios = check(criteriosRes) as {
     id: string;
     checklist_id: string;
   }[];

@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PersonaPrint } from "@/components/personas/PersonaPrint";
-import { usePersonas } from "@/lib/personas/api";
+import { usePersonasPorIds } from "@/lib/personas/api";
 import { formatarData } from "@/lib/personas/constants";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -37,12 +37,11 @@ export const Route = createFileRoute("/_authenticated/personagens/imprimir")({
 
 function Imprimir() {
   const { ids, nome, exercicio, responsavel } = Route.useSearch();
-  const { data: personas = [], isLoading } = usePersonas();
+  const idsSelecionados = ids.split(",").filter(Boolean);
+  const { data: personas = [], isLoading } = usePersonasPorIds(idsSelecionados);
   const { nome: usuario } = useAuth();
 
-  const lista = ids
-    .split(",")
-    .filter(Boolean)
+  const lista = idsSelecionados
     .map((id: string) => personas.find((p) => p.id === id))
     .filter(Boolean) as typeof personas;
 

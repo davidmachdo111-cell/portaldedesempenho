@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   Archive,
@@ -37,7 +37,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useAcoesPersona, usePersonas } from "@/lib/personas/api";
+import { useAcoesPersona, usePersona, usePersonasPaginadas, usePersonasPorIds, type PersonaResumo } from "@/lib/personas/api";
 import { useAuth } from "@/hooks/useAuth";
 import {
   COMPLEXIDADES,
@@ -104,7 +104,6 @@ function Selecao({
 function Biblioteca() {
   const navigate = useNavigate();
   const { podeGerenciarPersonagens } = useAuth();
-  const { data: personas = [], isLoading } = usePersonas();
   const { duplicar, alternarStatus, alternarFavorita, excluir } = useAcoesPersona();
 
   const [busca, setBusca] = useState("");
@@ -116,40 +115,30 @@ function Biblioteca() {
   const [tipoCliente, setTipoCliente] = useState("");
   const [visual, setVisual] = useState<"cards" | "tabela">("cards");
   const [selecionadas, setSelecionadas] = useState<string[]>([]);
-  const [visualizando, setVisualizando] = useState<Persona | null>(null);
-  const [aExcluir, setAExcluir] = useState<Persona | null>(null);
+  const [visualizando, setVisualizando] = useState<PersonaResumo | null>(null);
+  const [aExcluir, setAExcluir] = useState<PersonaResumo | null>(null);
+  const [pagina, setPagina] = useState(1);
+  const buscaAdiada = useDeferredValue(busca);
+  const filtros = {
+    pagina,
+    busca: buscaAdiada,
+    exercicio: exercicio === TODOS ? undefined : exercicio,
+    vertente: vertente === TODOS ? undefined : vertente,
+    complexidade: complexidade === TODOS ? undefined : complexidade,
+    status: status === TODOS ? undefined : status,
+    cidade,
+    tipoCliente,
+  };
+  const consulta = usePersonasPaginadas(filtros);
+  const personas = consulta.data?.itens ?? [];
+  const total = consulta.data?.total ?? 0;
+  const paginas = Math.max(1, Math.ceil(total / 24));
+  const { data: pdfs = {} } = usePdfsDePersonas(personas.map((p) => p.id));
+  const { data: selecionadasObj = [] } = usePersonasPorIds(selecionadas);
+  const { data: personaCompleta } = usePersona(visualizando?.id);
+  const isLoading = consulta.isLoading;
 
-  const filtradas = useMemo(() => {
-    const termo = busca.trim().toLowerCase();
-    return personas.filter((p) => {
-      if (exercicio !== TODOS && p.exercicio !== exercicio) return false;
-      if (vertente !== TODOS && p.vertente !== vertente) return false;
-      if (complexidade !== TODOS && p.complexidade !== complexidade) return false;
-      if (status !== TODOS && p.status !== status) return false;
-      if (cidade && !(p.cidade ?? "").toLowerCase().includes(cidade.toLowerCase())) return false;
-      if (tipoCliente && !(p.tipo_cliente ?? "").toLowerCase().includes(tipoCliente.toLowerCase()))
-        return false;
-      if (!termo) return true;
-      const alvo = [
-        p.nome,
-        p.objetivo,
-        p.contexto_oculto,
-        p.fala_inicial,
-        p.cidade,
-        p.tipo_cliente,
-        ...(p.palavras_chave ?? []),
-        ...(p.perfil_comportamental ?? []),
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
-      return alvo.includes(termo);
-    });
-  }, [personas, busca, exercicio, vertente, complexidade, status, cidade, tipoCliente]);
-
-  const { data: pdfs = {} } = usePdfsDePersonas(filtradas.map((p) => p.id));
-
-  const selecionadasObj = personas.filter((p) => selecionadas.includes(p.id));
+  useEffect(() => setPagina(1), [buscaAdiada, exercicio, vertente, complexidade, status, cidade, tipoCliente]);
 
   function alternarSelecao(id: string) {
     setSelecionadas((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
@@ -169,7 +158,7 @@ function Biblioteca() {
   return (
     <AppShell
       titulo="Biblioteca de Personas"
-      descricao={`${filtradas.length} de ${personas.length} personas`}
+      descricao={`${personas.length} de ${total} personas`}
       acoes={
         <>
           <Button variant="outline" onClick={imprimirSelecionadas}>
@@ -259,7 +248,7 @@ function Biblioteca() {
 
       {isLoading ? (
         <p className="text-muted-foreground">Carregando personas…</p>
-      ) : filtradas.length === 0 ? (
+      ) : personas.length === 0 ? (
         <div className="surface-card p-12 text-center">
           <p className="font-medium">Nenhuma persona encontrada</p>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -277,7 +266,7 @@ function Biblioteca() {
         </div>
       ) : visual === "cards" ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {filtradas.map((p) => (
+          {personas.map((p) => (
             <article
               key={p.id}
               className={cn(
@@ -392,7 +381,7 @@ function Biblioteca() {
               </tr>
             </thead>
             <tbody>
-              {filtradas.map((p) => (
+              {personas.map((p) => (
                 <tr
                   key={p.id}
                   className="border-b border-border/70 last:border-0 hover:bg-muted/40"
@@ -457,6 +446,18 @@ function Biblioteca() {
         </div>
       )}
 
+      {total > 24 && (
+        <div className="mt-5 flex items-center justify-center gap-3">
+          <Button variant="outline" disabled={pagina === 1} onClick={() => setPagina((p) => p - 1)}>
+            Anterior
+          </Button>
+          <span className="text-sm text-muted-foreground">Página {pagina} de {paginas}</span>
+          <Button variant="outline" disabled={pagina >= paginas} onClick={() => setPagina((p) => p + 1)}>
+            Próxima
+          </Button>
+        </div>
+      )}
+
       {selecionadasObj.length > 0 && (
         <div className="no-print mt-6 flex flex-wrap items-center gap-3 rounded-xl border border-brand/30 bg-brand/5 p-4">
           <span className="text-sm">
@@ -476,7 +477,11 @@ function Biblioteca() {
           <DialogHeader>
             <DialogTitle>{visualizando?.nome}</DialogTitle>
           </DialogHeader>
-          {visualizando && <PersonaPrint persona={visualizando} indice={1} />}
+          {personaCompleta ? (
+            <PersonaPrint persona={personaCompleta} indice={1} />
+          ) : (
+            <p className="py-8 text-center text-sm text-muted-foreground">Carregando detalhes…</p>
+          )}
         </DialogContent>
       </Dialog>
 
