@@ -1,6 +1,6 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { AdminShell } from "@/components/checklists/ChecklistsShell";
 import { Button } from "@/components/ui/button";
@@ -50,10 +50,22 @@ function PaginaAcompanhamento() {
   const [avaliador, setAvaliador] = useState(TODOS);
   const [setor, setSetor] = useState(TODOS);
   const [status, setStatus] = useState(TODOS);
+  const [pagina, setPagina] = useState(1);
+  const buscaAdiada = useDeferredValue(busca);
 
   const dados = useQuery({
-    queryKey: ["acompanhamento"],
-    queryFn: () => buscar(),
+    queryKey: ["acompanhamento", pagina, buscaAdiada, avaliador, setor, status],
+    queryFn: () =>
+      buscar({
+        data: {
+          pagina,
+          porPagina: 25,
+          busca: buscaAdiada,
+          avaliador: avaliador === TODOS ? undefined : avaliador,
+          setor: setor === TODOS ? undefined : setor,
+          status: status === TODOS ? undefined : (status as "rascunho" | "concluida"),
+        },
+      }),
     enabled: isAdmin,
   });
   const setores = useQuery({ queryKey: ["setores"], queryFn: listarSetores, enabled: isAdmin });
@@ -72,20 +84,11 @@ function PaginaAcompanhamento() {
     };
   }, [isAdmin, qc]);
 
-  const linhas = dados.data ?? [];
-  const avaliadores = useMemo(
-    () => [...new Set(linhas.map((l) => l.avaliador_nome))].sort(),
-    [linhas],
-  );
+  const linhas = dados.data?.itens ?? [];
+  const avaliadores = dados.data?.avaliadores ?? [];
+  const total = dados.data?.total ?? 0;
 
-  const filtradas = linhas.filter(
-    (l) =>
-      (avaliador === TODOS || l.avaliador_nome === avaliador) &&
-      (setor === TODOS || l.setor === setor) &&
-      (status === TODOS || l.status === status) &&
-      (!busca.trim() ||
-        `${l.colaborador_nome} ${l.checklist_nome}`.toLowerCase().includes(busca.toLowerCase())),
-  );
+  useEffect(() => setPagina(1), [buscaAdiada, avaliador, setor, status]);
 
   if (!isAdmin) {
     return (
@@ -162,7 +165,7 @@ function PaginaAcompanhamento() {
               </tr>
             </thead>
             <tbody>
-              {filtradas.map((l) => (
+               {linhas.map((l) => (
                 <tr key={l.id} className="border-b border-border/60 last:border-0">
                   <td className="p-3 font-medium text-heading">{l.checklist_nome}</td>
                   <td className="p-3">{l.colaborador_nome || "—"}</td>
@@ -211,13 +214,20 @@ function PaginaAcompanhamento() {
               ))}
             </tbody>
           </table>
-          {!dados.isLoading && !filtradas.length && (
+          {!dados.isLoading && !linhas.length && (
             <p className="p-6 text-center text-sm text-muted-foreground">
               Nenhuma avaliação encontrada com os filtros atuais.
             </p>
           )}
           {dados.isLoading && (
             <p className="p-6 text-center text-sm text-muted-foreground">Carregando…</p>
+          )}
+          {total > 25 && (
+            <div className="flex items-center justify-center gap-3 border-t p-3">
+              <Button variant="outline" size="sm" disabled={pagina === 1} onClick={() => setPagina((p) => p - 1)}>Anterior</Button>
+              <span className="text-xs text-muted-foreground">Página {pagina}</span>
+              <Button variant="outline" size="sm" disabled={pagina * 25 >= total} onClick={() => setPagina((p) => p + 1)}>Próxima</Button>
+            </div>
           )}
         </div>
       </div>

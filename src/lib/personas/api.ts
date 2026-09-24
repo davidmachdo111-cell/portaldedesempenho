@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { HistoricoItem, Persona, Simulacao } from "./constants";
 
@@ -38,6 +38,106 @@ function diffPersona(antes: Partial<Persona>, depois: Partial<Persona>) {
 }
 
 /* ------------------------------ personas ------------------------------ */
+
+export type PersonaResumo = Pick<
+  Persona,
+  | "id"
+  | "nome"
+  | "cidade"
+  | "tipo_cliente"
+  | "exercicio"
+  | "vertente"
+  | "complexidade"
+  | "objetivo"
+  | "status"
+  | "favorita"
+  | "created_at"
+  | "updated_at"
+>;
+
+const COLUNAS_RESUMO =
+  "id, nome, cidade, tipo_cliente, exercicio, vertente, complexidade, objetivo, status, favorita, created_at, updated_at";
+
+export type FiltrosPersonas = {
+  pagina: number;
+  porPagina?: number;
+  busca?: string | undefined;
+  exercicio?: string | undefined;
+  vertente?: string | undefined;
+  complexidade?: string | undefined;
+  status?: string | undefined;
+  cidade?: string | undefined;
+  tipoCliente?: string | undefined;
+};
+
+export function usePersonasPaginadas(filtros: FiltrosPersonas) {
+  return useQuery({
+    queryKey: ["personas", "lista", filtros],
+    placeholderData: keepPreviousData,
+    queryFn: async (): Promise<{ itens: PersonaResumo[]; total: number }> => {
+      const porPagina = filtros.porPagina ?? 24;
+      const inicio = (filtros.pagina - 1) * porPagina;
+      let consulta = supabase
+        .from("personas")
+        .select(COLUNAS_RESUMO, { count: "exact" })
+        .order("updated_at", { ascending: false })
+        .range(inicio, inicio + porPagina - 1);
+      if (filtros.exercicio) consulta = consulta.eq("exercicio", filtros.exercicio);
+      if (filtros.vertente) consulta = consulta.eq("vertente", filtros.vertente);
+      if (filtros.complexidade) consulta = consulta.eq("complexidade", filtros.complexidade);
+      if (filtros.status) consulta = consulta.eq("status", filtros.status);
+      if (filtros.cidade) consulta = consulta.ilike("cidade", `%${filtros.cidade}%`);
+      if (filtros.tipoCliente) consulta = consulta.ilike("tipo_cliente", `%${filtros.tipoCliente}%`);
+      if (filtros.busca) {
+        const termo = filtros.busca.replace(/[,%()]/g, " ").trim();
+        if (termo) consulta = consulta.or(`nome.ilike.%${termo}%,objetivo.ilike.%${termo}%`);
+      }
+      const { data, error, count } = await consulta;
+      if (error) throw error;
+      return { itens: (data ?? []) as PersonaResumo[], total: count ?? 0 };
+    },
+  });
+}
+
+export function usePersonasPorIds(ids: string[]) {
+  const chave = [...ids].sort();
+  return useQuery({
+    queryKey: ["personas", "ids", chave],
+    enabled: chave.length > 0,
+    queryFn: async (): Promise<Persona[]> => {
+      const { data, error } = await supabase.from("personas").select("*").in("id", chave);
+      if (error) throw error;
+      return (data ?? []) as unknown as Persona[];
+    },
+  });
+}
+
+export function useResumoPersonas() {
+  return useQuery({
+    queryKey: ["personas", "resumo-dashboard"],
+    queryFn: async (): Promise<PersonaResumo[]> => {
+      const { data, error } = await supabase
+        .from("personas")
+        .select(COLUNAS_RESUMO)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as PersonaResumo[];
+    },
+  });
+}
+
+export function useTotalSimulacoes() {
+  return useQuery({
+    queryKey: ["simulacoes", "total"],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("simulacoes")
+        .select("id", { count: "exact", head: true });
+      if (error) throw error;
+      return count ?? 0;
+    },
+  });
+}
 
 export function usePersonas() {
   return useQuery({
@@ -119,8 +219,14 @@ export function useAcoesPersona() {
   };
 
   const duplicar = useMutation({
-    mutationFn: async (persona: Persona) => {
+    mutationFn: async (persona: PersonaResumo) => {
       const { data: auth } = await supabase.auth.getUser();
+      const { data: original, error: erroOriginal } = await supabase
+        .from("personas")
+        .select("*")
+        .eq("id", persona.id)
+        .single();
+      if (erroOriginal) throw erroOriginal;
       const {
         id: _id,
         created_at: _c,
@@ -128,7 +234,7 @@ export function useAcoesPersona() {
         created_by: _cb,
         updated_by: _ub,
         ...resto
-      } = persona;
+      } = original as unknown as Persona;
       const { data, error } = await supabase
         .from("personas")
         .insert({
@@ -153,7 +259,7 @@ export function useAcoesPersona() {
   });
 
   const alternarStatus = useMutation({
-    mutationFn: async (persona: Persona) => {
+    mutationFn: async (persona: PersonaResumo) => {
       const novo = persona.status === "ativa" ? "arquivada" : "ativa";
       const { error } = await supabase.from("personas").update({ status: novo }).eq("id", persona.id);
       if (error) throw error;
@@ -168,7 +274,7 @@ export function useAcoesPersona() {
   });
 
   const alternarFavorita = useMutation({
-    mutationFn: async (persona: Persona) => {
+    mutationFn: async (persona: PersonaResumo) => {
       const { error } = await supabase
         .from("personas")
         .update({ favorita: !persona.favorita })
@@ -180,7 +286,7 @@ export function useAcoesPersona() {
   });
 
   const excluir = useMutation({
-    mutationFn: async (persona: Persona) => {
+    mutationFn: async (persona: PersonaResumo) => {
       await registrarHistorico({
         persona_id: null,
         persona_nome: persona.nome,
@@ -203,7 +309,7 @@ export function useHistorico(personaId?: string, limite = 30) {
     queryFn: async (): Promise<HistoricoItem[]> => {
       let q = supabase
         .from("persona_historico")
-        .select("*")
+        .select("id, persona_id, persona_nome, acao, detalhes, user_id, user_nome, created_at")
         .order("created_at", { ascending: false })
         .limit(limite);
       if (personaId) q = q.eq("persona_id", personaId);

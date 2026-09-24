@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { ClipboardCheck, Play, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { AdminShell } from "@/components/checklists/ChecklistsShell";
@@ -9,7 +10,7 @@ import {
   criarAvaliacao,
   excluirAvaliacao,
   listarChecklistsLiberados,
-  listarMinhasAvaliacoes,
+  listarMinhasAvaliacoesPaginadas,
 } from "@/lib/checklists/avaliacoes";
 import { formatarData } from "@/lib/checklists/checklists";
 
@@ -36,14 +37,15 @@ export const Route = createFileRoute("/_authenticated/checklists/avaliacoes/")({
 function PaginaMinhasAvaliacoes() {
   const qc = useQueryClient();
   const router = useRouter();
+  const [pagina, setPagina] = useState(1);
 
   const liberados = useQuery({
     queryKey: ["checklists-liberados"],
     queryFn: listarChecklistsLiberados,
   });
   const avaliacoes = useQuery({
-    queryKey: ["minhas-avaliacoes"],
-    queryFn: listarMinhasAvaliacoes,
+    queryKey: ["minhas-avaliacoes", pagina],
+    queryFn: () => listarMinhasAvaliacoesPaginadas(pagina),
   });
 
   const iniciar = useMutation({
@@ -66,6 +68,7 @@ function PaginaMinhasAvaliacoes() {
 
   const nomeChecklist = (id: string) =>
     (liberados.data ?? []).find((c) => c.id === id)?.nome ?? "Checklist";
+  const registros = avaliacoes.data?.itens ?? [];
 
   return (
     <AdminShell
@@ -105,11 +108,11 @@ function PaginaMinhasAvaliacoes() {
         <section className="surface overflow-hidden">
           <header className="border-b border-border px-5 py-4">
             <h2 className="text-base font-semibold">
-              Avaliações registradas ({avaliacoes.data?.length ?? 0})
+               Avaliações registradas ({avaliacoes.data?.total ?? 0})
             </h2>
           </header>
           <ul className="divide-y divide-border">
-            {(avaliacoes.data ?? []).map((a) => (
+            {registros.map((a) => (
               <li key={a.id} className="flex flex-wrap items-center gap-3 px-5 py-3">
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-heading">
@@ -139,12 +142,19 @@ function PaginaMinhasAvaliacoes() {
                 </button>
               </li>
             ))}
-            {!avaliacoes.isLoading && !(avaliacoes.data ?? []).length && (
+            {!avaliacoes.isLoading && !registros.length && (
               <li className="px-5 py-8 text-center text-sm text-muted-foreground">
                 Você ainda não iniciou nenhuma avaliação.
               </li>
             )}
           </ul>
+          {(avaliacoes.data?.total ?? 0) > 20 && (
+            <div className="flex items-center justify-center gap-3 border-t p-3">
+              <Button variant="outline" size="sm" disabled={pagina === 1} onClick={() => setPagina((p) => p - 1)}>Anterior</Button>
+              <span className="text-xs text-muted-foreground">Página {pagina}</span>
+              <Button variant="outline" size="sm" disabled={pagina * 20 >= (avaliacoes.data?.total ?? 0)} onClick={() => setPagina((p) => p + 1)}>Próxima</Button>
+            </div>
+          )}
         </section>
       </div>
     </AdminShell>

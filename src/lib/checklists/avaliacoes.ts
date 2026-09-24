@@ -95,15 +95,20 @@ const normalizar = (r: Record<string, unknown>): RegistroAvaliacao => ({
 });
 
 export async function listarMinhasAvaliacoes(): Promise<RegistroAvaliacao[]> {
+  return (await listarMinhasAvaliacoesPaginadas(1, 50)).itens;
+}
+
+export async function listarMinhasAvaliacoesPaginadas(pagina: number, porPagina = 20) {
   const id = await meuId();
-  const rows = check(
-    await supabase
-      .from("avaliacoes")
-      .select("id, checklist_id, avaliador_id, colaborador_nome, setor, tutor, data_inicio, data_avaliacao, status, media, created_at, updated_at")
-      .eq("avaliador_id", id)
-      .order("updated_at", { ascending: false }),
-  ) as Record<string, unknown>[];
-  return rows.map(normalizar);
+  const inicio = (pagina - 1) * porPagina;
+  const { data, error, count } = await supabase
+    .from("avaliacoes")
+    .select("id, checklist_id, avaliador_id, colaborador_nome, setor, tutor, data_inicio, data_avaliacao, status, media, created_at, updated_at", { count: "exact" })
+    .eq("avaliador_id", id)
+    .order("updated_at", { ascending: false })
+    .range(inicio, inicio + porPagina - 1);
+  if (error) throw new Error(error.message);
+  return { itens: ((data ?? []) as Record<string, unknown>[]).map(normalizar), total: count ?? 0 };
 }
 
 export async function listarTodasAvaliacoes(): Promise<RegistroAvaliacao[]> {
@@ -114,6 +119,28 @@ export async function listarTodasAvaliacoes(): Promise<RegistroAvaliacao[]> {
       .order("updated_at", { ascending: false }),
   ) as Record<string, unknown>[];
   return rows.map(normalizar);
+}
+
+export async function resumoAvaliacoes() {
+  const { data, error, count } = await supabase
+    .from("avaliacoes")
+    .select("id, colaborador_nome, setor, data_avaliacao, status, media, updated_at", {
+      count: "exact",
+    })
+    .order("updated_at", { ascending: false })
+    .limit(6);
+  if (error) throw new Error(error.message);
+  const recentes = data ?? [];
+  const concluidasRecentes = recentes.filter((row) => row.status === "concluida");
+  return {
+    total: count ?? 0,
+    concluidas: concluidasRecentes.length,
+    media: concluidasRecentes.length
+      ? concluidasRecentes.reduce((soma, row) => soma + Number(row.media ?? 0), 0) /
+        concluidasRecentes.length
+      : 0,
+    recentes,
+  };
 }
 
 export async function criarAvaliacao(checklist_id: string): Promise<RegistroAvaliacao> {

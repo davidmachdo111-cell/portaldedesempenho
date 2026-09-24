@@ -6,7 +6,7 @@ import { ClipboardCheck, ClipboardList, FolderTree, Plus, Users } from "lucide-r
 import { Button } from "@/components/ui/button";
 import { AdminShell } from "@/components/checklists/ChecklistsShell";
 import { listarChecklists } from "@/lib/checklists/checklists";
-import { listarTodasAvaliacoes } from "@/lib/checklists/avaliacoes";
+import { resumoAvaliacoes } from "@/lib/checklists/avaliacoes";
 import { listarAvaliadores } from "@/lib/checklists/avaliadores";
 import { classificacao } from "@/lib/checklists/avaliacao";
 import { formatarData } from "@/lib/checklists/checklists";
@@ -26,13 +26,11 @@ function Painel() {
     queryKey: ["avaliadores"],
     queryFn: listarAvaliadores,
   });
-  const avaliacoes = useQuery({ queryKey: ["avaliacoes-todas"], queryFn: listarTodasAvaliacoes });
+  const avaliacoes = useQuery({ queryKey: ["avaliacoes", "resumo"], queryFn: resumoAvaliacoes });
 
-  const lista = avaliacoes.data ?? [];
+  const lista = avaliacoes.data?.recentes ?? [];
   const concluidas = lista.filter((a) => a.status === "concluida");
-  const media = concluidas.length
-    ? concluidas.reduce((s, a) => s + Number(a.media), 0) / concluidas.length
-    : 0;
+  const media = avaliacoes.data?.media ?? 0;
 
   const cards = [
     {
@@ -49,7 +47,7 @@ function Painel() {
     },
     {
       label: "Avaliações realizadas",
-      valor: concluidas.length,
+      valor: avaliacoes.data?.total ?? 0,
       icon: ClipboardCheck,
       to: "/checklists/liberacoes" as const,
     },

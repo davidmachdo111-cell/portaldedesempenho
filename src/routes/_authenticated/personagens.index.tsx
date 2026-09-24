@@ -16,13 +16,12 @@ import {
 import { AppShell } from "@/components/personas/PersonasShell";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { useHistorico, usePersonas, useSimulacoes } from "@/lib/personas/api";
+import { useHistorico, useResumoPersonas, useTotalSimulacoes, type PersonaResumo } from "@/lib/personas/api";
 import {
   COMPLEXIDADES,
   EXERCICIOS,
   VERTENTES,
   formatarData,
-  type Persona,
 } from "@/lib/personas/constants";
 
 export const Route = createFileRoute("/_authenticated/personagens/")({
@@ -82,7 +81,11 @@ function Indicador({
   );
 }
 
-function contar(personas: Persona[], chave: keyof Persona, valores: readonly string[]) {
+function contar(
+  personas: PersonaResumo[],
+  chave: "exercicio" | "vertente" | "complexidade",
+  valores: readonly string[],
+) {
   return valores
     .map((v) => ({ nome: v, total: personas.filter((p) => p[chave] === v).length }))
     .filter((d) => d.total > 0);
@@ -90,9 +93,9 @@ function contar(personas: Persona[], chave: keyof Persona, valores: readonly str
 
 function Dashboard() {
   const { podeGerenciarPersonagens } = useAuth();
-  const { data: personas = [], isLoading } = usePersonas();
+  const { data: personas = [], isLoading } = useResumoPersonas();
   const { data: historico = [] } = useHistorico(undefined, 8);
-  const { data: simulacoes = [] } = useSimulacoes();
+  const { data: totalSimulacoes = 0 } = useTotalSimulacoes();
 
   const ativas = personas.filter((p) => p.status === "ativa");
   const arquivadas = personas.filter((p) => p.status === "arquivada");
@@ -142,7 +145,7 @@ function Dashboard() {
             />
             <Indicador
               titulo="Exercícios montados"
-              valor={simulacoes.length}
+              valor={totalSimulacoes}
               icone={ClipboardList}
               destaque="highlight"
             />
