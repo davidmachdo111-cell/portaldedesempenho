@@ -8,6 +8,13 @@
       "when": 1790248902432,
       "tag": "0000_optimize_portal_list_filters",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790614679689,
+      "tag": "0001_add_audit_and_observability",
+      "breakpoints": true
     }
   ]
 }

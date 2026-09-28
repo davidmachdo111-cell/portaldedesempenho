@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_telemetry: {
+        Row: {
+          created_at: string
+          details: Json
+          duration_ms: number | null
+          event_type: string
+          id: string
+          metric: string | null
+          route: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          details?: Json
+          duration_ms?: number | null
+          event_type: string
+          id?: string
+          metric?: string | null
+          route: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          details?: Json
+          duration_ms?: number | null
+          event_type?: string
+          id?: string
+          metric?: string | null
+          route?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       atribuicoes: {
         Row: {
           avaliador_id: string
@@ -42,6 +75,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      audit_events: {
+        Row: {
+          action: string
+          actor_id: string | null
+          actor_name: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          id: string
+          source: string
+          summary: Json
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          actor_name?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          source?: string
+          summary?: Json
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          actor_name?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          source?: string
+          summary?: Json
+        }
+        Relationships: []
       }
       avaliacoes: {
         Row: {
@@ -1196,6 +1265,18 @@ export type Database = {
       }
       pode_gerenciar_personas: { Args: { _user_id: string }; Returns: boolean }
       pode_ver_colaboradores: { Args: { _user_id: string }; Returns: boolean }
+      record_audit_event: {
+        Args: {
+          _action: string
+          _actor_id?: string
+          _actor_name?: string
+          _entity_id: string
+          _entity_type: string
+          _source?: string
+          _summary?: Json
+        }
+        Returns: string
+      }
       simulado_liberado: { Args: { _simulacao_id: string }; Returns: boolean }
       simulado_vinculado: { Args: { _simulacao_id: string }; Returns: boolean }
     }
