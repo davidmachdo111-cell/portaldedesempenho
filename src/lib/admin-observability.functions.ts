@@ -2,16 +2,14 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-async function assertAdmin(context: { supabase: { rpc: (name: string, args: Record<string, unknown>) => Promise<{ data: unknown }> }; userId: string }) {
-  const { data } = await context.supabase.rpc("is_admin", { _user_id: context.userId });
-  if (data !== true) throw new Error("Acesso restrito a administradores.");
-}
-
 export const getAuditEvents = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => z.object({ page: z.number().int().min(1).default(1), type: z.string().max(60).optional() }).parse(input))
   .handler(async ({ data, context }) => {
-    await assertAdmin(context);
+    const { data: allowed } = await context.supabase.rpc("is_admin", {
+      _user_id: context.userId,
+    });
+    if (allowed !== true) throw new Error("Acesso restrito a administradores.");
     const start = (data.page - 1) * 25;
     let query = context.supabase
       .from("audit_events")
@@ -27,7 +25,10 @@ export const getAuditEvents = createServerFn({ method: "GET" })
 export const getTelemetrySummary = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await assertAdmin(context);
+    const { data: allowed } = await context.supabase.rpc("is_admin", {
+      _user_id: context.userId,
+    });
+    if (allowed !== true) throw new Error("Acesso restrito a administradores.");
     const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const { data, error } = await context.supabase
       .from("app_telemetry")
