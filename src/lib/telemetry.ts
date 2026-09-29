@@ -9,16 +9,20 @@ export async function recordTelemetry(input: {
   durationMs?: number;
   details?: Record<string, string | number | boolean>;
 }) {
-  const { data } = await supabase.auth.getUser();
-  if (!data.user) return;
-  await supabase.from("app_telemetry").insert({
-    user_id: data.user.id,
-    event_type: input.eventType,
-    route: input.route.slice(0, 240),
-    metric: input.metric?.slice(0, 80) ?? null,
-    duration_ms: input.durationMs == null ? null : Math.max(0, Math.round(input.durationMs)),
-    details: (input.details ?? {}) as never,
-  });
+  try {
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) return;
+    await supabase.from("app_telemetry").insert({
+      user_id: data.user.id,
+      event_type: input.eventType,
+      route: input.route.slice(0, 240),
+      metric: input.metric?.slice(0, 80) ?? null,
+      duration_ms: input.durationMs == null ? null : Math.max(0, Math.round(input.durationMs)),
+      details: (input.details ?? {}) as never,
+    });
+  } catch {
+    // Telemetria nunca deve interromper a navegação principal.
+  }
 }
 
 export function observeNavigation(route: string) {

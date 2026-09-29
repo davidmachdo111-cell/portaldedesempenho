@@ -10,11 +10,13 @@ import {
   UserRound,
   FolderOpen,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { meQueryOptions } from "@/lib/platform-queries";
 import { Button } from "@/components/ui/button";
+import { GlobalSearch } from "@/components/platform/GlobalSearch";
+import { observeNavigation } from "@/lib/telemetry";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -61,6 +63,8 @@ export function PlatformShell({
     if (perfilIndisponivel) return item.permission === "colaboradores";
     return permissions.includes(item.permission);
   });
+
+  useEffect(() => observeNavigation(pathname), [pathname]);
 
   async function handleSignOut() {
     await queryClient.cancelQueries();
@@ -125,7 +129,9 @@ export function PlatformShell({
             <h1 className="text-lg font-semibold tracking-tight">{title}</h1>
             {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
           </div>
-          <div className="flex items-center gap-2 md:hidden">
+          <div className="flex items-center gap-2">
+            <GlobalSearch />
+            <div className="flex items-center gap-2 md:hidden">
             {visible.map((item) => (
               <Button key={item.to} variant="outline" size="sm" asChild>
                 <Link to={item.to}>
@@ -136,6 +142,7 @@ export function PlatformShell({
             <Button variant="outline" size="sm" onClick={handleSignOut}>
               <LogOut className="size-4" />
             </Button>
+            </div>
           </div>
         </header>
         <main className="flex-1 p-6">{children}</main>

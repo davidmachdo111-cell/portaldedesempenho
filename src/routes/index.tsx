@@ -16,6 +16,8 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "Portal único com acesso aos módulos Checklists e Personagens e Exercícios, com usuários, perfis e permissões centralizados.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Index,

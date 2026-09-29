@@ -1,9 +1,11 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { PlatformShell } from "@/components/platform/PlatformShell";
 import { UsersAdmin } from "@/components/platform/UsersAdmin";
+import { AdminObservability } from "@/components/platform/AdminObservability";
 import {
   modulesQueryOptions,
   permissionsQueryOptions,
@@ -36,6 +38,8 @@ export const Route = createFileRoute("/_authenticated/admin")({
         property: "og:description",
         content: "Usuários, perfis, permissões, sessões e módulos centralizados.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   beforeLoad: async () => {
@@ -51,23 +55,27 @@ export const Route = createFileRoute("/_authenticated/admin")({
 });
 
 function AdminPage() {
-  const { data: roles = [] } = useQuery(rolesQueryOptions);
-  const { data: permissions = [] } = useQuery(permissionsQueryOptions);
-  const { data: sessions = [] } = useQuery(sessionsQueryOptions);
-  const { data: modules = [] } = useQuery(modulesQueryOptions);
+  const [activeTab, setActiveTab] = useState("users");
+  const needsPermissions = activeTab === "roles" || activeTab === "permissions";
+  const { data: roles = [] } = useQuery({ ...rolesQueryOptions, enabled: activeTab === "roles" });
+  const { data: permissions = [] } = useQuery({ ...permissionsQueryOptions, enabled: needsPermissions });
+  const { data: sessions = [] } = useQuery({ ...sessionsQueryOptions, enabled: activeTab === "sessions" });
+  const { data: modules = [] } = useQuery({ ...modulesQueryOptions, enabled: activeTab === "modules" });
 
   return (
     <PlatformShell
       title="Administração Central"
       subtitle="Usuários, perfis, permissões, sessões e módulos"
     >
-      <Tabs defaultValue="users" className="space-y-6">
-        <TabsList>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className="h-auto flex-wrap justify-start">
           <TabsTrigger value="users">Usuários</TabsTrigger>
           <TabsTrigger value="roles">Perfis</TabsTrigger>
           <TabsTrigger value="permissions">Permissões</TabsTrigger>
           <TabsTrigger value="sessions">Sessões</TabsTrigger>
           <TabsTrigger value="modules">Módulos</TabsTrigger>
+          <TabsTrigger value="audit">Auditoria</TabsTrigger>
+          <TabsTrigger value="telemetry">Desempenho</TabsTrigger>
         </TabsList>
 
         <TabsContent value="users">
@@ -202,6 +210,14 @@ function AdminPage() {
               </Table>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="audit">
+          <AdminObservability mode="audit" />
+        </TabsContent>
+
+        <TabsContent value="telemetry">
+          <AdminObservability mode="telemetry" />
         </TabsContent>
       </Tabs>
     </PlatformShell>
