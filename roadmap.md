@@ -6,10 +6,10 @@
 - [x] Revisar índices e validar a compilação
 
 ## Integrações e validação final
-- [ ] Integrar a busca global no cabeçalho
-- [ ] Personalizar o Portal para Administrador, Avaliador e Auxiliar
-- [ ] Integrar auditoria e monitoramento na Administração
-- [ ] Corrigir acessibilidade e idioma das telas globais afetadas
+- [x] Integrar a busca global no cabeçalho
+- [x] Personalizar o Portal para Administrador, Avaliador e Auxiliar
+- [x] Integrar auditoria e monitoramento na Administração
+- [x] Corrigir acessibilidade e idioma das telas globais afetadas
 - [ ] Validar testes automatizados e compilação
 - [ ] Validar navegação e permissões dos três perfis
 - [ ] Registrar métricas finais das telas principais

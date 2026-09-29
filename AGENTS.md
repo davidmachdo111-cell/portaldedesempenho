@@ -8,3 +8,8 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+## Decisões de arquitetura
+
+- Busca global e telemetria de navegação vivem no `PlatformShell`, garantindo comportamento único em todas as telas autenticadas.
+- Resumos por perfil usam funções autenticadas no servidor e consultas agregadas, evitando carregar cadastros completos no Portal.
