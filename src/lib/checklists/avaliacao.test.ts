@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { criterioVinculado, criteriosOrdenados, mediaGeral, notaExercicio, totalMarcaveis, type Avaliacao } from "./avaliacao";
+import { classificacao, criterioVinculado, criteriosOrdenados, faixa, mediaGeral, notaExercicio, totalMarcaveis, type Avaliacao } from "./avaliacao";
 
 const avaliacao: Avaliacao = {
   id: "a", colaborador: "", tutor: "", setor: "", dataInicio: "", dataAvaliacao: "",
@@ -21,5 +21,20 @@ describe("matriz de avaliação", () => {
   });
   it("ordena critérios pela frequência", () => {
     expect(criteriosOrdenados(avaliacao).map((item) => item.id)).toEqual(["c1", "c2"]);
+  });
+  it("mantém compatibilidade histórica quando não há vínculos", () => {
+    const historica = { ...avaliacao, vinculos: [] };
+    expect(totalMarcaveis(historica)).toBe(4);
+    expect(notaExercicio(historica, "e1")).toBeCloseTo(5 / 6 * 100);
+  });
+  it("classifica corretamente os limites", () => {
+    expect(faixa(59)).toBe("baixa");
+    expect(faixa(60)).toBe("media");
+    expect(faixa(79)).toBe("media");
+    expect(faixa(80)).toBe("alta");
+    expect(classificacao(59)).toBe("Necessita desenvolvimento");
+    expect(classificacao(60)).toBe("Regular");
+    expect(classificacao(75)).toBe("Bom");
+    expect(classificacao(90)).toBe("Excelente");
   });
 });

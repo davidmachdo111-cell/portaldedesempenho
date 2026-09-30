@@ -34,6 +34,13 @@ import {
 } from "@/lib/personas/constants";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
+import {
+  carregarEstadoExercicio,
+  estadoInicialExercicio,
+  filtrarPersonasExercicio,
+  FILTRO_TODOS,
+  prepararSalvamentoExercicio,
+} from "@/lib/personas/exercicio";
 
 export const Route = createFileRoute("/_authenticated/personagens/exercicio")({
   head: () => ({
@@ -54,7 +61,7 @@ export const Route = createFileRoute("/_authenticated/personagens/exercicio")({
   component: MontarSimulacao,
 });
 
-const TODOS = "__todos__";
+const TODOS = FILTRO_TODOS;
 
 function MontarSimulacao() {
   const navigate = useNavigate();
@@ -78,14 +85,7 @@ function MontarSimulacao() {
 
   const filtradas = useMemo(
     () =>
-      personas.filter((p) => {
-        if (exercicio !== TODOS && p.exercicio !== exercicio) return false;
-        if (vertente !== TODOS && p.vertente !== vertente) return false;
-        if (complexidade !== TODOS && p.complexidade !== complexidade) return false;
-        if (status !== TODOS && p.status !== status) return false;
-        if (busca && !p.nome.toLowerCase().includes(busca.toLowerCase())) return false;
-        return true;
-      }),
+      filtrarPersonasExercicio(personas, { exercicio, vertente, complexidade, status, busca }),
     [personas, exercicio, vertente, complexidade, status, busca],
   );
 
@@ -101,7 +101,9 @@ function MontarSimulacao() {
     const alvo = Math.min(quantidadeSugerida, pool.length);
     while (escolhidas.length < alvo) {
       const idx = Math.floor(Math.random() * pool.length);
-      escolhidas.push(pool.splice(idx, 1)[0]!.id);
+      const sorteada = pool.splice(idx, 1)[0];
+      if (!sorteada) break;
+      escolhidas.push(sorteada.id);
     }
     setSelecionadas(escolhidas);
     toast.success(`${escolhidas.length} persona(s) sorteada(s).`);
@@ -124,16 +126,17 @@ function MontarSimulacao() {
   }
 
   function novoExercicio(silencioso = false) {
-    setSimulacaoId(undefined);
-    setNome("");
-    setResponsavel("");
-    setObservacoes("");
-    setExercicio(TODOS);
-    setVertente(TODOS);
-    setComplexidade(TODOS);
-    setStatus("ativa");
-    setBusca("");
-    setSelecionadas([]);
+    const inicial = estadoInicialExercicio();
+    setSimulacaoId(inicial.id);
+    setNome(inicial.nome);
+    setResponsavel(inicial.responsavel);
+    setObservacoes(inicial.observacoes);
+    setExercicio(inicial.exercicio);
+    setVertente(inicial.vertente);
+    setComplexidade(inicial.complexidade);
+    setStatus(inicial.status);
+    setBusca(inicial.busca);
+    setSelecionadas(inicial.personaIds);
     if (!silencioso) toast.success("Formulário limpo para um novo exercício.");
   }
 
@@ -142,15 +145,23 @@ function MontarSimulacao() {
       toast.error("Selecione ao menos uma persona.");
       return;
     }
-    const values = {
-      nome: nome || "Exercício sem título",
-      exercicio: exercicio === TODOS ? null : exercicio,
-      responsavel: responsavel || usuario,
-      observacoes,
-      persona_ids: selecionadas,
-    };
-    const editando = Boolean(simulacaoId);
-    await salvar.mutateAsync(editando ? { id: simulacaoId!, values } : { values });
+    const payload = prepararSalvamentoExercicio(
+      {
+        ...(simulacaoId ? { id: simulacaoId } : {}),
+        nome,
+        responsavel,
+        observacoes,
+        exercicio,
+        vertente,
+        complexidade,
+        status,
+        busca,
+        personaIds: selecionadas,
+      },
+      usuario,
+    );
+    const editando = Boolean(payload.id);
+    await salvar.mutateAsync(payload);
 
     toast.success(editando ? "Exercício atualizado." : "Exercício criado.");
     novoExercicio(true);
@@ -159,12 +170,17 @@ function MontarSimulacao() {
   function carregar(simId: string) {
     const s = simulacoes.find((x) => x.id === simId);
     if (!s) return;
-    setSimulacaoId(s.id);
-    setNome(s.nome);
-    setResponsavel(s.responsavel ?? "");
-    setObservacoes(s.observacoes ?? "");
-    setExercicio(s.exercicio ?? TODOS);
-    setSelecionadas(s.persona_ids ?? []);
+    const carregado = carregarEstadoExercicio(s);
+    setSimulacaoId(carregado.id);
+    setNome(carregado.nome);
+    setResponsavel(carregado.responsavel);
+    setObservacoes(carregado.observacoes);
+    setExercicio(carregado.exercicio);
+    setVertente(carregado.vertente);
+    setComplexidade(carregado.complexidade);
+    setStatus(carregado.status);
+    setBusca(carregado.busca);
+    setSelecionadas(carregado.personaIds);
     toast.success("Exercício carregado.");
   }
 

@@ -19,3 +19,10 @@
 - [x] Adiar conteúdos, históricos e visualizadores pesados até a solicitação
 - [x] Preservar dados em cache ao voltar para telas visitadas
 - [x] Medir o tempo até o conteúdo da rota estar pronto
+
+## Testes automatizados ampliados
+- [x] Cobrir criação versus edição e reset de exercícios
+- [x] Cobrir vínculos e conclusão de atividades
+- [x] Cobrir visualização e download autorizado de arquivos
+- [x] Cobrir fluxo e matriz de avaliação
+- [x] Executar a suíte completa: 28 testes aprovados em 8 arquivos
