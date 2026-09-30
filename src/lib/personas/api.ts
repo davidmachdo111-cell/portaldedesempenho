@@ -1,6 +1,7 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { HistoricoItem, Persona, Simulacao } from "./constants";
+import { planejarSincronizacaoPersonas } from "./exercicio";
 
 /* ------------------------------ helpers ------------------------------ */
 
@@ -427,18 +428,17 @@ async function sincronizarPersonasDoExercicio(simulacaoId: string, personaIds: s
     .eq("simulacao_id", simulacaoId);
   if (erroLeitura) throw erroLeitura;
 
-  const existentes = (atuais ?? []) as { id: string; persona_id: string }[];
-  const remover = existentes.filter((v) => !personaIds.includes(v.persona_id)).map((v) => v.id);
-  const inserir = personaIds
-    .filter((id) => !existentes.some((v) => v.persona_id === id))
-    .map((id) => ({
-      simulacao_id: simulacaoId,
-      persona_id: id,
-      ordem: personaIds.indexOf(id),
-    }));
+  const plano = planejarSincronizacaoPersonas(
+    (atuais ?? []) as { id: string; persona_id: string }[],
+    personaIds,
+  );
+  const inserir = plano.inserir.map((vinculo) => ({ simulacao_id: simulacaoId, ...vinculo }));
 
-  if (remover.length) {
-    const { error } = await supabase.from("simulacao_personas").delete().in("id", remover);
+  if (plano.removerIds.length) {
+    const { error } = await supabase
+      .from("simulacao_personas")
+      .delete()
+      .in("id", plano.removerIds);
     if (error) throw error;
   }
   if (inserir.length) {
@@ -447,7 +447,7 @@ async function sincronizarPersonasDoExercicio(simulacaoId: string, personaIds: s
   }
   // Mantém a ordem escolhida também nos vínculos que já existiam.
   await Promise.all(
-    personaIds.map((personaId, ordem) =>
+    plano.ordenar.map(({ personaId, ordem }) =>
       supabase
         .from("simulacao_personas")
         .update({ ordem })

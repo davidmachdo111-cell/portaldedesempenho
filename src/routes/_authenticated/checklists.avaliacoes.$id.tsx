@@ -25,6 +25,11 @@ import {
   salvarAvaliacao,
   type RegistroAvaliacao,
 } from "@/lib/checklists/avaliacoes";
+import {
+  alternarMarcacaoAvaliacao,
+  registroComStatus,
+  validarConclusaoAvaliacao,
+} from "@/lib/checklists/fluxo-avaliacao";
 
 export const Route = createFileRoute("/_authenticated/checklists/avaliacoes/$id")({
   component: PaginaPreenchimento,
@@ -123,27 +128,20 @@ function PaginaPreenchimento() {
 
   const alternarMarcacao = (exId: string, critId: string) => {
     if (bloqueado) return;
-    const chave = `${exId}:${critId}`;
-    const marcados = { ...registro.marcados };
-    if (marcados[chave]) delete marcados[chave];
-    else marcados[chave] = true;
-    atualizar({ marcados });
+    atualizar({ marcados: alternarMarcacaoAvaliacao(registro.marcados, exId, critId) });
   };
 
   const definirObservacao = (exId: string, obs: Observacao) =>
     atualizar({ observacoes: { ...registro.observacoes, [exId]: obs } });
 
   const concluir = async () => {
-    if (!registro.colaborador_nome.trim()) {
-      toast.error("Informe o nome do colaborador avaliado.");
-      return;
-    }
-    if (!registro.setor.trim()) {
-      toast.error("Selecione o setor.");
+    const erro = validarConclusaoAvaliacao(registro);
+    if (erro) {
+      toast.error(erro);
       return;
     }
     if (timer.current) clearTimeout(timer.current);
-    const novo = { ...registro, status: "concluida" as const };
+    const novo = registroComStatus(registro, "concluida");
     setRegistro(novo);
     await persistir(novo);
     toast.success("Avaliação concluída.");
@@ -151,7 +149,7 @@ function PaginaPreenchimento() {
 
   const reabrir = async () => {
     if (timer.current) clearTimeout(timer.current);
-    const novo = { ...registro, status: "rascunho" as const };
+    const novo = registroComStatus(registro, "rascunho");
     setRegistro(novo);
     setModoEdicaoAdmin(true);
     await persistir(novo);

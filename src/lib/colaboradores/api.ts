@@ -1,4 +1,9 @@
 import { supabase } from "@/integrations/supabase/client";
+import {
+  calcularProgresso,
+  dadosAndamentoAtividade,
+  deveCriarAtividadeExercicio,
+} from "./regras";
 
 /**
  * Cadastro central de colaboradores.
@@ -340,14 +345,7 @@ export async function iniciarAvaliacaoPendente(
 /* ---------- métricas ---------- */
 
 export function progresso(atividades: AtividadeColaborador[]) {
-  const total = atividades.length;
-  const concluidas = atividades.filter((a) => a.status === "concluida").length;
-  return {
-    total,
-    concluidas,
-    pendentes: total - concluidas,
-    percentual: total ? Math.round((concluidas / total) * 100) : 0,
-  };
+  return calcularProgresso(atividades);
 }
 
 export const formatarData = (iso: string | null | undefined) =>
@@ -619,15 +617,9 @@ export async function registrarAndamentoAtividade(
   status: StatusAtividade,
 ) {
   const a = await autor();
-  const concluida = status === "concluida";
   const { error } = await supabase
     .from("colaborador_atividades")
-    .update({
-      status,
-      concluida_em: concluida ? new Date().toISOString() : null,
-      concluido_por: concluida ? a.id : null,
-      concluido_por_nome: concluida ? a.nome : null,
-    })
+    .update(dadosAndamentoAtividade(status, a))
     .eq("id", atividade.id);
   if (error) throw new Error(error.message);
   await registrar(atividade.colaborador_id, `atividade_${status}`, {
@@ -800,8 +792,7 @@ export async function vincularExercicio(colaboradorId: string, exercicio: Exerci
   if (error && error.code !== "23505") throw new Error(error.message);
 
   const atuais = await listarAtividades(colaboradorId);
-  const jaTem = atuais.some((x) => x.tipo === "simulado" && x.ref_id === exercicio.id);
-  if (!jaTem) {
+  if (deveCriarAtividadeExercicio(atuais, exercicio.id)) {
     await liberarAtividades(colaboradorId, [
       { tipo: "simulado", ref_id: exercicio.id, titulo: exercicio.nome, detalhe: exercicio.detalhe },
     ]);

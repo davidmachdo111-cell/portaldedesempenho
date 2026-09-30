@@ -83,9 +83,9 @@ export function planejarSincronizacaoPersonas(
     removerIds: existentes.filter((v) => !personaIds.includes(v.persona_id)).map((v) => v.id),
     inserir: personaIds
       .filter((id) => !existentes.some((v) => v.persona_id === id))
-      .map((personaId, _index, ids) => ({
+      .map((personaId) => ({
         persona_id: personaId,
-        ordem: personaIds.indexOf(ids[_index] ?? personaId),
+        ordem: personaIds.indexOf(personaId),
       })),
     ordenar: personaIds.map((personaId, ordem) => ({ personaId, ordem })),
   };
