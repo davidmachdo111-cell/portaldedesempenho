@@ -1,4 +1,5 @@
-import type { AtividadeColaborador, StatusAtividade } from "./api";
+type StatusAtividade = "pendente" | "em_andamento" | "concluida";
+type AtividadeMinima = { status: StatusAtividade; tipo?: string; ref_id?: string | null };
 
 export function dadosAndamentoAtividade(
   status: StatusAtividade,
@@ -14,7 +15,7 @@ export function dadosAndamentoAtividade(
   };
 }
 
-export function calcularProgresso(atividades: Pick<AtividadeColaborador, "status">[]) {
+export function calcularProgresso(atividades: AtividadeMinima[]) {
   const total = atividades.length;
   const concluidas = atividades.filter((atividade) => atividade.status === "concluida").length;
   return {
@@ -26,7 +27,7 @@ export function calcularProgresso(atividades: Pick<AtividadeColaborador, "status
 }
 
 export function deveCriarAtividadeExercicio(
-  atividades: Pick<AtividadeColaborador, "tipo" | "ref_id">[],
+  atividades: Required<Pick<AtividadeMinima, "tipo" | "ref_id">>[],
   exercicioId: string,
 ) {
   return !atividades.some(
