@@ -1,7 +1,7 @@
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import {
   ArrowDown,
   ArrowUp,
@@ -16,7 +16,6 @@ import {
 import { toast } from "sonner";
 
 import { PlatformShell } from "@/components/platform/PlatformShell";
-import { ConteudosVinculados } from "@/components/colaboradores/ConteudosVinculados";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +23,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { LoadingList, LoadingPage } from "@/components/platform/LoadingState";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
@@ -62,6 +62,10 @@ import {
   type ItemCatalogo,
   type TipoAtividade,
 } from "@/lib/colaboradores/api";
+
+const ConteudosVinculados = lazy(() =>
+  import("@/components/colaboradores/ConteudosVinculados").then((module) => ({ default: module.ConteudosVinculados })),
+);
 
 export const Route = createFileRoute("/_authenticated/colaboradores/$id")({
   // Apenas o administrador ou o avaliador/auxiliar vinculado abre o painel do colaborador.
@@ -203,7 +207,7 @@ function PainelColaborador() {
       subtitle="Painel individual de treinamentos e atividades"
     >
       {!dados ? (
-        <p className="text-sm text-muted-foreground">Carregando…</p>
+        <LoadingPage />
       ) : (
         <div className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -315,7 +319,11 @@ function PainelColaborador() {
             </TabsContent>
 
             <TabsContent value="conteudos" className="mt-4">
-              <ConteudosVinculados colaboradorId={id} />
+              {aba === "conteudos" && (
+                <Suspense fallback={<LoadingList rows={4} />}>
+                  <ConteudosVinculados colaboradorId={id} />
+                </Suspense>
+              )}
             </TabsContent>
 
             <TabsContent value="dados" className="mt-4">
@@ -397,6 +405,7 @@ function PainelColaborador() {
             </TabsContent>
 
             <TabsContent value="avaliacoes" className="mt-4">
+              {avaliacoes.isLoading ? <LoadingList rows={4} /> : (
               <div className="overflow-hidden rounded-xl border bg-card">
                 <ul className="divide-y">
                   {(avaliacoes.data ?? []).map((a) => (
@@ -421,9 +430,11 @@ function PainelColaborador() {
                   )}
                 </ul>
               </div>
+              )}
             </TabsContent>
 
             <TabsContent value="historico" className="mt-4">
+              {historico.isLoading ? <LoadingList rows={5} /> : (
               <div className="overflow-hidden rounded-xl border bg-card">
                 <ul className="divide-y">
                   {(historico.data ?? []).map((h) => (
@@ -442,6 +453,7 @@ function PainelColaborador() {
                   )}
                 </ul>
               </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>

@@ -13,3 +13,9 @@
 - [x] Validar testes automatizados e compilação
 - [x] Validar navegação e permissões dos três perfis
 - [x] Registrar métricas finais das telas principais
+
+## Desempenho percebido
+- [x] Padronizar skeletons nas telas principais
+- [x] Adiar conteúdos, históricos e visualizadores pesados até a solicitação
+- [x] Preservar dados em cache ao voltar para telas visitadas
+- [x] Medir o tempo até o conteúdo da rota estar pronto

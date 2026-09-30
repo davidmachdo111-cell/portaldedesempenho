@@ -16,7 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { meQueryOptions } from "@/lib/platform-queries";
 import { Button } from "@/components/ui/button";
 import { GlobalSearch } from "@/components/platform/GlobalSearch";
-import { observeNavigation } from "@/lib/telemetry";
+import { installNavigationTiming, observeNavigation } from "@/lib/telemetry";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -64,6 +64,7 @@ export function PlatformShell({
     return permissions.includes(item.permission);
   });
 
+  useEffect(() => installNavigationTiming(), []);
   useEffect(() => observeNavigation(pathname), [pathname]);
 
   async function handleSignOut() {

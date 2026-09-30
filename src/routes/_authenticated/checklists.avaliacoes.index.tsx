@@ -13,6 +13,7 @@ import {
   listarMinhasAvaliacoesPaginadas,
 } from "@/lib/checklists/avaliacoes";
 import { formatarData } from "@/lib/checklists/checklists";
+import { LoadingList } from "@/components/platform/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/checklists/avaliacoes/")({
   head: () => ({
@@ -80,7 +81,7 @@ function PaginaMinhasAvaliacoes() {
           <header className="border-b border-border px-5 py-4">
             <h2 className="text-base font-semibold">Checklists liberados</h2>
           </header>
-          <ul className="divide-y divide-border">
+          {liberados.isLoading ? <LoadingList rows={4} /> : <ul className="divide-y divide-border">
             {(liberados.data ?? []).map((c) => (
               <li key={c.id} className="flex flex-wrap items-center gap-3 px-5 py-4">
                 <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-secondary text-brand-support">
@@ -102,7 +103,7 @@ function PaginaMinhasAvaliacoes() {
                 Nenhum checklist liberado para você ainda.
               </li>
             )}
-          </ul>
+          </ul>}
         </section>
 
         <section className="surface overflow-hidden">
@@ -111,7 +112,7 @@ function PaginaMinhasAvaliacoes() {
                Avaliações registradas ({avaliacoes.data?.total ?? 0})
             </h2>
           </header>
-          <ul className="divide-y divide-border">
+          {avaliacoes.isLoading ? <LoadingList rows={5} /> : <ul className="divide-y divide-border">
             {registros.map((a) => (
               <li key={a.id} className="flex flex-wrap items-center gap-3 px-5 py-3">
                 <div className="min-w-0 flex-1">
@@ -147,7 +148,7 @@ function PaginaMinhasAvaliacoes() {
                 Você ainda não iniciou nenhuma avaliação.
               </li>
             )}
-          </ul>
+          </ul>}
           {(avaliacoes.data?.total ?? 0) > 20 && (
             <div className="flex items-center justify-center gap-3 border-t p-3">
               <Button variant="outline" size="sm" disabled={pagina === 1} onClick={() => setPagina((p) => p - 1)}>Anterior</Button>

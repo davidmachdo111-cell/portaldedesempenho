@@ -3,13 +3,15 @@ import { createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 
 export const getRouter = () => {
-  // Cache padrão mais longo evita refetches duplicados ao navegar entre módulos.
+  // Mantém telas visitadas prontas ao voltar; mutações invalidam apenas os dados alterados.
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 60_000,
-        gcTime: 10 * 60_000,
+        staleTime: 5 * 60_000,
+        gcTime: 30 * 60_000,
         refetchOnWindowFocus: false,
+        refetchOnMount: false,
+        refetchOnReconnect: false,
         retry: 1,
       },
     },
