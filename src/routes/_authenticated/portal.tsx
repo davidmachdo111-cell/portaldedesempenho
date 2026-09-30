@@ -127,6 +127,12 @@ function PortalPage() {
           {allowed.map((module) => {
             const Icon =
               (Icons as unknown as Record<string, typeof LayoutGrid>)[module.icon] ?? LayoutGrid;
+            const moduleName = module.key === "personagens_simulados"
+              ? "Personagens e Exercícios"
+              : module.name;
+            const moduleDescription = module.key === "personagens_simulados"
+              ? "Personas, exercícios e materiais vinculados para treinamento."
+              : module.description;
             return (
               <Card
                 key={module.id}
@@ -136,8 +142,8 @@ function PortalPage() {
                   <div className="mb-3 flex size-12 items-center justify-center rounded-xl bg-brand-gradient text-brand-foreground">
                     <Icon className="size-6" />
                   </div>
-                  <CardTitle>{module.name}</CardTitle>
-                  <CardDescription>{module.description}</CardDescription>
+                  <CardTitle>{moduleName}</CardTitle>
+                  <CardDescription>{moduleDescription}</CardDescription>
                 </CardHeader>
                 <CardContent className="mt-auto">
                   <Button asChild className="w-full">

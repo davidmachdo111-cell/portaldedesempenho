@@ -10,6 +10,6 @@
 - [x] Personalizar o Portal para Administrador, Avaliador e Auxiliar
 - [x] Integrar auditoria e monitoramento na Administração
 - [x] Corrigir acessibilidade e idioma das telas globais afetadas
-- [ ] Validar testes automatizados e compilação
-- [ ] Validar navegação e permissões dos três perfis
-- [ ] Registrar métricas finais das telas principais
+- [x] Validar testes automatizados e compilação
+- [x] Validar navegação e permissões dos três perfis
+- [x] Registrar métricas finais das telas principais
