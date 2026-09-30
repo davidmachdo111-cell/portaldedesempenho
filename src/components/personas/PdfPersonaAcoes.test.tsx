@@ -2,8 +2,10 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AcoesPdfPersona, VisualizadorPdf } from "./PdfPersonaAcoes";
 
-const baixarAnexo = vi.fn();
-const urlAnexo = vi.fn();
+const { baixarAnexo, urlAnexo } = vi.hoisted(() => ({
+  baixarAnexo: vi.fn(),
+  urlAnexo: vi.fn(),
+}));
 
 vi.mock("@/lib/personas/anexos", () => ({ baixarAnexo, urlAnexo }));
 vi.mock("sonner", () => ({ toast: { error: vi.fn(), success: vi.fn() } }));

@@ -15,3 +15,4 @@
 - Resumos por perfil usam funções autenticadas no servidor e consultas agregadas, evitando carregar cadastros completos no Portal.
 - Queries permanecem frescas por cinco minutos e em memória por trinta; mutações invalidam somente famílias de dados alteradas.
 - Tempos de rota medem do início da navegação interna até o conteúdo pintado e são registrados sem bloquear a interface.
+- Regras críticas de exercícios, vínculos, conclusão e avaliação ficam em funções puras reutilizadas pela interface, permitindo testes determinísticos sem acessar dados reais.

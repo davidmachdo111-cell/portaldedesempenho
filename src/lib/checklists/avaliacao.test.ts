@@ -28,11 +28,13 @@ describe("matriz de avaliação", () => {
     expect(notaExercicio(historica, "e1")).toBeCloseTo(5 / 6 * 100);
   });
   it("classifica corretamente os limites", () => {
-    expect(faixa(59)).toBe("critico");
-    expect(faixa(60)).toBe("atencao");
-    expect(faixa(75)).toBe("bom");
-    expect(faixa(90)).toBe("excelente");
-    expect(classificacao(80)).toBe("Aprovado");
-    expect(classificacao(79)).toBe("Reprovado");
+    expect(faixa(59)).toBe("baixa");
+    expect(faixa(60)).toBe("media");
+    expect(faixa(79)).toBe("media");
+    expect(faixa(80)).toBe("alta");
+    expect(classificacao(59)).toBe("Necessita desenvolvimento");
+    expect(classificacao(60)).toBe("Regular");
+    expect(classificacao(75)).toBe("Bom");
+    expect(classificacao(90)).toBe("Excelente");
   });
 });
