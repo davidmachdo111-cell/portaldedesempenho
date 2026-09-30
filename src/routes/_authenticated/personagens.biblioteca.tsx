@@ -51,6 +51,8 @@ import { PersonaPrint } from "@/components/personas/PersonaPrint";
 import { AcoesPdfPersona } from "@/components/personas/PdfPersonaAcoes";
 import { usePdfsDePersonas } from "@/lib/personas/pdf";
 import { cn } from "@/lib/utils";
+import { LoadingList } from "@/components/platform/LoadingState";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/_authenticated/personagens/biblioteca")({
   head: () => ({
@@ -247,7 +249,7 @@ function Biblioteca() {
       </div>
 
       {isLoading ? (
-        <p className="text-muted-foreground">Carregando personas…</p>
+        <LoadingList rows={6} />
       ) : personas.length === 0 ? (
         <div className="surface-card p-12 text-center">
           <p className="font-medium">Nenhuma persona encontrada</p>
@@ -480,7 +482,11 @@ function Biblioteca() {
           {personaCompleta ? (
             <PersonaPrint persona={personaCompleta} indice={1} />
           ) : (
-            <p className="py-8 text-center text-sm text-muted-foreground">Carregando detalhes…</p>
+            <div className="space-y-4 py-4" aria-busy="true" aria-label="Carregando detalhes">
+              <Skeleton className="h-7 w-2/5" />
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-40 w-full" />
+            </div>
           )}
         </DialogContent>
       </Dialog>

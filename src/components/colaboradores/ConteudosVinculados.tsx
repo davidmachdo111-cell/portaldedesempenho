@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { LoadingList } from "@/components/platform/LoadingState";
 import {
   baixarAnexo,
   formatarTamanho,
@@ -135,7 +136,7 @@ export function ConteudosVinculados({ colaboradorId }: { colaboradorId: string }
   }
 
   if (conteudos.isLoading) {
-    return <p className="text-sm text-muted-foreground">Carregando conteúdos…</p>;
+    return <LoadingList rows={4} />;
   }
 
   if (!itens.length) {

@@ -16,6 +16,8 @@ import {
 import { AppShell } from "@/components/personas/PersonasShell";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { LoadingCards } from "@/components/platform/LoadingState";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useHistorico, useResumoPersonas, useTotalSimulacoes, type PersonaResumo } from "@/lib/personas/api";
 import {
   COMPLEXIDADES,
@@ -131,7 +133,13 @@ function Dashboard() {
       }
     >
       {isLoading ? (
-        <p className="text-muted-foreground">Carregando indicadores…</p>
+        <div className="space-y-6">
+          <LoadingCards />
+          <div className="grid gap-4 lg:grid-cols-3">
+            <Skeleton className="h-80 lg:col-span-2" />
+            <Skeleton className="h-80" />
+          </div>
+        </div>
       ) : (
         <div className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

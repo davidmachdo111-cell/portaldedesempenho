@@ -13,3 +13,5 @@
 
 - Busca global e telemetria de navegação vivem no `PlatformShell`, garantindo comportamento único em todas as telas autenticadas.
 - Resumos por perfil usam funções autenticadas no servidor e consultas agregadas, evitando carregar cadastros completos no Portal.
+- Queries permanecem frescas por cinco minutos e em memória por trinta; mutações invalidam somente famílias de dados alteradas.
+- Tempos de rota medem do início da navegação interna até o conteúdo pintado e são registrados sem bloquear a interface.

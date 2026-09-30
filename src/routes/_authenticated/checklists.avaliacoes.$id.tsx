@@ -9,6 +9,7 @@ import { CabecalhoAvaliacao } from "@/components/checklists/avaliacao/CabecalhoA
 import { MatrizPreenchimento } from "@/components/checklists/avaliacao/MatrizPreenchimento";
 import { PainelObservacoes } from "@/components/checklists/avaliacao/PainelObservacoes";
 import { PainelResultados } from "@/components/checklists/avaliacao/PainelResultados";
+import { LoadingPage } from "@/components/platform/LoadingState";
 import {
   mediaGeral,
   totalMarcaveis,
@@ -97,7 +98,7 @@ function PaginaPreenchimento() {
   if (dados.isLoading || !registro || !avaliacao) {
     return (
       <AdminShell titulo="Preenchimento" descricao="Carregando avaliação…">
-        <div className="surface p-8 text-center text-sm text-muted-foreground">Carregando…</div>
+        <LoadingPage />
       </AdminShell>
     );
   }

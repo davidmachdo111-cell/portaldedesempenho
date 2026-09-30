@@ -10,6 +10,7 @@ import { resumoAvaliacoes } from "@/lib/checklists/avaliacoes";
 import { listarAvaliadores } from "@/lib/checklists/avaliadores";
 import { classificacao } from "@/lib/checklists/avaliacao";
 import { formatarData } from "@/lib/checklists/checklists";
+import { LoadingCards, LoadingList } from "@/components/platform/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/checklists/")({
   component: Painel,
@@ -71,7 +72,9 @@ function Painel() {
         </Button>
       }
     >
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {checklists.isLoading || avaliadores.isLoading || avaliacoes.isLoading ? (
+        <LoadingCards />
+      ) : <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {cards.map((c) => (
           <Link key={c.label} to={c.to} className="surface p-5 transition hover:shadow-lg">
             <div className="flex items-center justify-between">
@@ -83,14 +86,14 @@ function Painel() {
             <p className="mt-3 text-3xl font-semibold text-heading">{c.valor}</p>
           </Link>
         ))}
-      </div>
+      </div>}
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <section className="surface overflow-hidden">
           <header className="border-b border-border px-5 py-4">
             <h2 className="text-base font-semibold">Checklists recentes</h2>
           </header>
-          <ul className="divide-y divide-border">
+          {checklists.isLoading ? <LoadingList rows={5} /> : <ul className="divide-y divide-border">
             {(checklists.data ?? []).slice(0, 5).map((c) => (
               <li key={c.id}>
                 <Link
@@ -119,7 +122,7 @@ function Painel() {
                 Nenhum checklist criado ainda.
               </li>
             )}
-          </ul>
+          </ul>}
         </section>
 
         <section className="surface overflow-hidden">
@@ -131,7 +134,7 @@ function Painel() {
               </span>
             )}
           </header>
-          <ul className="divide-y divide-border">
+          {avaliacoes.isLoading ? <LoadingList rows={5} /> : <ul className="divide-y divide-border">
             {lista.slice(0, 6).map((a) => (
               <li key={a.id} className="flex items-center justify-between gap-3 px-5 py-3">
                 <div className="min-w-0">
@@ -154,7 +157,7 @@ function Painel() {
                 Nenhuma avaliação registrada ainda.
               </li>
             )}
-          </ul>
+          </ul>}
         </section>
       </div>
     </AdminShell>
