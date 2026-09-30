@@ -101,7 +101,9 @@ function MontarSimulacao() {
     const alvo = Math.min(quantidadeSugerida, pool.length);
     while (escolhidas.length < alvo) {
       const idx = Math.floor(Math.random() * pool.length);
-      escolhidas.push(pool.splice(idx, 1)[0]!.id);
+      const sorteada = pool.splice(idx, 1)[0];
+      if (!sorteada) break;
+      escolhidas.push(sorteada.id);
     }
     setSelecionadas(escolhidas);
     toast.success(`${escolhidas.length} persona(s) sorteada(s).`);
