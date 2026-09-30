@@ -25,4 +25,4 @@
 - [x] Cobrir vínculos e conclusão de atividades
 - [x] Cobrir visualização e download autorizado de arquivos
 - [x] Cobrir fluxo e matriz de avaliação
-- [ ] Executar a suíte completa e registrar o total final
+- [x] Executar a suíte completa: 28 testes aprovados em 8 arquivos
