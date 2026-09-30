@@ -44,6 +44,7 @@ import {
   useVinculosDaPagina,
 } from "@/components/colaboradores/VinculosResponsaveis";
 import { DialogExerciciosColaborador } from "@/components/colaboradores/ExerciciosVinculados";
+import { LoadingList } from "@/components/platform/LoadingState";
 
 
 export const Route = createFileRoute("/_authenticated/colaboradores/")({
@@ -198,7 +199,7 @@ function PaginaColaboradores() {
             <span>Vínculos</span>
             <span />
           </div>
-          <ul className="divide-y">
+          {colaboradores.isLoading ? <LoadingList rows={6} /> : <ul className="divide-y">
             {lista.map((c) => {
               const m = metricas(c.id);
               const meus = vinculos.data?.[c.id] ?? [];
@@ -292,7 +293,7 @@ function PaginaColaboradores() {
                 Nenhum colaborador encontrado.
               </li>
             )}
-          </ul>
+          </ul>}
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3">
