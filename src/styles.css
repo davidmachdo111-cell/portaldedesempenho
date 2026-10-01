@@ -212,6 +212,10 @@
 }
 
 /* ---------- Impressão A4 (módulo Personagens e Exercícios) ---------- */
+.impressao-exercicio {
+  display: none;
+}
+
 @media print {
   @page {
     size: A4;
@@ -225,6 +229,22 @@
 
   .no-print {
     display: none !important;
+  }
+
+  body.imprimindo-exercicio * {
+    visibility: hidden !important;
+  }
+
+  body.imprimindo-exercicio .impressao-exercicio,
+  body.imprimindo-exercicio .impressao-exercicio * {
+    visibility: visible !important;
+  }
+
+  body.imprimindo-exercicio .impressao-exercicio {
+    display: block !important;
+    position: absolute;
+    inset: 0;
+    width: 100%;
   }
 
   .print-page {

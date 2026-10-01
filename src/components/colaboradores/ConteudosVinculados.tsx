@@ -16,6 +16,7 @@ import {
 import { AcoesPdfPersona, VisualizadorPdf } from "@/components/personas/PdfPersonaAcoes";
 import { pdfDosAnexos } from "@/lib/personas/pdf";
 import { VisualizarExercicio } from "@/components/colaboradores/ExercicioVisualizacao";
+import { ImpressaoExercicio } from "@/components/colaboradores/ImpressaoExercicio";
 import {
   LABEL_STATUS_ATIVIDADE,
   listarConteudosVinculados,
@@ -127,9 +128,7 @@ export function ConteudosVinculados({ colaboradorId }: { colaboradorId: string }
   });
 
   const [visualizando, setVisualizando] = useState<string | null>(null);
-  const [impressao, setImpressao] = useState<{ exercicioId: string; tentativa: number } | null>(
-    null,
-  );
+  const [impressao, setImpressao] = useState<string | null>(null);
   const itens = conteudos.data ?? [];
   const emFoco = itens.find((i) => i.atividadeId === visualizando) ?? null;
 
@@ -175,12 +174,7 @@ export function ConteudosVinculados({ colaboradorId }: { colaboradorId: string }
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() =>
-                    setImpressao((atual) => ({
-                      exercicioId: item.refId,
-                      tentativa: (atual?.tentativa ?? 0) + 1,
-                    }))
-                  }
+                  onClick={() => setImpressao(item.refId)}
                 >
                   <Printer className="size-4" /> Imprimir exercício
                 </Button>
@@ -246,11 +240,9 @@ export function ConteudosVinculados({ colaboradorId }: { colaboradorId: string }
         </Card>
       ))}
       {impressao && (
-        <iframe
-          key={`${impressao.exercicioId}-${impressao.tentativa}`}
-          title="Impressão do exercício"
-          src={`/meus-conteudos/exercicio/${encodeURIComponent(impressao.exercicioId)}`}
-          className="hidden"
+        <ImpressaoExercicio
+          exercicioId={impressao}
+          onFinalizar={() => setImpressao(null)}
         />
       )}
     </div>
