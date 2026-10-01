@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
 import { CheckCircle2, Clock, Download, Eye, FileText, Paperclip, Printer } from "lucide-react";
 import { toast } from "sonner";
 
@@ -128,6 +127,9 @@ export function ConteudosVinculados({ colaboradorId }: { colaboradorId: string }
   });
 
   const [visualizando, setVisualizando] = useState<string | null>(null);
+  const [impressao, setImpressao] = useState<{ exercicioId: string; tentativa: number } | null>(
+    null,
+  );
   const itens = conteudos.data ?? [];
   const emFoco = itens.find((i) => i.atividadeId === visualizando) ?? null;
 
@@ -170,10 +172,17 @@ export function ConteudosVinculados({ colaboradorId }: { colaboradorId: string }
                 </Button>
               )}
               {item.tipo === "simulado" ? (
-                <Button asChild variant="outline" size="sm">
-                  <Link to="/meus-conteudos/exercicio/$id" params={{ id: item.refId }}>
-                    <Printer className="size-4" /> Roteiro do exercício
-                  </Link>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    setImpressao((atual) => ({
+                      exercicioId: item.refId,
+                      tentativa: (atual?.tentativa ?? 0) + 1,
+                    }))
+                  }
+                >
+                  <Printer className="size-4" /> Imprimir exercício
                 </Button>
               ) : (
                 <AcoesPdfPersona nome={item.titulo} pdf={pdfDosAnexos(item.anexos)} />
@@ -236,6 +245,14 @@ export function ConteudosVinculados({ colaboradorId }: { colaboradorId: string }
           </CardContent>
         </Card>
       ))}
+      {impressao && (
+        <iframe
+          key={`${impressao.exercicioId}-${impressao.tentativa}`}
+          title="Impressão do exercício"
+          src={`/meus-conteudos/exercicio/${encodeURIComponent(impressao.exercicioId)}`}
+          className="hidden"
+        />
+      )}
     </div>
   );
 }
