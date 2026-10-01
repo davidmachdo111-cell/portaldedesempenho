@@ -15,6 +15,13 @@
       "when": 1790614679689,
       "tag": "0001_add_audit_and_observability",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790858182779,
+      "tag": "0002_tighten_selected_rls_policies",
+      "breakpoints": true
     }
   ]
 }
