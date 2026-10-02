@@ -1,6 +1,6 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import {
   DndContext,
   KeyboardSensor,
@@ -680,84 +680,97 @@ function EditorChecklist() {
               <div>
                 <h2 className="text-base font-semibold">Exercícios</h2>
                 <p className="text-xs text-muted-foreground">
-                  Expanda um exercício para escolher quais critérios pertencem a ele.
+                  Vincule critérios pela matriz ou edite um exercício por vez.
                 </p>
               </div>
               <Button variant="outline" size="sm" onClick={addExercicio}>
                 <Plus className="h-4 w-4" /> Exercício
               </Button>
             </header>
-            <div className="p-5">
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={(e) => patch({ exercicios: reordenar(exercicios, e) })}
-              >
-                <SortableContext
-                  items={exercicios.map((x) => x.id)}
-                  strategy={verticalListSortingStrategy}
+            <Tabs defaultValue="matriz" className="p-5">
+              <TabsList aria-label="Modo de vínculo dos critérios">
+                <TabsTrigger value="matriz" className="gap-2">
+                  <Table2 className="size-4" /> Matriz
+                </TabsTrigger>
+                <TabsTrigger value="exercicio" className="gap-2">
+                  <ListChecks className="size-4" /> Por exercício
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="matriz" className="mt-4">
+                <MatrizVinculos
+                  exercicios={exercicios}
+                  secoes={secoes}
+                  criterios={criterios}
+                  vinculos={vinculos}
+                  onChange={(novosVinculos) => patch({ vinculos: novosVinculos })}
+                />
+              </TabsContent>
+              <TabsContent value="exercicio" className="mt-4">
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={(e) => patch({ exercicios: reordenar(exercicios, e) })}
                 >
-                  <div className="space-y-2">
-                    {exercicios.map((x) => (
-                      <ItemExercicio
-                        key={x.id}
-                        exercicio={x}
-                        secoes={secoes}
-                        criterios={criterios}
-                        vinculados={vinculadosPorExercicio.get(x.id) ?? new Set<string>()}
-                        aberto={expandidos.includes(x.id)}
-                        onAlternarAberto={() =>
-                          setExpandidos((atual) =>
-                            atual.includes(x.id)
-                              ? atual.filter((i) => i !== x.id)
-                              : [...atual, x.id],
-                          )
-                        }
-                        onRenomear={(nome) =>
-                          patch({
-                            exercicios: exercicios.map((y) => (y.id === x.id ? { ...y, nome } : y)),
-                          })
-                        }
-                        onRemover={() =>
-                          patch({
-                            exercicios: exercicios.filter((y) => y.id !== x.id),
-                            vinculos: vinculos.filter((v) => v.exercicio_id !== x.id),
-                          })
-                        }
-                        onAlternarCriterio={(criterioId, marcado) =>
-                          patch({
-                            vinculos: marcado
-                              ? [...vinculos, { exercicio_id: x.id, criterio_id: criterioId }]
-                              : vinculos.filter(
-                                  (v) =>
-                                    !(v.exercicio_id === x.id && v.criterio_id === criterioId),
-                                ),
-                          })
-                        }
-                        onMarcarTodos={(marcar) =>
-                          patch({
-                            vinculos: marcar
-                              ? [
-                                  ...vinculos.filter((v) => v.exercicio_id !== x.id),
-                                  ...criterios.map((c) => ({
-                                    exercicio_id: x.id,
-                                    criterio_id: c.id,
-                                  })),
-                                ]
-                              : vinculos.filter((v) => v.exercicio_id !== x.id),
-                          })
-                        }
-                      />
-                    ))}
-                  </div>
-                </SortableContext>
-              </DndContext>
-              {!exercicios.length && (
-                <p className="py-6 text-center text-sm text-muted-foreground">
-                  Nenhum exercício cadastrado.
-                </p>
-              )}
-            </div>
+                  <SortableContext
+                    items={exercicios.map((x) => x.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="space-y-2">
+                      {exercicios.map((x) => (
+                        <ItemExercicio
+                          key={x.id}
+                          exercicio={x}
+                          secoes={secoes}
+                          criterios={criterios}
+                          vinculados={vinculadosPorExercicio.get(x.id) ?? new Set<string>()}
+                          aberto={expandidos.includes(x.id)}
+                          onAlternarAberto={() =>
+                            setExpandidos((atual) =>
+                              atual.includes(x.id)
+                                ? atual.filter((i) => i !== x.id)
+                                : [...atual, x.id],
+                            )
+                          }
+                          onRenomear={(nome) =>
+                            patch({ exercicios: exercicios.map((y) => (y.id === x.id ? { ...y, nome } : y)) })
+                          }
+                          onRemover={() =>
+                            patch({
+                              exercicios: exercicios.filter((y) => y.id !== x.id),
+                              vinculos: vinculos.filter((v) => v.exercicio_id !== x.id),
+                            })
+                          }
+                          onAlternarCriterio={(criterioId, marcado) =>
+                            patch({
+                              vinculos: marcado
+                                ? [...vinculos, { exercicio_id: x.id, criterio_id: criterioId }]
+                                : vinculos.filter(
+                                    (v) => !(v.exercicio_id === x.id && v.criterio_id === criterioId),
+                                  ),
+                            })
+                          }
+                          onMarcarTodos={(marcar) =>
+                            patch({
+                              vinculos: marcar
+                                ? [
+                                    ...vinculos.filter((v) => v.exercicio_id !== x.id),
+                                    ...criterios.map((c) => ({ exercicio_id: x.id, criterio_id: c.id })),
+                                  ]
+                                : vinculos.filter((v) => v.exercicio_id !== x.id),
+                            })
+                          }
+                        />
+                      ))}
+                    </div>
+                  </SortableContext>
+                </DndContext>
+                {!exercicios.length && (
+                  <p className="py-6 text-center text-sm text-muted-foreground">
+                    Nenhum exercício cadastrado.
+                  </p>
+                )}
+              </TabsContent>
+            </Tabs>
           </section>
         </div>
 
