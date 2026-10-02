@@ -26,3 +26,9 @@
 - [x] Cobrir visualização e download autorizado de arquivos
 - [x] Cobrir fluxo e matriz de avaliação
 - [x] Executar a suíte completa: 28 testes aprovados em 8 arquivos
+
+## Matriz de vínculos do Checklist Mestre
+- [x] Exibir critérios por seção e exercícios por coluna
+- [x] Permitir vínculos individuais e seleções em massa
+- [x] Manter o editor por exercício e o salvamento existente
+- [ ] Validar testes, compilação e interação no navegador

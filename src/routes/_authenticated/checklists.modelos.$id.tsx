@@ -1,6 +1,6 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import {
   DndContext,
   KeyboardSensor,
@@ -18,7 +18,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { ArrowLeft, ChevronDown, GripVertical, Plus, Save, Trash2 } from "lucide-react";
+import { ArrowLeft, ChevronDown, GripVertical, ListChecks, Plus, Save, Search, Table2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -208,6 +209,180 @@ function ItemExercicio({
               </div>
             ))}
         </div>
+      )}
+    </div>
+  );
+}
+
+function MatrizVinculos({
+  exercicios,
+  secoes,
+  criterios,
+  vinculos,
+  onChange,
+}: {
+  exercicios: Exercicio[];
+  secoes: Secao[];
+  criterios: Criterio[];
+  vinculos: EstruturaChecklist["vinculos"];
+  onChange: (vinculos: EstruturaChecklist["vinculos"]) => void;
+}) {
+  const [busca, setBusca] = useState("");
+  const termo = busca.trim().toLocaleLowerCase("pt-BR");
+  const criterioVisivel = (criterio: Criterio) =>
+    !termo || criterio.nome.toLocaleLowerCase("pt-BR").includes(termo);
+  const temVinculo = (exercicioId: string, criterioId: string) =>
+    vinculos.some((v) => v.exercicio_id === exercicioId && v.criterio_id === criterioId);
+  const alterarGrupo = (exercicioId: string, criterioIds: string[], marcar: boolean) => {
+    const ids = new Set(criterioIds);
+    const restantes = vinculos.filter(
+      (v) => v.exercicio_id !== exercicioId || !ids.has(v.criterio_id),
+    );
+    onChange(
+      marcar
+        ? [
+            ...restantes,
+            ...criterioIds.map((criterioId) => ({ exercicio_id: exercicioId, criterio_id: criterioId })),
+          ]
+        : restantes,
+    );
+  };
+  const alterarCriterioEmTodos = (criterioId: string, marcar: boolean) => {
+    const restantes = vinculos.filter((v) => v.criterio_id !== criterioId);
+    onChange(
+      marcar
+        ? [
+            ...restantes,
+            ...exercicios.map((exercicio) => ({
+              exercicio_id: exercicio.id,
+              criterio_id: criterioId,
+            })),
+          ]
+        : restantes,
+    );
+  };
+  const grupos = secoes
+    .map((secao) => ({ secao, itens: criterios.filter((c) => c.secao_id === secao.id && criterioVisivel(c)) }))
+    .concat([
+      {
+        secao: { id: "__sem", checklist_id: "", nome: "Sem seção", ordem: 999 } as Secao,
+        itens: criterios.filter(
+          (c) => (!c.secao_id || !secoes.some((s) => s.id === c.secao_id)) && criterioVisivel(c),
+        ),
+      },
+    ])
+    .filter((grupo) => grupo.itens.length > 0);
+
+  if (!exercicios.length || !criterios.length) {
+    return (
+      <p className="py-8 text-center text-sm text-muted-foreground">
+        Cadastre ao menos um exercício e um critério para usar a matriz.
+      </p>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="relative max-w-md">
+        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+          placeholder="Buscar critério"
+          className="pl-9"
+        />
+      </div>
+      <div className="overflow-auto rounded-lg border border-border">
+        <table className="w-full min-w-max border-collapse text-sm">
+          <thead>
+            <tr className="bg-muted/70">
+              <th className="sticky left-0 z-20 min-w-64 border-b border-r border-border bg-muted px-3 py-3 text-left font-semibold">
+                Seção / critério
+              </th>
+              <th className="w-20 border-b border-r border-border px-2 py-3 text-center text-xs font-semibold">
+                Todos
+              </th>
+              {exercicios.map((exercicio) => {
+                const marcados = criterios.filter((c) => temVinculo(exercicio.id, c.id));
+                const peso = marcados.reduce((total, c) => total + c.peso, 0);
+                return (
+                  <th key={exercicio.id} className="w-36 max-w-44 border-b border-r border-border px-3 py-3 text-center align-top last:border-r-0">
+                    <span className="block max-w-40 whitespace-normal font-semibold">{exercicio.nome}</span>
+                    <span className="mt-1 block text-xs font-normal text-muted-foreground">
+                      {marcados.length} critérios · {peso} pts
+                    </span>
+                    <Checkbox
+                      className="mt-2"
+                      aria-label={`Selecionar todos os critérios para ${exercicio.nome}`}
+                      checked={marcados.length === criterios.length ? true : marcados.length ? "indeterminate" : false}
+                      onCheckedChange={(valor) =>
+                        alterarGrupo(exercicio.id, criterios.map((c) => c.id), valor === true)
+                      }
+                    />
+                  </th>
+                );
+              })}
+            </tr>
+          </thead>
+          <tbody>
+            {grupos.map(({ secao, itens }) => (
+              <Fragment key={secao.id}>
+                <tr className="bg-secondary/65">
+                  <td className="sticky left-0 z-10 border-b border-r border-border bg-secondary px-3 py-2 font-semibold text-heading">
+                    {secao.nome}
+                  </td>
+                  <td className="border-b border-r border-border px-2 py-2 text-center text-xs text-muted-foreground">
+                    {itens.length}
+                  </td>
+                  {exercicios.map((exercicio) => {
+                    const quantidade = itens.filter((c) => temVinculo(exercicio.id, c.id)).length;
+                    return (
+                      <td key={exercicio.id} className="border-b border-r border-border px-3 py-2 text-center last:border-r-0">
+                        <Checkbox
+                          aria-label={`Vincular seção ${secao.nome} a ${exercicio.nome}`}
+                          checked={quantidade === itens.length ? true : quantidade ? "indeterminate" : false}
+                          onCheckedChange={(valor) =>
+                            alterarGrupo(exercicio.id, itens.map((c) => c.id), valor === true)
+                          }
+                        />
+                      </td>
+                    );
+                  })}
+                </tr>
+                {itens.map((criterio) => {
+                  const quantidade = exercicios.filter((e) => temVinculo(e.id, criterio.id)).length;
+                  return (
+                    <tr key={criterio.id} className={quantidade ? "bg-card" : "bg-warning/5"}>
+                      <td className="sticky left-0 z-10 border-b border-r border-border bg-inherit px-3 py-2.5">
+                        <span className="block font-medium">{criterio.nome}</span>
+                        <span className="text-xs text-muted-foreground">Peso {criterio.peso} · usado em {quantidade}</span>
+                      </td>
+                      <td className="border-b border-r border-border px-2 py-2 text-center">
+                        <Checkbox
+                          aria-label={`Vincular ${criterio.nome} a todos os exercícios`}
+                          checked={quantidade === exercicios.length ? true : quantidade ? "indeterminate" : false}
+                          onCheckedChange={(valor) => alterarCriterioEmTodos(criterio.id, valor === true)}
+                        />
+                      </td>
+                      {exercicios.map((exercicio) => (
+                        <td key={exercicio.id} className="border-b border-r border-border px-3 py-2 text-center last:border-r-0">
+                          <Checkbox
+                            aria-label={`Vincular ${criterio.nome} a ${exercicio.nome}`}
+                            checked={temVinculo(exercicio.id, criterio.id)}
+                            onCheckedChange={(valor) => alterarGrupo(exercicio.id, [criterio.id], valor === true)}
+                          />
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })}
+              </Fragment>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {!grupos.length && (
+        <p className="py-5 text-center text-sm text-muted-foreground">Nenhum critério encontrado.</p>
       )}
     </div>
   );
@@ -505,84 +680,97 @@ function EditorChecklist() {
               <div>
                 <h2 className="text-base font-semibold">Exercícios</h2>
                 <p className="text-xs text-muted-foreground">
-                  Expanda um exercício para escolher quais critérios pertencem a ele.
+                  Vincule critérios pela matriz ou edite um exercício por vez.
                 </p>
               </div>
               <Button variant="outline" size="sm" onClick={addExercicio}>
                 <Plus className="h-4 w-4" /> Exercício
               </Button>
             </header>
-            <div className="p-5">
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={(e) => patch({ exercicios: reordenar(exercicios, e) })}
-              >
-                <SortableContext
-                  items={exercicios.map((x) => x.id)}
-                  strategy={verticalListSortingStrategy}
+            <Tabs defaultValue="matriz" className="p-5">
+              <TabsList aria-label="Modo de vínculo dos critérios">
+                <TabsTrigger value="matriz" className="gap-2">
+                  <Table2 className="size-4" /> Matriz
+                </TabsTrigger>
+                <TabsTrigger value="exercicio" className="gap-2">
+                  <ListChecks className="size-4" /> Por exercício
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="matriz" className="mt-4">
+                <MatrizVinculos
+                  exercicios={exercicios}
+                  secoes={secoes}
+                  criterios={criterios}
+                  vinculos={vinculos}
+                  onChange={(novosVinculos) => patch({ vinculos: novosVinculos })}
+                />
+              </TabsContent>
+              <TabsContent value="exercicio" className="mt-4">
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={(e) => patch({ exercicios: reordenar(exercicios, e) })}
                 >
-                  <div className="space-y-2">
-                    {exercicios.map((x) => (
-                      <ItemExercicio
-                        key={x.id}
-                        exercicio={x}
-                        secoes={secoes}
-                        criterios={criterios}
-                        vinculados={vinculadosPorExercicio.get(x.id) ?? new Set<string>()}
-                        aberto={expandidos.includes(x.id)}
-                        onAlternarAberto={() =>
-                          setExpandidos((atual) =>
-                            atual.includes(x.id)
-                              ? atual.filter((i) => i !== x.id)
-                              : [...atual, x.id],
-                          )
-                        }
-                        onRenomear={(nome) =>
-                          patch({
-                            exercicios: exercicios.map((y) => (y.id === x.id ? { ...y, nome } : y)),
-                          })
-                        }
-                        onRemover={() =>
-                          patch({
-                            exercicios: exercicios.filter((y) => y.id !== x.id),
-                            vinculos: vinculos.filter((v) => v.exercicio_id !== x.id),
-                          })
-                        }
-                        onAlternarCriterio={(criterioId, marcado) =>
-                          patch({
-                            vinculos: marcado
-                              ? [...vinculos, { exercicio_id: x.id, criterio_id: criterioId }]
-                              : vinculos.filter(
-                                  (v) =>
-                                    !(v.exercicio_id === x.id && v.criterio_id === criterioId),
-                                ),
-                          })
-                        }
-                        onMarcarTodos={(marcar) =>
-                          patch({
-                            vinculos: marcar
-                              ? [
-                                  ...vinculos.filter((v) => v.exercicio_id !== x.id),
-                                  ...criterios.map((c) => ({
-                                    exercicio_id: x.id,
-                                    criterio_id: c.id,
-                                  })),
-                                ]
-                              : vinculos.filter((v) => v.exercicio_id !== x.id),
-                          })
-                        }
-                      />
-                    ))}
-                  </div>
-                </SortableContext>
-              </DndContext>
-              {!exercicios.length && (
-                <p className="py-6 text-center text-sm text-muted-foreground">
-                  Nenhum exercício cadastrado.
-                </p>
-              )}
-            </div>
+                  <SortableContext
+                    items={exercicios.map((x) => x.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="space-y-2">
+                      {exercicios.map((x) => (
+                        <ItemExercicio
+                          key={x.id}
+                          exercicio={x}
+                          secoes={secoes}
+                          criterios={criterios}
+                          vinculados={vinculadosPorExercicio.get(x.id) ?? new Set<string>()}
+                          aberto={expandidos.includes(x.id)}
+                          onAlternarAberto={() =>
+                            setExpandidos((atual) =>
+                              atual.includes(x.id)
+                                ? atual.filter((i) => i !== x.id)
+                                : [...atual, x.id],
+                            )
+                          }
+                          onRenomear={(nome) =>
+                            patch({ exercicios: exercicios.map((y) => (y.id === x.id ? { ...y, nome } : y)) })
+                          }
+                          onRemover={() =>
+                            patch({
+                              exercicios: exercicios.filter((y) => y.id !== x.id),
+                              vinculos: vinculos.filter((v) => v.exercicio_id !== x.id),
+                            })
+                          }
+                          onAlternarCriterio={(criterioId, marcado) =>
+                            patch({
+                              vinculos: marcado
+                                ? [...vinculos, { exercicio_id: x.id, criterio_id: criterioId }]
+                                : vinculos.filter(
+                                    (v) => !(v.exercicio_id === x.id && v.criterio_id === criterioId),
+                                  ),
+                            })
+                          }
+                          onMarcarTodos={(marcar) =>
+                            patch({
+                              vinculos: marcar
+                                ? [
+                                    ...vinculos.filter((v) => v.exercicio_id !== x.id),
+                                    ...criterios.map((c) => ({ exercicio_id: x.id, criterio_id: c.id })),
+                                  ]
+                                : vinculos.filter((v) => v.exercicio_id !== x.id),
+                            })
+                          }
+                        />
+                      ))}
+                    </div>
+                  </SortableContext>
+                </DndContext>
+                {!exercicios.length && (
+                  <p className="py-6 text-center text-sm text-muted-foreground">
+                    Nenhum exercício cadastrado.
+                  </p>
+                )}
+              </TabsContent>
+            </Tabs>
           </section>
         </div>
 
