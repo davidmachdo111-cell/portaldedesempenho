@@ -31,4 +31,4 @@
 - [x] Exibir critérios por seção e exercícios por coluna
 - [x] Permitir vínculos individuais e seleções em massa
 - [x] Manter o editor por exercício e o salvamento existente
-- [ ] Validar testes, compilação e interação no navegador
+- [x] Validar testes, compilação e interação no navegador
