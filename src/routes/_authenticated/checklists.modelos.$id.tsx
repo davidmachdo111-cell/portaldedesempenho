@@ -1,6 +1,6 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import {
   DndContext,
   KeyboardSensor,
@@ -229,49 +229,66 @@ function MatrizVinculos({
 }) {
   const [busca, setBusca] = useState("");
   const termo = busca.trim().toLocaleLowerCase("pt-BR");
-  const criterioVisivel = (criterio: Criterio) =>
-    !termo || criterio.nome.toLocaleLowerCase("pt-BR").includes(termo);
+  const { vinculosPorExercicio, totaisPorExercicio } = useMemo(() => {
+    const criterioPorId = new Map(criterios.map((criterio) => [criterio.id, criterio]));
+    const indice = new Map(exercicios.map((exercicio) => [exercicio.id, new Set<string>()]));
+
+    for (const vinculo of vinculos) {
+      if (criterioPorId.has(vinculo.criterio_id)) {
+        indice.get(vinculo.exercicio_id)?.add(vinculo.criterio_id);
+      }
+    }
+
+    const totais = new Map(
+      exercicios.map((exercicio) => {
+        const ids = indice.get(exercicio.id) ?? new Set<string>();
+        const peso = [...ids].reduce(
+          (total, criterioId) => total + (criterioPorId.get(criterioId)?.peso ?? 0),
+          0,
+        );
+        return [exercicio.id, { quantidade: ids.size, peso }] as const;
+      }),
+    );
+
+    return { vinculosPorExercicio: indice, totaisPorExercicio: totais };
+  }, [criterios, exercicios, vinculos]);
+
+  const secoesPorId = useMemo(() => new Set(secoes.map((secao) => secao.id)), [secoes]);
+  const grupos = useMemo(() => {
+    const visiveis = criterios.filter(
+      (criterio) => !termo || criterio.nome.toLocaleLowerCase("pt-BR").includes(termo),
+    );
+    return secoes
+      .map((secao) => ({ secao, itens: visiveis.filter((criterio) => criterio.secao_id === secao.id) }))
+      .concat([
+        {
+          secao: { id: "__sem", checklist_id: "", nome: "Sem seção", ordem: 999 } as Secao,
+          itens: visiveis.filter((criterio) => !criterio.secao_id || !secoesPorId.has(criterio.secao_id)),
+        },
+      ])
+      .filter((grupo) => grupo.itens.length > 0);
+  }, [criterios, secoes, secoesPorId, termo]);
+
   const temVinculo = (exercicioId: string, criterioId: string) =>
-    vinculos.some((v) => v.exercicio_id === exercicioId && v.criterio_id === criterioId);
-  const alterarGrupo = (exercicioId: string, criterioIds: string[], marcar: boolean) => {
-    const ids = new Set(criterioIds);
-    const restantes = vinculos.filter(
-      (v) => v.exercicio_id !== exercicioId || !ids.has(v.criterio_id),
+    vinculosPorExercicio.get(exercicioId)?.has(criterioId) ?? false;
+
+  const alterarPares = (
+    pares: Array<{ exercicio_id: string; criterio_id: string }>,
+    marcar: boolean,
+  ) => {
+    const porChave = new Map(
+      vinculos.map((vinculo) => [`${vinculo.exercicio_id}:${vinculo.criterio_id}`, vinculo]),
     );
-    onChange(
-      marcar
-        ? [
-            ...restantes,
-            ...criterioIds.map((criterioId) => ({ exercicio_id: exercicioId, criterio_id: criterioId })),
-          ]
-        : restantes,
-    );
+    for (const par of pares) {
+      const chave = `${par.exercicio_id}:${par.criterio_id}`;
+      if (marcar) porChave.set(chave, par);
+      else porChave.delete(chave);
+    }
+    onChange([...porChave.values()]);
   };
-  const alterarCriterioEmTodos = (criterioId: string, marcar: boolean) => {
-    const restantes = vinculos.filter((v) => v.criterio_id !== criterioId);
-    onChange(
-      marcar
-        ? [
-            ...restantes,
-            ...exercicios.map((exercicio) => ({
-              exercicio_id: exercicio.id,
-              criterio_id: criterioId,
-            })),
-          ]
-        : restantes,
-    );
-  };
-  const grupos = secoes
-    .map((secao) => ({ secao, itens: criterios.filter((c) => c.secao_id === secao.id && criterioVisivel(c)) }))
-    .concat([
-      {
-        secao: { id: "__sem", checklist_id: "", nome: "Sem seção", ordem: 999 } as Secao,
-        itens: criterios.filter(
-          (c) => (!c.secao_id || !secoes.some((s) => s.id === c.secao_id)) && criterioVisivel(c),
-        ),
-      },
-    ])
-    .filter((grupo) => grupo.itens.length > 0);
+
+  const estadoSelecao = (selecionados: number, total: number) =>
+    selecionados === total && total > 0 ? true : selecionados > 0 ? "indeterminate" : false;
 
   if (!exercicios.length || !criterios.length) {
     return (
@@ -283,40 +300,56 @@ function MatrizVinculos({
 
   return (
     <div className="space-y-4">
-      <div className="relative max-w-md">
-        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          value={busca}
-          onChange={(e) => setBusca(e.target.value)}
-          placeholder="Buscar critério"
-          className="pl-9"
-        />
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
+        <div className="min-w-0">
+          <h3 className="text-sm font-semibold text-heading">Matriz de critérios</h3>
+          <div className="relative mt-2 max-w-md">
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+              placeholder="Buscar critério"
+              aria-label="Buscar critério"
+              className="pl-9"
+            />
+          </div>
+        </div>
+        <p className="shrink-0 pb-2 text-xs text-muted-foreground">
+          {criterios.length} critérios · {exercicios.length} exercícios
+        </p>
       </div>
-      <div className="overflow-auto rounded-lg border border-border">
-        <table className="w-full min-w-max border-collapse text-sm">
-          <thead>
-            <tr className="bg-muted/70">
-              <th className="sticky left-0 z-20 min-w-64 border-b border-r border-border bg-muted px-3 py-3 text-left font-semibold">
+      <div className="max-h-[min(68vh,46rem)] max-w-full overflow-auto rounded-lg border border-border [scrollbar-gutter:stable]">
+        <table className="w-max min-w-full table-fixed border-separate border-spacing-0 text-sm">
+          <colgroup>
+            <col className="w-56" />
+            <col className="w-20" />
+            {exercicios.map((exercicio) => <col key={exercicio.id} className="w-30" />)}
+          </colgroup>
+          <thead className="relative z-30">
+            <tr>
+              <th scope="col" className="sticky left-0 top-0 z-50 w-56 border-b border-r border-border bg-muted px-3 py-3 text-left font-semibold">
                 Seção / critério
               </th>
-              <th className="w-20 border-b border-r border-border px-2 py-3 text-center text-xs font-semibold">
+              <th scope="col" className="sticky left-56 top-0 z-50 w-20 border-b border-r border-border bg-muted px-2 py-3 text-center text-xs font-semibold shadow-[3px_0_5px_-4px_var(--border)]">
                 Todos
               </th>
               {exercicios.map((exercicio) => {
-                const marcados = criterios.filter((c) => temVinculo(exercicio.id, c.id));
-                const peso = marcados.reduce((total, c) => total + c.peso, 0);
+                const total = totaisPorExercicio.get(exercicio.id) ?? { quantidade: 0, peso: 0 };
                 return (
-                  <th key={exercicio.id} className="w-36 max-w-44 border-b border-r border-border px-3 py-3 text-center align-top last:border-r-0">
-                    <span className="block max-w-40 whitespace-normal font-semibold">{exercicio.nome}</span>
+                  <th key={exercicio.id} scope="col" className="sticky top-0 z-40 w-30 border-b border-r border-border bg-muted px-2 py-3 text-center align-top last:border-r-0">
+                    <span className="line-clamp-3 block min-h-10 whitespace-normal font-semibold leading-5" title={exercicio.nome}>{exercicio.nome}</span>
                     <span className="mt-1 block text-xs font-normal text-muted-foreground">
-                      {marcados.length} critérios · {peso} pts
+                      {total.quantidade} critérios · {total.peso} pts
                     </span>
                     <Checkbox
                       className="mt-2"
                       aria-label={`Selecionar todos os critérios para ${exercicio.nome}`}
-                      checked={marcados.length === criterios.length ? true : marcados.length ? "indeterminate" : false}
+                      checked={estadoSelecao(total.quantidade, criterios.length)}
                       onCheckedChange={(valor) =>
-                        alterarGrupo(exercicio.id, criterios.map((c) => c.id), valor === true)
+                        alterarPares(
+                          criterios.map((criterio) => ({ exercicio_id: exercicio.id, criterio_id: criterio.id })),
+                          valor === true,
+                        )
                       }
                     />
                   </th>
@@ -327,22 +360,43 @@ function MatrizVinculos({
           <tbody>
             {grupos.map(({ secao, itens }) => (
               <Fragment key={secao.id}>
-                <tr className="bg-secondary/65">
-                  <td className="sticky left-0 z-10 border-b border-r border-border bg-secondary px-3 py-2 font-semibold text-heading">
+                <tr>
+                  <th scope="rowgroup" className="sticky left-0 z-20 w-56 border-b border-r border-border bg-secondary px-3 py-2 text-left text-xs font-semibold uppercase text-heading">
                     {secao.nome}
-                  </td>
-                  <td className="border-b border-r border-border px-2 py-2 text-center text-xs text-muted-foreground">
-                    {itens.length}
+                  </th>
+                  <td className="sticky left-56 z-20 w-20 border-b border-r border-border bg-secondary px-2 py-2 text-center shadow-[3px_0_5px_-4px_var(--border)]">
+                    {(() => {
+                      const selecionados = itens.reduce(
+                        (total, criterio) => total + exercicios.filter((exercicio) => temVinculo(exercicio.id, criterio.id)).length,
+                        0,
+                      );
+                      const total = itens.length * exercicios.length;
+                      return (
+                        <Checkbox
+                          aria-label={`Vincular critérios exibidos da seção ${secao.nome} a todos os exercícios`}
+                          checked={estadoSelecao(selecionados, total)}
+                          onCheckedChange={(valor) =>
+                            alterarPares(
+                              exercicios.flatMap((exercicio) => itens.map((criterio) => ({ exercicio_id: exercicio.id, criterio_id: criterio.id }))),
+                              valor === true,
+                            )
+                          }
+                        />
+                      );
+                    })()}
                   </td>
                   {exercicios.map((exercicio) => {
                     const quantidade = itens.filter((c) => temVinculo(exercicio.id, c.id)).length;
                     return (
-                      <td key={exercicio.id} className="border-b border-r border-border px-3 py-2 text-center last:border-r-0">
+                      <td key={exercicio.id} className="border-b border-r border-border bg-secondary px-2 py-2 text-center last:border-r-0">
                         <Checkbox
-                          aria-label={`Vincular seção ${secao.nome} a ${exercicio.nome}`}
-                          checked={quantidade === itens.length ? true : quantidade ? "indeterminate" : false}
+                          aria-label={`Vincular critérios exibidos da seção ${secao.nome} a ${exercicio.nome}`}
+                          checked={estadoSelecao(quantidade, itens.length)}
                           onCheckedChange={(valor) =>
-                            alterarGrupo(exercicio.id, itens.map((c) => c.id), valor === true)
+                            alterarPares(
+                              itens.map((criterio) => ({ exercicio_id: exercicio.id, criterio_id: criterio.id })),
+                              valor === true,
+                            )
                           }
                         />
                       </td>
@@ -352,24 +406,34 @@ function MatrizVinculos({
                 {itens.map((criterio) => {
                   const quantidade = exercicios.filter((e) => temVinculo(e.id, criterio.id)).length;
                   return (
-                    <tr key={criterio.id} className={quantidade ? "bg-card" : "bg-warning/5"}>
-                      <td className="sticky left-0 z-10 border-b border-r border-border bg-inherit px-3 py-2.5">
-                        <span className="block font-medium">{criterio.nome}</span>
-                        <span className="text-xs text-muted-foreground">Peso {criterio.peso} · usado em {quantidade}</span>
-                      </td>
-                      <td className="border-b border-r border-border px-2 py-2 text-center">
+                    <tr key={criterio.id} className="group/criterio">
+                      <th scope="row" className="sticky left-0 z-10 w-56 border-b border-r border-border bg-card px-3 py-2.5 text-left group-hover/criterio:bg-muted">
+                        <span className="line-clamp-3 block whitespace-normal font-medium leading-5" title={criterio.nome}>{criterio.nome}</span>
+                        <span className="mt-0.5 block text-xs font-normal text-muted-foreground">Peso {criterio.peso}</span>
+                      </th>
+                      <td className="sticky left-56 z-10 w-20 border-b border-r border-border bg-card px-2 py-2 text-center shadow-[3px_0_5px_-4px_var(--border)] group-hover/criterio:bg-muted">
                         <Checkbox
                           aria-label={`Vincular ${criterio.nome} a todos os exercícios`}
-                          checked={quantidade === exercicios.length ? true : quantidade ? "indeterminate" : false}
-                          onCheckedChange={(valor) => alterarCriterioEmTodos(criterio.id, valor === true)}
+                          checked={estadoSelecao(quantidade, exercicios.length)}
+                          onCheckedChange={(valor) =>
+                            alterarPares(
+                              exercicios.map((exercicio) => ({ exercicio_id: exercicio.id, criterio_id: criterio.id })),
+                              valor === true,
+                            )
+                          }
                         />
                       </td>
                       {exercicios.map((exercicio) => (
-                        <td key={exercicio.id} className="border-b border-r border-border px-3 py-2 text-center last:border-r-0">
+                        <td key={exercicio.id} className="border-b border-r border-border bg-card px-2 py-2 text-center group-hover/criterio:bg-muted last:border-r-0">
                           <Checkbox
                             aria-label={`Vincular ${criterio.nome} a ${exercicio.nome}`}
                             checked={temVinculo(exercicio.id, criterio.id)}
-                            onCheckedChange={(valor) => alterarGrupo(exercicio.id, [criterio.id], valor === true)}
+                            onCheckedChange={(valor) =>
+                              alterarPares(
+                                [{ exercicio_id: exercicio.id, criterio_id: criterio.id }],
+                                valor === true,
+                              )
+                            }
                           />
                         </td>
                       ))}
