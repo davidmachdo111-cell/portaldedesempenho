@@ -1,38 +1,98 @@
-# Matriz de critérios — proposta de refinamento
+# Reestruturação completa da Matriz de critérios
 
 ## Objetivo
-Tornar a matriz legível e operável com 10, 15 ou mais exercícios, sem alterar o cadastro de critérios, os vínculos salvos, a avaliação ou os cálculos de notas. Esta etapa é apenas uma análise: nenhuma implementação será feita agora.
+Transformar a matriz existente em uma área de trabalho limpa, previsível e confortável com 2, 10, 15, 24 ou mais exercícios. A alteração ficará restrita à apresentação e ao desempenho da matriz, preservando vínculos, salvamento, permissões, cálculos, histórico e o modo **Por exercício**.
 
-## Diagnóstico da tela atual
-- A matriz está no editor do Checklist Mestre e compartilha os mesmos vínculos e o mesmo salvamento do modo **Por exercício**.
-- A primeira coluna usa largura mínima, mas não fixa; a tabela usa `min-w-max` e colunas de exercício de largura variável. O scroll existe na própria matriz, porém sem limite vertical nem cabeçalho verticalmente fixo.
-- Cada critério mostra `Peso N · usado em X` e linhas sem vínculo recebem fundo amarelo suave. A seleção de critério já fica em **Todos** e nas colunas de exercícios, não na célula do peso.
-- Os números atuais são calculados a partir dos critérios, pesos e vínculos em memória, não são valores aleatórios. O custo de cálculo, porém, cresce porque cada célula verifica os vínculos por varredura do array e os totais são recalculados durante a renderização.
+## Diagnóstico da implementação atual
+- A tabela já usa os vínculos corretos e compartilha o mesmo estado com **Por exercício**, mas cada célula procura vínculos por varredura do array, multiplicando o custo com muitos critérios e exercícios.
+- Apenas **Seção / critério** está fixa horizontalmente. **Todos** ainda participa do fluxo móvel, causando risco de sobreposição durante a rolagem.
+- O cabeçalho não está fixo verticalmente e o contêiner não limita a altura; por isso a barra horizontal fica disponível somente no fim da tabela.
+- A primeira coluna tem apenas largura mínima e pode crescer. As colunas de exercício também não têm largura estrutural rígida.
+- Critérios sem vínculos recebem fundo amarelo e exibem `usado em X`, contrariando a hierarquia visual desejada.
+- A linha de seção mostra quantidade na coluna **Todos**, em vez do checkbox geral com estado vazio, marcado ou indeterminado.
+- Não existe título próprio da matriz nem o resumo informativo `X critérios · Y exercícios` junto da busca.
 
 ## Estrutura visual recomendada
 ```text
-Busca por critério
-┌──────────────────────┬────────┬─────────────┬─────────────┬─────────────┐
-│ Seção / critério     │ Todos  │ Exercício A │ Exercício B │ Exercício C │ →
-│ (coluna fixa)        │        │ 5 · 16 pts  │ 3 · 9 pts   │ 0 · 0 pts   │
-│                      │        │     □       │     □       │     □       │
-├──────────────────────┼────────┼─────────────┼─────────────┼─────────────┤
-│ Seção: Atendimento   │   ◩    │      ◩      │      □      │      ☑      │
-│ Critério com nome    │   ☑    │      ☑      │      □      │      ☑      │
-│ em até 2–3 linhas   │        │             │             │             │
-│ Peso 3               │        │             │             │             │
-└──────────────────────┴────────┴─────────────┴─────────────┴─────────────┘
+Matriz de critérios                         16 critérios · 24 exercícios
+[ Buscar critério                                                      ]
+
+┌────────────────────────┬────────┬────────────┬────────────┬────────────┐
+│ Seção / critério       │ Todos  │ Exercício 1│ Exercício 2│ Exercício 3│ →
+│                        │        │7 crit.·29pt│5 crit.·18pt│0 crit.·0pt │
+│                        │        │     ☑      │     ◩      │     □      │
+├────────────────────────┼────────┼────────────┼────────────┼────────────┤
+│ ATENDIMENTO            │   ◩    │     ☑      │     ◩      │     □      │
+├────────────────────────┼────────┼────────────┼────────────┼────────────┤
+│ Texto do critério em   │   ☑    │     ☑      │     □      │     ☑      │
+│ duas ou três linhas    │        │            │            │            │
+│ Peso 4                 │        │            │            │            │
+└────────────────────────┴────────┴────────────┴────────────┴────────────┘
+  área fixa opaca                    área horizontalmente navegável
 ```
 
-## Decisões de layout e interação
-1. **Primeira coluna:** largura fixa em torno de 220–240 px, ajustável ao espaço disponível; nome do critério quebra naturalmente em até três linhas. Para nomes maiores, oferecer o texto completo no foco/hover, sem aumentar a largura da tabela. `Peso 3` fica abaixo do nome, em texto secundário simples, sem chip, borda ou aparência de ação. Remover inteiramente `usado em X`.
-2. **Seleção:** a primeira coluna permanece apenas descritiva. Checkboxes aparecem somente em **Todos** e nas colunas de exercícios. A célula de seção em **Todos** seleciona os critérios daquela seção em todos os exercícios; a célula de seção de cada exercício seleciona aquela seção apenas naquele exercício. Cabeçalhos de exercícios continuam selecionando a coluna inteira. Estados parcial/total/vazio derivados dos vínculos reais; grupos vazios não exibem controle ativo.
-3. **Rolagem:** limitar a largura do contêiner à área disponível e deixar a tabela ter a largura de suas colunas. Rolar horizontalmente apenas dentro da matriz; manter a coluna descritiva fixa à esquerda, inclusive nas linhas de seção. Dar ao mesmo contêiner uma altura máxima razoável para rolagem vertical interna e fixar o cabeçalho dos exercícios no topo. No canto superior esquerdo, cruzar os dois posicionamentos fixos com camadas e fundos opacos adequados. O cabeçalho deve permanecer legível quando nomes quebrarem linha.
-4. **Densidade:** **Todos** estreita, colunas de exercícios com largura constante e compacta suficiente para nome, total e checkbox; nomes longos quebram em 2–3 linhas sem alargar uma coluna isolada. Divisórias finas e neutras, seção com ênfase tipográfica discreta; retirar o fundo amarelo de critérios sem vínculo. Eventual indicação de vínculo ausente deve ser neutra e não competir com a seleção.
-5. **Totais:** no cabeçalho de cada exercício, contar os critérios distintos efetivamente vinculados e somar seus pesos atuais; `0 critérios · 0 pts` quando vazio. Totais globais não devem variar com a busca. Ao filtrar, a seleção de seção deve agir somente nos critérios visíveis, com rótulo acessível que diga “critérios exibidos”; manter os totais por exercício calculados sobre todos os critérios, e não sobre o resultado da busca.
+## Implementação recomendada
 
-## Cuidados técnicos para a implementação futura
-- Usar uma única tabela semântica, com células de cabeçalho e associação de linhas/colunas para leitura por tecnologias assistivas. Dar nomes acessíveis específicos a cada checkbox e indicar seleção parcial no estado indeterminado.
-- Construir um índice de vínculos por exercício/critério (`Set` ou `Map`) uma vez por atualização, em vez de percorrer todos os vínculos para cada célula. Derivar contagens, pesos e estados desse índice e dos critérios existentes; deduplicar pares ao calcular totais e evitar mutações duplicadas em seleções em massa.
-- Manter largura estável via colunas com medidas explícitas; testar sticky em cruzamento, rolagem com teclado e foco visível, zoom do navegador, nomes longos, seções extensas e tema claro/escuro. Para dezenas de exercícios, a largura total da tabela ainda existirá, mas ficará confinada ao contêiner; considerar navegação entre colunas se a observação real mostrar necessidade, sem esconder exercícios por padrão.
-- Validar 0, 1, 10 e 15+ exercícios; nenhuma/algumas/todas as seleções; filtro ativo; mudança de peso; alternância entre **Matriz** e **Por exercício**; salvar e reabrir. Confirmar que totais e checkboxes refletem os mesmos vínculos após reabrir, sem modificar avaliações históricas.
+### 1. Cabeçalho e informações da matriz
+- Adicionar o título **Matriz de critérios**, a busca e o resumo real `X critérios · Y exercícios` em uma faixa compacta acima da tabela.
+- Exibir sempre todos os exercícios cadastrados; não criar seletor, limite ou paginação de colunas.
+- Manter o resumo global independente do filtro de busca.
+
+### 2. Geometria estável das colunas
+- Definir a tabela com medidas explícitas por `colgroup` ou estilos semânticos equivalentes.
+- Usar primeira coluna controlada, em torno de 220–240 px dentro do espaço real disponível, com quebra natural em até três linhas e texto completo acessível no foco/hover.
+- Fixar **Todos** em 72–84 px e cada exercício em aproximadamente 116–124 px.
+- Calcular o `left` de **Todos** pela mesma variável de largura usada na primeira coluna. Assim, largura visual e deslocamento sticky serão idênticos, sem correções artificiais por `z-index`.
+
+### 3. Rolagem e sticky combinados
+- Confinar `overflow-x` e `overflow-y` ao mesmo contêiner da matriz, com largura máxima do espaço disponível e altura máxima baseada na janela.
+- Fixar o cabeçalho no topo durante a rolagem vertical.
+- Fixar **Seção / critério** à esquerda e **Todos** imediatamente após ela durante a rolagem horizontal.
+- Tratar os cruzamentos do cabeçalho com as duas colunas fixas como células opacas de camada superior.
+- Manter uma única barra horizontal acessível no rodapé visível do contêiner. Como a matriz terá rolagem vertical interna, essa barra permanece disponível sem exigir chegar ao último critério.
+- Aplicar uma divisória ou sombra lateral muito sutil após **Todos**, deixando clara a transição entre área fixa e área móvel.
+
+### 4. Hierarquia visual
+- Remover completamente `usado em X` e manter apenas `Peso X` em texto secundário, sem chip, borda ou aparência de ação.
+- Retirar o fundo amarelo de critérios sem vínculo; o checkbox será o indicador principal do estado.
+- Usar fundo neutro discreto e tipografia mais firme nas linhas de seção, sem aparência de card.
+- Aplicar hover leve nas linhas de critérios e divisórias finas, evitando grade pesada.
+- Centralizar checkboxes apenas nas células **Todos** e exercícios. A coluna descritiva nunca terá seleção.
+- Organizar o cabeçalho do exercício em três níveis: nome quebrável, total real e checkbox.
+
+### 5. Seleções de grupo
+- Na linha de seção, exibir checkbox também em **Todos**.
+- Para cada exercício, o checkbox da seção representa somente os critérios visíveis daquela seção: vazio, marcado ou indeterminado.
+- Em **Todos**, o checkbox da seção representa os critérios visíveis daquela seção em todos os exercícios.
+- Ao clicar em estado parcial, completar a seleção; ao clicar em estado completo, limpar a seleção.
+- Grupos sem critérios não aparecem e não expõem controle ativo.
+- Manter labels específicos, como `Vincular critérios exibidos da seção Atendimento a Exercício 2`.
+
+### 6. Dados reais e desempenho
+- Construir uma vez por atualização um índice `Map<exercicioId, Set<criterioId>>`, deduplicando pares.
+- Derivar desse índice: estado de cada célula, totais por exercício, soma de pesos e estados de seção.
+- Criar também índices de critérios por ID e por seção, evitando filtros repetidos durante cada renderização.
+- Calcular totais sobre todos os critérios, mesmo quando a busca estiver ativa; a busca afeta somente linhas visíveis e ações de seção sobre o conteúdo exibido.
+- Preservar o array de vínculos esperado pelo salvamento atual e impedir duplicações em alterações individuais ou em massa.
+- Separar a matriz em componentes pequenos e memoizados somente onde a medição mostrar ganho, sem introduzir virtualização que quebre tabela semântica ou sticky.
+
+## Cuidados técnicos
+- Usar uma única tabela semântica, com cabeçalhos de linha/coluna e associações adequadas para leitura assistiva.
+- Preservar o componente Checkbox existente, incluindo `aria-checked="mixed"`, foco visível e operação por teclado.
+- Garantir fundos sólidos nas células fixas em tema claro e escuro.
+- Não criar chamadas adicionais ao backend; toda a interação continua no estado já carregado e usa o botão **Salvar** existente.
+- Não alterar o modo **Por exercício**, o modelo de dados, as regras de avaliação, permissões, histórico ou outras áreas do editor.
+- Não usar apenas sombra ou camada para esconder sobreposição: a correção depende de larguras compartilhadas, `left` exato e um único contêiner de rolagem.
+
+## Validação obrigatória
+- Conferir 2, 10, 15 e 24 exercícios, além de dezenas de critérios, nomes curtos e longos.
+- Testar nenhuma, algumas e todas as seleções; seleção individual, por seção, por critério em todos e por exercício completo.
+- Testar busca, seção sem resultado, totais globais durante filtro e ações apenas sobre critérios exibidos.
+- Combinar rolagem vertical e horizontal, verificando cabeçalho, primeira coluna, **Todos**, fundos opacos e ausência de sobreposição.
+- Confirmar que existe somente uma barra horizontal, sempre acessível dentro da matriz, e nenhum scroll horizontal na página.
+- Alternar entre **Matriz** e **Por exercício**, salvar, reabrir e confirmar os mesmos vínculos e totais.
+- Validar teclado, foco, estado indeterminado, zoom do navegador e temas claro/escuro.
+- Medir interação com 24 exercícios para confirmar ausência de travamentos ou renderizações excessivas.
+
+## Critério de conclusão
+A entrega estará concluída quando a matriz exibir todos os exercícios automaticamente, mantiver as duas primeiras colunas e o cabeçalho fixos sem sobreposição, apresentar somente dados reais, continuar sincronizada com **Por exercício** e permanecer fluida e legível nos cenários de maior volume.
