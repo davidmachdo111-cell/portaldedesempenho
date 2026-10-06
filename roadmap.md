@@ -32,3 +32,9 @@
 - [x] Permitir vínculos individuais e seleções em massa
 - [x] Manter o editor por exercício e o salvamento existente
 - [x] Validar testes, compilação e interação no navegador
+
+## Reestruturação da Matriz de critérios
+- [x] Fixar cabeçalho, primeira coluna e Todos sem sobreposição
+- [x] Remover "usado em X" e fundos amarelos
+- [x] Adicionar seleção de seção em Todos e contadores reais
+- [x] Indexar vínculos em memória e evitar duplicações
