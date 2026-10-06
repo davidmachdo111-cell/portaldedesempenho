@@ -48,6 +48,16 @@ import {
 } from "@/lib/checklists/checklists";
 
 export const Route = createFileRoute("/_authenticated/checklists/modelos/$id")({
+  head: () => ({
+    meta: [
+      { title: "Checklist Mestre | Portal de Desempenho" },
+      { name: "description", content: "Edição do Checklist Mestre e matriz de vínculos entre critérios e exercícios." },
+      { property: "og:title", content: "Checklist Mestre | Portal de Desempenho" },
+      { property: "og:description", content: "Edição do Checklist Mestre e matriz de vínculos entre critérios e exercícios." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();
     if (!data.user) throw redirect({ to: "/auth" });
