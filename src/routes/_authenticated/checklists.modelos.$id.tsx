@@ -48,6 +48,16 @@ import {
 } from "@/lib/checklists/checklists";
 
 export const Route = createFileRoute("/_authenticated/checklists/modelos/$id")({
+  head: () => ({
+    meta: [
+      { title: "Checklist Mestre | Portal de Desempenho" },
+      { name: "description", content: "Edição do Checklist Mestre e matriz de vínculos entre critérios e exercícios." },
+      { property: "og:title", content: "Checklist Mestre | Portal de Desempenho" },
+      { property: "og:description", content: "Edição do Checklist Mestre e matriz de vínculos entre critérios e exercícios." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   beforeLoad: async () => {
     const { data } = await supabase.auth.getUser();
     if (!data.user) throw redirect({ to: "/auth" });
@@ -318,31 +328,31 @@ function MatrizVinculos({
           {criterios.length} critérios · {exercicios.length} exercícios
         </p>
       </div>
-      <div className="max-h-[min(68vh,46rem)] max-w-full overflow-auto rounded-lg border border-border [scrollbar-gutter:stable]">
-        <table className="w-max min-w-full table-fixed border-separate border-spacing-0 text-sm">
+      <div className="relative isolate max-h-[min(68vh,46rem)] max-w-full overflow-auto rounded-lg border border-border bg-card [--matrix-criterion-width:22rem] [--matrix-all-width:4rem] [--matrix-exercise-width:11rem] [scrollbar-gutter:stable]">
+        <table className="w-px table-fixed border-separate border-spacing-0 text-sm">
           <colgroup>
-            <col className="w-56" />
-            <col className="w-20" />
-            {exercicios.map((exercicio) => <col key={exercicio.id} className="w-30" />)}
+            <col className="w-[var(--matrix-criterion-width)]" />
+            <col className="w-[var(--matrix-all-width)]" />
+            {exercicios.map((exercicio) => <col key={exercicio.id} className="w-[var(--matrix-exercise-width)]" />)}
           </colgroup>
           <thead className="relative z-30">
             <tr>
-              <th scope="col" className="sticky left-0 top-0 z-50 w-56 border-b border-r border-border bg-muted px-3 py-3 text-left font-semibold">
+              <th scope="col" className="sticky left-0 top-0 z-50 w-[var(--matrix-criterion-width)] border-b border-r border-border bg-card px-5 py-5 text-left align-middle font-semibold text-foreground">
                 Seção / critério
               </th>
-              <th scope="col" className="sticky left-56 top-0 z-50 w-20 border-b border-r border-border bg-muted px-2 py-3 text-center text-xs font-semibold shadow-[3px_0_5px_-4px_var(--border)]">
+              <th scope="col" className="sticky left-[var(--matrix-criterion-width)] top-0 z-50 w-[var(--matrix-all-width)] border-b border-r border-border bg-card px-2 py-5 text-center align-middle text-xs font-medium text-muted-foreground">
                 Todos
               </th>
               {exercicios.map((exercicio) => {
                 const total = totaisPorExercicio.get(exercicio.id) ?? { quantidade: 0, peso: 0 };
                 return (
-                  <th key={exercicio.id} scope="col" className="sticky top-0 z-40 w-30 border-b border-r border-border bg-muted px-2 py-3 text-center align-top last:border-r-0">
-                    <span className="line-clamp-3 block min-h-10 whitespace-normal font-semibold leading-5" title={exercicio.nome}>{exercicio.nome}</span>
+                  <th key={exercicio.id} scope="col" className="sticky top-0 z-40 w-[var(--matrix-exercise-width)] border-b border-r border-border bg-card px-4 py-5 text-center align-top last:border-r-0">
+                    <span className="block min-h-10 whitespace-normal break-words font-semibold leading-5 text-foreground" title={exercicio.nome}>{exercicio.nome}</span>
                     <span className="mt-1 block text-xs font-normal text-muted-foreground">
                       {total.quantidade} critérios · {total.peso} pts
                     </span>
                     <Checkbox
-                      className="mt-2"
+                      className="mx-auto mt-4 flex size-4"
                       aria-label={`Selecionar todos os critérios para ${exercicio.nome}`}
                       checked={estadoSelecao(total.quantidade, criterios.length)}
                       onCheckedChange={(valor) =>
@@ -361,10 +371,10 @@ function MatrizVinculos({
             {grupos.map(({ secao, itens }) => (
               <Fragment key={secao.id}>
                 <tr>
-                  <th scope="rowgroup" className="sticky left-0 z-20 w-56 border-b border-r border-border bg-secondary px-3 py-2 text-left text-xs font-semibold uppercase text-heading">
+                  <th scope="rowgroup" className="sticky left-0 z-20 w-[var(--matrix-criterion-width)] border-b border-r border-border bg-muted px-5 py-3.5 text-left text-xs font-semibold uppercase leading-5 text-foreground">
                     {secao.nome}
                   </th>
-                  <td className="sticky left-56 z-20 w-20 border-b border-r border-border bg-secondary px-2 py-2 text-center shadow-[3px_0_5px_-4px_var(--border)]">
+                  <td className="sticky left-[var(--matrix-criterion-width)] z-20 w-[var(--matrix-all-width)] border-b border-r border-border bg-muted px-2 py-3.5 text-center align-middle">
                     {(() => {
                       const selecionados = itens.reduce(
                         (total, criterio) => total + exercicios.filter((exercicio) => temVinculo(exercicio.id, criterio.id)).length,
@@ -373,6 +383,7 @@ function MatrizVinculos({
                       const total = itens.length * exercicios.length;
                       return (
                         <Checkbox
+                          className="mx-auto flex size-4"
                           aria-label={`Vincular critérios exibidos da seção ${secao.nome} a todos os exercícios`}
                           checked={estadoSelecao(selecionados, total)}
                           onCheckedChange={(valor) =>
@@ -388,8 +399,9 @@ function MatrizVinculos({
                   {exercicios.map((exercicio) => {
                     const quantidade = itens.filter((c) => temVinculo(exercicio.id, c.id)).length;
                     return (
-                      <td key={exercicio.id} className="border-b border-r border-border bg-secondary px-2 py-2 text-center last:border-r-0">
+                      <td key={exercicio.id} className="border-b border-r border-border bg-muted px-4 py-3.5 text-center align-middle last:border-r-0">
                         <Checkbox
+                          className="mx-auto flex size-4"
                           aria-label={`Vincular critérios exibidos da seção ${secao.nome} a ${exercicio.nome}`}
                           checked={estadoSelecao(quantidade, itens.length)}
                           onCheckedChange={(valor) =>
@@ -407,12 +419,13 @@ function MatrizVinculos({
                   const quantidade = exercicios.filter((e) => temVinculo(e.id, criterio.id)).length;
                   return (
                     <tr key={criterio.id} className="group/criterio">
-                      <th scope="row" className="sticky left-0 z-10 w-56 border-b border-r border-border bg-card px-3 py-2.5 text-left group-hover/criterio:bg-muted">
-                        <span className="line-clamp-3 block whitespace-normal font-medium leading-5" title={criterio.nome}>{criterio.nome}</span>
-                        <span className="mt-0.5 block text-xs font-normal text-muted-foreground">Peso {criterio.peso}</span>
+                      <th scope="row" className="sticky left-0 z-10 w-[var(--matrix-criterion-width)] border-b border-r border-border/60 bg-card px-5 py-4 text-left align-middle group-hover/criterio:bg-muted">
+                        <span className="block whitespace-normal break-words font-normal leading-6 text-foreground" title={criterio.nome}>{criterio.nome}</span>
+                        <span className="mt-1 block text-xs font-normal leading-4 text-muted-foreground">Peso {criterio.peso}</span>
                       </th>
-                      <td className="sticky left-56 z-10 w-20 border-b border-r border-border bg-card px-2 py-2 text-center shadow-[3px_0_5px_-4px_var(--border)] group-hover/criterio:bg-muted">
+                      <td className="sticky left-[var(--matrix-criterion-width)] z-10 w-[var(--matrix-all-width)] border-b border-r border-border/60 bg-card px-2 py-4 text-center align-middle group-hover/criterio:bg-muted">
                         <Checkbox
+                          className="mx-auto flex size-4"
                           aria-label={`Vincular ${criterio.nome} a todos os exercícios`}
                           checked={estadoSelecao(quantidade, exercicios.length)}
                           onCheckedChange={(valor) =>
@@ -424,8 +437,9 @@ function MatrizVinculos({
                         />
                       </td>
                       {exercicios.map((exercicio) => (
-                        <td key={exercicio.id} className="border-b border-r border-border bg-card px-2 py-2 text-center group-hover/criterio:bg-muted last:border-r-0">
+                        <td key={exercicio.id} className="border-b border-r border-border/60 bg-card px-4 py-4 text-center align-middle group-hover/criterio:bg-muted last:border-r-0">
                           <Checkbox
+                            className="mx-auto flex size-4"
                             aria-label={`Vincular ${criterio.nome} a ${exercicio.nome}`}
                             checked={temVinculo(exercicio.id, criterio.id)}
                             onCheckedChange={(valor) =>
