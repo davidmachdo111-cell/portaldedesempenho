@@ -224,6 +224,28 @@ function ItemExercicio({
   );
 }
 
+function CheckMatriz({
+  checked,
+  className,
+  ...props
+}: React.ComponentProps<typeof CheckboxPrimitive.Root>) {
+  return (
+    <CheckboxPrimitive.Root
+      checked={checked}
+      className={`mx-auto grid size-[18px] cursor-pointer place-content-center rounded-[5px] border-[1.5px] border-border bg-card transition-colors hover:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground data-[state=indeterminate]:border-primary data-[state=indeterminate]:bg-primary/10 data-[state=indeterminate]:text-primary ${className ?? ""}`}
+      {...props}
+    >
+      <CheckboxPrimitive.Indicator className="grid place-content-center">
+        {checked === "indeterminate" ? (
+          <Minus className="size-3" strokeWidth={3} />
+        ) : (
+          <Check className="size-3" strokeWidth={3} />
+        )}
+      </CheckboxPrimitive.Indicator>
+    </CheckboxPrimitive.Root>
+  );
+}
+
 function MatrizVinculos({
   exercicios,
   secoes,
