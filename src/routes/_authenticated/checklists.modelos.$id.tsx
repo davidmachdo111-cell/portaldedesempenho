@@ -224,28 +224,6 @@ function ItemExercicio({
   );
 }
 
-function CheckMatriz({
-  checked,
-  className,
-  ...props
-}: React.ComponentProps<typeof CheckboxPrimitive.Root>) {
-  return (
-    <CheckboxPrimitive.Root
-      checked={checked}
-      className={`mx-auto grid size-[18px] cursor-pointer place-content-center rounded-[5px] border-[1.5px] border-border bg-card transition-colors hover:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground data-[state=indeterminate]:border-primary data-[state=indeterminate]:bg-primary/10 data-[state=indeterminate]:text-primary ${className ?? ""}`}
-      {...props}
-    >
-      <CheckboxPrimitive.Indicator className="grid place-content-center">
-        {checked === "indeterminate" ? (
-          <Minus className="size-3" strokeWidth={3} />
-        ) : (
-          <Check className="size-3" strokeWidth={3} />
-        )}
-      </CheckboxPrimitive.Indicator>
-    </CheckboxPrimitive.Root>
-  );
-}
-
 function MatrizVinculos({
   exercicios,
   secoes,
@@ -331,10 +309,10 @@ function MatrizVinculos({
   }
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
+    <div className="criteria-matrix space-y-4">
+      <h3 className="text-sm font-semibold text-heading">Matriz de critérios</h3>
+      <div className="matrix-toolbar grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
         <div className="min-w-0">
-          <h3 className="text-sm font-semibold text-heading">Matriz de critérios</h3>
           <div className="relative mt-2 max-w-md">
             <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -350,7 +328,7 @@ function MatrizVinculos({
           {criterios.length} critérios · {exercicios.length} exercícios
         </p>
       </div>
-      <div className="relative isolate max-h-[min(68vh,46rem)] max-w-full overflow-auto rounded-lg border border-border bg-card [--matrix-criterion-width:22rem] [--matrix-all-width:4rem] [--matrix-exercise-width:11rem] [scrollbar-gutter:stable]">
+      <div className="matrix-scroll relative isolate max-h-[min(68vh,46rem)] max-w-full overflow-auto rounded-lg border border-border bg-card [--matrix-criterion-width:23.75rem] [--matrix-all-width:5rem] [--matrix-exercise-width:6.875rem] [scrollbar-gutter:stable]">
         <table className="w-px table-fixed border-separate border-spacing-0 text-sm">
           <colgroup>
             <col className="w-[var(--matrix-criterion-width)]" />

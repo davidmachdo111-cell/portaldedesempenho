@@ -211,6 +211,195 @@
   background-image: linear-gradient(135deg, var(--brand-dark) 0%, var(--brand) 65%, var(--brand-lime) 140%);
 }
 
+/* Reference styling is deliberately isolated from every other screen/control. */
+.criteria-matrix {
+  --matrix-surface: #ffffff;
+  --matrix-text: #17313e;
+  --matrix-secondary: #7c888e;
+  --matrix-line: #e7ebea;
+  --matrix-section: #f3f7f5;
+  --matrix-all: #f6faf7;
+  --matrix-green: #258c53;
+  --matrix-partial: #e5f4e9;
+  --matrix-empty-border: #bac3c0;
+  --matrix-label: #2d7351;
+  color: var(--matrix-text);
+  letter-spacing: 0;
+}
+
+.criteria-matrix .matrix-toolbar {
+  align-items: center;
+  gap: 20px;
+  padding: 13px 19px;
+  margin-bottom: 0;
+  border: 1px solid var(--matrix-line);
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+  background: var(--matrix-surface);
+}
+
+.criteria-matrix .matrix-toolbar .relative {
+  margin-top: 0;
+  max-width: 365px;
+}
+
+.criteria-matrix .matrix-toolbar input {
+  height: 35px;
+  border: 1px solid var(--matrix-empty-border);
+  border-radius: 8px;
+  background: var(--matrix-surface);
+  color: var(--matrix-text);
+  font-size: 13px;
+  box-shadow: none;
+}
+
+.criteria-matrix .matrix-toolbar input::placeholder,
+.criteria-matrix .matrix-toolbar svg,
+.criteria-matrix .matrix-toolbar p {
+  color: var(--matrix-secondary);
+}
+
+.criteria-matrix .matrix-toolbar p {
+  padding-bottom: 0;
+  font-size: 11px;
+}
+
+.criteria-matrix .matrix-scroll {
+  margin-top: 0;
+  border-color: var(--matrix-line);
+  border-radius: 0 0 12px 12px;
+  background: var(--matrix-surface);
+}
+
+.criteria-matrix table {
+  font-size: 13px;
+}
+
+.criteria-matrix th,
+.criteria-matrix td {
+  border-color: var(--matrix-line);
+  background: var(--matrix-surface);
+  color: var(--matrix-text);
+}
+
+.criteria-matrix thead th {
+  height: 109px;
+  padding: 16px 8px 14px;
+  vertical-align: top;
+}
+
+.criteria-matrix thead th:first-child {
+  padding: 18px 19px;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--matrix-secondary);
+}
+
+.criteria-matrix thead th:nth-child(2) {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--matrix-label);
+}
+
+.criteria-matrix thead th > span:first-child {
+  min-height: 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--matrix-text);
+}
+
+.criteria-matrix thead th > span:nth-child(2) {
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 15px;
+  color: var(--matrix-secondary);
+}
+
+.criteria-matrix thead [role="checkbox"] {
+  margin-top: 16px;
+}
+
+.criteria-matrix tbody th[scope="rowgroup"],
+.criteria-matrix tbody th[scope="rowgroup"] ~ td {
+  padding: 10px 8px;
+  background: var(--matrix-section);
+  font-size: 11px;
+  line-height: 17px;
+}
+
+.criteria-matrix tbody th[scope="rowgroup"] {
+  padding-left: 19px;
+  padding-right: 19px;
+}
+
+.criteria-matrix tbody th[scope="row"],
+.criteria-matrix tbody th[scope="row"] ~ td {
+  padding: 14px 8px;
+}
+
+.criteria-matrix tbody th[scope="row"] {
+  padding-left: 19px;
+  padding-right: 19px;
+}
+
+.criteria-matrix tbody th[scope="row"] > span:first-child {
+  color: var(--matrix-text);
+  line-height: 19px;
+}
+
+.criteria-matrix tbody th[scope="row"] > span:nth-child(2) {
+  margin-top: 5px;
+  color: var(--matrix-secondary);
+  font-size: 11px;
+  line-height: 15px;
+}
+
+.criteria-matrix tr > :nth-child(2) {
+  background: var(--matrix-all);
+}
+
+.criteria-matrix [role="checkbox"] {
+  position: relative;
+  display: grid;
+  width: 17px;
+  height: 17px;
+  border: 1px solid var(--matrix-empty-border);
+  border-radius: 4px;
+  background: var(--matrix-surface);
+  color: var(--matrix-green);
+  box-shadow: none;
+}
+
+.criteria-matrix [role="checkbox"][data-state="checked"] {
+  border-color: var(--matrix-green);
+  background: var(--matrix-green);
+  color: var(--matrix-surface);
+}
+
+.criteria-matrix [role="checkbox"] svg {
+  width: 13px;
+  height: 13px;
+  stroke-width: 3;
+}
+
+.criteria-matrix [role="checkbox"][data-state="indeterminate"] {
+  border-color: var(--matrix-green);
+  background: var(--matrix-partial);
+}
+
+.criteria-matrix [role="checkbox"][data-state="indeterminate"] svg {
+  display: none;
+}
+
+.criteria-matrix [role="checkbox"][data-state="indeterminate"]::after {
+  content: "";
+  position: absolute;
+  inset: 7px 3px auto;
+  height: 1px;
+  background: var(--matrix-green);
+}
+
 /* ---------- Impressão A4 (módulo Personagens e Exercícios) ---------- */
 .impressao-exercicio {
   display: none;

@@ -18,3 +18,4 @@
 - Regras críticas de exercícios, vínculos, conclusão e avaliação ficam em funções puras reutilizadas pela interface, permitindo testes determinísticos sem acessar dados reais.
 - A impressão de exercícios vinculados é renderizada na tela atual e chama o diálogo nativo, evitando navegação ou páginas ocultas.
 - Vínculos entre critérios e exercícios são editados pela matriz ou por exercício sobre o mesmo estado, preservando um único fluxo de salvamento.
+- Criteria matrix reference styling is scoped to its wrapper in the global stylesheet; shared controls remain unchanged to avoid affecting other screens.
