@@ -1,5 +1,15 @@
 # Roadmap de evolução do Portal de Desempenho
 
+## Revisão técnica e segurança
+- [ ] Auditar tabelas, policies, RPCs, grants e integridade existentes
+- [ ] Corrigir permissões granulares, ações, guards e autorização das funções
+- [ ] Reforçar RLS por operação e responsabilidade, sem alterar o visual
+- [ ] Salvar Checklist Mestre em transação com controle de concorrência
+- [ ] Garantir consistência administrativa com transação e compensação de Auth
+- [ ] Negar acesso sem profile ativo e corrigir Média geral por agregação
+- [ ] Revisar cache, erros, manutenção pontual e proteção de credenciais
+- [ ] Executar testes, lint e verificações de segurança; registrar relatório e limitações
+
 ## Otimização concluída
 - [x] Reduzir consultas repetidas, paginar listas e filtrar no banco
 - [x] Carregar conteúdos pesados sob demanda e estabilizar autosave
