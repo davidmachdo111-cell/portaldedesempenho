@@ -43,6 +43,13 @@
       "when": 1791542569203,
       "tag": "0005_transactional_checklist_structure_and_summary",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791542594415,
+      "tag": "0006_atomic_platform_user_configuration",
+      "breakpoints": true
     }
   ]
 }

@@ -1239,6 +1239,15 @@ export type Database = {
         Args: { _colaborador_id: string }
         Returns: boolean
       }
+      configurar_usuario: {
+        Args: {
+          _bootstrap?: boolean
+          _criar?: boolean
+          _dados: Json
+          _id: string
+        }
+        Returns: undefined
+      }
       has_any_permission: {
         Args: { _permissions: string[]; _user_id: string }
         Returns: boolean
