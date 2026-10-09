@@ -10,6 +10,7 @@ import { getBootstrapStatus, bootstrapFirstAdmin } from "@/lib/platform-admin.fu
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { validarProfileAtivo } from "@/lib/profile-access";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const Route = createFileRoute("/auth")({
@@ -45,8 +46,17 @@ function AuthPage() {
   const needsBootstrap = bootstrap?.needsBootstrap === true;
 
   useEffect(() => {
-    void supabase.auth.getSession().then(({ data }) => {
-      if (data.session) window.location.replace("/portal");
+    void supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user) return;
+      const { data: profile, error } = await supabase.from("profiles").select("active").eq("id", data.user.id).maybeSingle();
+      try {
+        if (error) throw new Error("Não foi possível verificar seu acesso.");
+        validarProfileAtivo(profile);
+        window.location.replace("/portal");
+      } catch (cause) {
+        await supabase.auth.signOut();
+        toast.error(cause instanceof Error ? cause.message : "Acesso não autorizado.");
+      }
     });
   }, []);
 
@@ -61,20 +71,27 @@ function AuthPage() {
     }
     const { data: auth } = await supabase.auth.getUser();
     if (auth.user) {
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("active")
         .eq("id", auth.user.id)
         .maybeSingle();
-      if (profile && profile.active === false) {
+      try {
+        if (profileError) throw new Error("Não foi possível verificar seu acesso. Tente novamente.");
+        validarProfileAtivo(profile);
+      } catch (cause) {
         await supabase.auth.signOut();
-        toast.error("Usuário inativo. Procure o administrador.");
+        toast.error(cause instanceof Error ? cause.message : "Acesso não autorizado.");
         return;
       }
       await supabase.from("user_sessions").insert({
         user_id: auth.user.id,
         user_agent: navigator.userAgent.slice(0, 300),
       });
+    } else {
+      await supabase.auth.signOut();
+      toast.error("Sessão inválida. Entre novamente.");
+      return;
     }
     window.location.replace("/portal");
   }

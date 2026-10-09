@@ -21,7 +21,7 @@ export const ALIAS_PARA_CANONICAS: Record<string, string[]> = {
     "colaboradores.editar",
     "colaboradores.excluir",
   ],
-  checklists: ["checklists.ver", "checklists.aplicar"],
+  checklists: ["checklists.ver"],
   checklists_gerenciar: [
     "checklists.mestre_criar",
     "checklists.mestre_editar",
@@ -42,12 +42,21 @@ export const ALIAS_PARA_CANONICAS: Record<string, string[]> = {
 export function expandirPermissoes(canonicas: string[], isAdmin = false): string[] {
   const set = new Set(canonicas);
   for (const [alias, chaves] of Object.entries(ALIAS_PARA_CANONICAS)) {
-    if (isAdmin || chaves.some((k) => set.has(k))) set.add(alias);
+    if (isAdmin || chaves.every((k) => set.has(k))) set.add(alias);
   }
   if (isAdmin) {
     for (const chaves of Object.values(ALIAS_PARA_CANONICAS)) chaves.forEach((k) => set.add(k));
   }
   return Array.from(set);
+}
+
+/** Acesso de navegação não concede ações; can() sempre testa a chave exata. */
+export function temPermissao(permissoes: string[], key: string, isAdmin = false) {
+  return isAdmin || permissoes.includes(key);
+}
+
+export function administradorPorPerfil(roleKeys: string[]) {
+  return roleKeys.includes("administrador");
 }
 
 /** Agrupamento das permissões por módulo, usado na tela de permissões individuais. */

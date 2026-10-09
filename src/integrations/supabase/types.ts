@@ -1239,6 +1239,15 @@ export type Database = {
         Args: { _colaborador_id: string }
         Returns: boolean
       }
+      configurar_usuario: {
+        Args: {
+          _bootstrap?: boolean
+          _criar?: boolean
+          _dados: Json
+          _id: string
+        }
+        Returns: undefined
+      }
       has_any_permission: {
         Args: { _permissions: string[]; _user_id: string }
         Returns: boolean
@@ -1253,6 +1262,7 @@ export type Database = {
         | { Args: { _user_id: string }; Returns: boolean }
       persona_liberada: { Args: { _persona_id: string }; Returns: boolean }
       persona_vinculada: { Args: { _persona_id: string }; Returns: boolean }
+      pode_acessar_colaborador: { Args: { _id: string }; Returns: boolean }
       pode_avaliar: { Args: { _user_id: string }; Returns: boolean }
       pode_baixar_material: { Args: { _path: string }; Returns: boolean }
       pode_gerenciar_checklists: {
@@ -1264,7 +1274,9 @@ export type Database = {
         Returns: boolean
       }
       pode_gerenciar_personas: { Args: { _user_id: string }; Returns: boolean }
+      pode_ler_checklist: { Args: { _id: string }; Returns: boolean }
       pode_ver_colaboradores: { Args: { _user_id: string }; Returns: boolean }
+      profile_ativo: { Args: { _user_id: string }; Returns: boolean }
       record_audit_event: {
         Args: {
           _action: string
@@ -1276,6 +1288,11 @@ export type Database = {
           _summary?: Json
         }
         Returns: string
+      }
+      resumo_avaliacoes: { Args: never; Returns: Json }
+      salvar_checklist_estrutura: {
+        Args: { _estrutura: Json; _novo?: boolean }
+        Returns: Json
       }
       simulado_liberado: { Args: { _simulacao_id: string }; Returns: boolean }
       simulado_vinculado: { Args: { _simulacao_id: string }; Returns: boolean }
