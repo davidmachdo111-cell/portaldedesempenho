@@ -1,6 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { expandirPermissoes } from "@/lib/permissions";
+import { administradorPorPerfil, expandirPermissoes } from "@/lib/permissions";
 import { carregarMeuAcesso } from "@/lib/platform-me.functions";
 
 export type PlatformProfile = {
@@ -26,16 +26,16 @@ export type PlatformModule = {
 /** Identidade + permissões do usuário autenticado (base de todo o controle de acesso). */
 export const meQueryOptions = queryOptions({
   queryKey: ["platform", "me"],
-  staleTime: 5 * 60_000,
+  staleTime: 0,
+  refetchOnMount: "always",
+  refetchOnWindowFocus: true,
+  retry: false,
   queryFn: async () => {
     const acesso = await carregarMeuAcesso();
     const roleKeys = acesso.roleKeys;
     const canonicas = acesso.canonicalPermissions;
 
-    const isAdmin =
-      roleKeys.includes("administrador") ||
-      roleKeys.includes("admin") ||
-      canonicas.includes("administracao.ver");
+    const isAdmin = administradorPorPerfil(roleKeys);
 
     return {
       userId: acesso.userId,
@@ -71,6 +71,8 @@ export const usersQueryOptions = queryOptions({
       supabase.from("user_permissions").select("user_id, permission_key"),
     ]);
     if (profiles.error) throw profiles.error;
+    if (roles.error) throw roles.error;
+    if (perms.error) throw perms.error;
     return (profiles.data as PlatformProfile[]).map((p) => ({
       ...p,
       roleKeys: (roles.data ?? []).filter((r) => r.user_id === p.id).map((r) => r.role_key),
@@ -89,6 +91,7 @@ export const rolesQueryOptions = queryOptions({
       supabase.from("role_permissions").select("role_key, permission_key"),
     ]);
     if (roles.error) throw roles.error;
+    if (rp.error) throw rp.error;
     return (roles.data ?? []).map((r) => ({
       ...r,
       permissionKeys: (rp.data ?? [])
