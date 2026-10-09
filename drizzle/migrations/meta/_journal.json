@@ -36,6 +36,13 @@
       "when": 1791542536598,
       "tag": "0004_granular_rls_and_relationship_scopes",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791542569203,
+      "tag": "0005_transactional_checklist_structure_and_summary",
+      "breakpoints": true
     }
   ]
 }

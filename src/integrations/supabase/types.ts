@@ -1280,6 +1280,11 @@ export type Database = {
         }
         Returns: string
       }
+      resumo_avaliacoes: { Args: never; Returns: Json }
+      salvar_checklist_estrutura: {
+        Args: { _estrutura: Json; _novo?: boolean }
+        Returns: Json
+      }
       simulado_liberado: { Args: { _simulacao_id: string }; Returns: boolean }
       simulado_vinculado: { Args: { _simulacao_id: string }; Returns: boolean }
     }
