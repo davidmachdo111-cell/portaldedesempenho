@@ -29,6 +29,13 @@
       "when": 1791542505290,
       "tag": "0003_active_profiles_and_safe_permission_aliases",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791542536598,
+      "tag": "0004_granular_rls_and_relationship_scopes",
+      "breakpoints": true
     }
   ]
 }
